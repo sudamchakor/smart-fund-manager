@@ -1,5 +1,5 @@
 {
-  "homepage": "https://{sudamchakor}.github.io/emiCalculator",
+  "homepage": "https://sudamchakor.github.io/emiCalculator",
   "name": "emi-calculator",
   "version": "0.1.0",
   "private": true,
@@ -49,5 +49,15 @@
   "devDependencies": {
     "gh-pages": "^6.3.0",
     "prettier": "3.8.1"
-  }
+  },
+  "keywords": [
+    "emi",
+    "calculator",
+    "loan",
+    "finance",
+    "react",
+    "interest-calculator",
+    "mortgage",
+    "web-app"
+  ]
 }
