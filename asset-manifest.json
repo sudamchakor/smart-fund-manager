@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/emiCalculator/static/css/main.277d0f15.css",
-    "main.js": "/emiCalculator/static/js/main.f378a6fa.js",
+    "main.js": "/emiCalculator/static/js/main.b74cfc79.js",
     "index.html": "/emiCalculator/index.html",
     "main.277d0f15.css.map": "/emiCalculator/static/css/main.277d0f15.css.map",
-    "main.f378a6fa.js.map": "/emiCalculator/static/js/main.f378a6fa.js.map"
+    "main.b74cfc79.js.map": "/emiCalculator/static/js/main.b74cfc79.js.map"
   },
   "entrypoints": [
     "static/css/main.277d0f15.css",
-    "static/js/main.f378a6fa.js"
+    "static/js/main.b74cfc79.js"
   ]
 }
