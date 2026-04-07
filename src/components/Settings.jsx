@@ -16,10 +16,9 @@ import {
   useMediaQuery,
   Snackbar,
   Alert,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "@mui/material";
 import { useEmiContext } from "../context/EmiContext";
+import ThemeSelector from "./ThemeSelector";
 
 const Settings = () => {
   const {
@@ -36,20 +35,6 @@ const Settings = () => {
   const [useSystemDefault, setUseSystemDefault] = useState(false);
   const [openToast, setOpenToast] = useState(false);
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
-  // Component for the little color dot
-  const ColorDot = ({ color }) => (
-    <Box
-      sx={{
-        width: 12,
-        height: 12,
-        borderRadius: "50%",
-        bgcolor: color,
-        mr: 1,
-        border: "1px solid rgba(0,0,0,0.1)",
-      }}
-    />
-  );
 
   useEffect(() => {
     if (useSystemDefault) setThemeMode(prefersDarkMode ? "dark" : "light");
@@ -97,31 +82,11 @@ const Settings = () => {
                 />
               </Stack>
 
-              <ToggleButtonGroup
-                fullWidth
-                value={themeMode}
-                exclusive
-                onChange={(e, next) => next && setThemeMode(next)}
+              <ThemeSelector
+                selectedTheme={themeMode}
+                onThemeChange={setThemeMode}
                 disabled={useSystemDefault}
-                size="small"
-                color="primary"
-              >
-                <ToggleButton value="light">
-                  <ColorDot color="#fff" /> Light
-                </ToggleButton>
-                <ToggleButton value="dark">
-                  <ColorDot color="#121212" /> Dark
-                </ToggleButton>
-                <ToggleButton value="blue">
-                  <ColorDot color="#1976d2" /> Blue
-                </ToggleButton>
-                <ToggleButton value="green">
-                  <ColorDot color="#2e7d32" /> Green
-                </ToggleButton>
-                <ToggleButton value="yellow">
-                  <ColorDot color="#fbc02d" /> Yellow
-                </ToggleButton>
-              </ToggleButtonGroup>
+              />
             </Box>
 
             <Divider />

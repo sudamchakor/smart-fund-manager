@@ -46,7 +46,7 @@ export const EmiProvider = ({ children }) => {
   });
 
   const [currency, setCurrency] = useState(
-    () => localStorage.getItem("emi_currency") || "INR",
+    () => localStorage.getItem("emi_currency") || "₹",
   );
   const [themeMode, setThemeMode] = useState(
     () => localStorage.getItem("emi_theme") || "light",
@@ -193,6 +193,7 @@ export const EmiProvider = ({ children }) => {
         taxes: taxesYearlyInRs / 12,
         homeInsurance: homeInsYearlyInRs / 12,
         maintenance: expenses.maintenance,
+        totalPayment: principalForMonth + interestForMonth + prepayForMonth,
       });
     }
 
@@ -246,30 +247,47 @@ export const EmiProvider = ({ children }) => {
     const oldUnit = loanDetails[unitField];
     if (oldUnit === newUnit) return;
 
-    let currentAmount = loanDetails[amountField] || 0;
-    let baseValue = loanDetails.homeValue;
+    if (unitField === "tenureUnit") {
+      const currentTenure = loanDetails.loanTenure;
+      let newTenure = currentTenure;
 
-    if (unitField === "feesUnit") {
-      const marginInRs =
-        loanDetails.marginUnit === "%"
-          ? (loanDetails.homeValue * loanDetails.marginAmount) / 100
-          : loanDetails.marginAmount;
-      baseValue =
-        loanDetails.homeValue + loanDetails.loanInsurance - marginInRs;
-    }
+      if (newUnit === "months" && oldUnit === "years") {
+        newTenure = Math.round(currentTenure * 12);
+      } else if (newUnit === "years" && oldUnit === "months") {
+        newTenure = parseFloat((currentTenure / 12).toFixed(2));
+      }
 
-    let newAmount = currentAmount;
-    if (newUnit === "%") {
-      newAmount = baseValue ? (currentAmount / baseValue) * 100 : 0;
+      setLoanDetails((prev) => ({
+        ...prev,
+        [unitField]: newUnit,
+        [amountField]: newTenure,
+      }));
     } else {
-      newAmount = (currentAmount * baseValue) / 100;
-    }
+      let currentAmount = loanDetails[amountField] || 0;
+      let baseValue = loanDetails.homeValue;
 
-    setLoanDetails((prev) => ({
-      ...prev,
-      [unitField]: newUnit,
-      [amountField]: Number(newAmount.toFixed(2)),
-    }));
+      if (unitField === "feesUnit") {
+        const marginInRs =
+          loanDetails.marginUnit === "%"
+            ? (loanDetails.homeValue * loanDetails.marginAmount) / 100
+            : loanDetails.marginAmount;
+        baseValue =
+          loanDetails.homeValue + loanDetails.loanInsurance - marginInRs;
+      }
+
+      let newAmount = currentAmount;
+      if (newUnit === "%") {
+        newAmount = baseValue ? (currentAmount / baseValue) * 100 : 0;
+      } else {
+        newAmount = (currentAmount * baseValue) / 100;
+      }
+
+      setLoanDetails((prev) => ({
+        ...prev,
+        [unitField]: newUnit,
+        [amountField]: Number(newAmount.toFixed(2)),
+      }));
+    }
   };
 
   const changeExpenseUnit = (unitField, amountField, newUnit) => {
@@ -281,7 +299,7 @@ export const EmiProvider = ({ children }) => {
 
     let newAmount = currentAmount;
     if (newUnit === "%") {
-      newAmount = baseValue ? (currentAmount / baseValue) * 100 : 0;
+      newAmount = baseValue ? (currentAmount / baseValue) * 100 : 0.0;
     } else {
       newAmount = (currentAmount * baseValue) / 100;
     }

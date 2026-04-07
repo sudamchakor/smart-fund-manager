@@ -9,31 +9,15 @@ const PieChartComponent = () => {
   const { calculatedValues, expenses, currency } = useEmiContext();
   const theme = useTheme();
 
-  const getColors = () => {
-    if (theme.palette.mode === "dark") {
-      return [
-        theme.palette.primary.light,
-        theme.palette.secondary.light,
-        theme.palette.error.light,
-        theme.palette.warning.light,
-        theme.palette.info.light,
-        theme.palette.success.light,
-        "#ce93d8", // purple light
-      ];
-    } else {
-      return [
-        theme.palette.primary.main,
-        theme.palette.secondary.main,
-        theme.palette.error.main,
-        theme.palette.warning.main,
-        theme.palette.info.main,
-        theme.palette.success.main,
-        "#9c27b0", // purple main
-      ];
-    }
-  };
-
-  const COLORS = getColors();
+  const COLORS = [
+    theme.palette.primary.main,
+    theme.palette.secondary.main,
+    theme.palette.warning.main,
+    theme.palette.info.main,
+    theme.palette.error.main,
+    theme.palette.success.main,
+    '#9d8d8f',
+  ];
 
   const data = [
     { name: "Down Payment", value: calculatedValues.marginInRs },

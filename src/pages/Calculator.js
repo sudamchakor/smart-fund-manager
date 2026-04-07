@@ -2,8 +2,8 @@ import React from "react";
 import { Grid, Box, Paper, Typography } from "@mui/material";
 import HomeLoanForm from "../components/HomeLoanForm";
 import PrepaymentsForm from "../components/PrepaymentsForm";
-import PieChartComponent from "../components/PieChartComponent";
-import PaymentSchedule from "../components/PaymentSchedule";
+import AnalyticsCard from "../components/AnalyticsCard";
+import PaymentScheduleTable from "../components/PaymentScheduleTable";
 import TotalMonthlyPayment from "../components/TotalMonthlyPayment";
 import "./Calculator.scss";
 import { useEmiContext } from "../context/EmiContext";
@@ -38,9 +38,7 @@ const Calculator = () => {
         </Grid>
         
         <Grid item xs={12}>
-          <Paper elevation={3} className="calculator-paper">
-            <PieChartComponent />
-          </Paper>
+          <AnalyticsCard />
         </Grid>
 
         {/* Full Width Row: Payment Schedule */}
@@ -51,7 +49,7 @@ const Calculator = () => {
                 Home Loan Payment Schedule ({startMonthYear} - {endMonthYear})
               </Typography>
             </Box>
-            <PaymentSchedule />
+            <PaymentScheduleTable />
           </Paper>
         </Grid>
       </Grid>

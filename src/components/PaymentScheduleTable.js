@@ -9,22 +9,24 @@ import {
   Paper,
 } from "@mui/material";
 import { useEmiContext } from "../context/EmiContext";
+import { useTheme } from "@mui/material/styles";
 
-const PaymentSchedule = () => {
+const PaymentScheduleTable = () => {
   const { calculatedValues, currency } = useEmiContext();
   const schedule = calculatedValues.schedule;
+  const theme = useTheme();
 
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
+        <TableHead sx={{ backgroundColor: theme.palette.primary.main }}>
           <TableRow>
-            <TableCell>Month</TableCell>
-            <TableCell align="right">Principal</TableCell>
-            <TableCell align="right">Interest</TableCell>
-            <TableCell align="right">Prepayment</TableCell>
-            <TableCell align="right">Total Payment</TableCell>
-            <TableCell align="right">Balance</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }}>Month</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }} align="right">Principal</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }} align="right">Interest</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }} align="right">Prepayment</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }} align="right">Total Payment</TableCell>
+            <TableCell sx={{ color: theme.palette.primary.contrastText }} align="right">Balance</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -64,4 +66,4 @@ const PaymentSchedule = () => {
   );
 };
 
-export default PaymentSchedule;
+export default PaymentScheduleTable;

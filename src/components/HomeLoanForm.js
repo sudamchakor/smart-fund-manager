@@ -32,11 +32,7 @@ const HomeLoanForm = () => {
   } = useEmiContext();
 
   const handleUnitChange = (unitField, amountField, event) => {
-    if (unitField === "tenureUnit") {
-      updateLoanDetails(unitField, event.target.value);
-    } else {
-      changeLoanUnit(unitField, amountField, event.target.value);
-    }
+    changeLoanUnit(unitField, amountField, event.target.value);
   };
 
   const handleChange = (field, event) => {

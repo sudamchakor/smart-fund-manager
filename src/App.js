@@ -1,5 +1,5 @@
-import React, { useMemo, useEffect } from "react";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import React, { useState, useMemo, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -16,72 +16,46 @@ import Settings from "./components/Settings";
 // Styles
 import "./App.css";
 
-import {
-  blue,
-  lightBlue,
-  green,
-  lightGreen,
-  yellow,
-  amber,
-} from "@mui/material/colors";
-
 const AppContent = () => {
   const { themeMode } = useEmiContext();
+  const [muiTheme, setMuiTheme] = useState(() => createTheme());
 
   useEffect(() => {
+    // Set the data-theme attribute on the body
     document.body.setAttribute("data-theme", themeMode);
-  }, [themeMode]);
 
-  const theme = useMemo(() => {
-    let palette = {
-      primary: { main: "#1e90ff" },
-      background: { default: "#f5f5f5" },
-      mode: "light",
-    };
+    // After setting the attribute, the new CSS variables are active.
+    // Read the computed values of the CSS variables.
+    const computedStyle = getComputedStyle(document.body);
+    const primaryColor = computedStyle.getPropertyValue('--primary-color').trim();
+    const secondaryColor = computedStyle.getPropertyValue('--secondary-color').trim();
+    const backgroundColor = computedStyle.getPropertyValue('--background-color').trim();
+    const surfaceColor = computedStyle.getPropertyValue('--surface-color').trim();
+    const textPrimaryColor = computedStyle.getPropertyValue('--text-primary-color').trim();
+    const textSecondaryColor = computedStyle.getPropertyValue('--text-secondary-color').trim();
 
-    if (themeMode === "dark") {
-      palette = {
-        primary: { main: "#90caf9" },
-        background: { default: "#121212", paper: "#1e1e1e" },
-        mode: "dark",
-      };
-      document.documentElement.style.setProperty("--primary-color", "#333");
-    } else if (themeMode === "blue") {
-      palette = {
-        primary: blue,
-        secondary: lightBlue,
-        background: { default: "#e3f2fd", paper: "#ffffff" },
-        mode: "light",
-      };
-      document.documentElement.style.setProperty("--primary-color", blue[700]);
-    } else if (themeMode === "green") {
-      palette = {
-        primary: green,
-        secondary: lightGreen,
-        background: { default: "#e8f5e9", paper: "#ffffff" },
-        mode: "light",
-      };
-      document.documentElement.style.setProperty("--primary-color", green[700]);
-    } else if (themeMode === "yellow") {
-      palette = {
-        primary: amber,
-        secondary: yellow,
-        background: { default: "#fffde7", paper: "#ffffff" },
-        mode: "light",
-      };
-      document.documentElement.style.setProperty("--primary-color", amber[700]);
-    } else {
-      document.documentElement.style.setProperty(
-        "--primary-color",
-        "dodgerblue",
-      );
-    }
+    // Create a new MUI theme with the computed values
+    const newTheme = createTheme({
+      palette: {
+        mode: themeMode === 'dark' ? 'dark' : 'light',
+        primary: { main: primaryColor || '#000' },
+        secondary: { main: secondaryColor || '#000' },
+        background: {
+          default: backgroundColor,
+          paper: surfaceColor,
+        },
+        text: {
+          primary: textPrimaryColor,
+          secondary: textSecondaryColor,
+        },
+      },
+    });
 
-    return createTheme({ palette });
+    setMuiTheme(newTheme);
   }, [themeMode]);
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={muiTheme}>
       <CssBaseline />
       <Box className="app-container">
         <Header />
