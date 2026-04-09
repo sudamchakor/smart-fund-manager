@@ -8,7 +8,7 @@ import {
   Stack,
 } from "@mui/material";
 
-const themes = [
+export const themes = [
   {
     name: "DodgerBlue", // M3 Professional Baseline
     value: "dodgerblue",
@@ -50,26 +50,32 @@ const ThemeSelector = ({ selectedTheme, onThemeChange, disabled }) => {
   return (
     <Grid container spacing={2}>
       {themes.map((theme) => (
-        <Grid item xs={2.4} key={theme.value}>
+        // xs={12} makes it 1 per row on mobile
+        // sm={6}  makes it 2 per row on tablets
+        // md={2.4} keeps it at 5 per row on desktop
+        <Grid item xs={12} sm={6} md={2.4} key={theme.value}>
           <Card
             variant="outlined"
             sx={{
               borderColor:
-                selectedTheme === theme.value ? "primary.main" : "transparent",
+                selectedTheme === theme.value ? "primary.main" : "divider",
               borderWidth: 2,
+              borderRadius: 1.5,
+              boxShadow: selectedTheme === theme.value ? 1 : 0,
             }}
           >
             <CardActionArea
               onClick={() => onThemeChange(theme.value)}
               disabled={disabled}
             >
-              <Stack direction="row" sx={{ height: 60 }}>
+              {/* Responsive height: shorter on mobile to prevent long scrolling */}
+              <Stack direction="row" sx={{ height: { xs: 30, sm: 40 } }}>
                 {theme.colors.map((color, index) => (
                   <Box
                     key={index}
                     sx={{
                       height: "100%",
-                      width: "20%",
+                      width: `${100 / theme.colors.length}%`,
                       backgroundColor: color,
                     }}
                   />
@@ -79,7 +85,12 @@ const ThemeSelector = ({ selectedTheme, onThemeChange, disabled }) => {
                 variant="caption"
                 align="center"
                 display="block"
-                p={1}
+                sx={{
+                  py: 0.5,
+                  fontWeight: selectedTheme === theme.value ? 600 : 400,
+                  fontSize: "0.75rem",
+                  textTransform: "capitalize",
+                }}
               >
                 {theme.name}
               </Typography>
@@ -90,5 +101,4 @@ const ThemeSelector = ({ selectedTheme, onThemeChange, disabled }) => {
     </Grid>
   );
 };
-
 export default ThemeSelector;

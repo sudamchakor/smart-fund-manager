@@ -9,9 +9,6 @@ export const useEmiContext = () => useContext(EmiContext);
 
 // The Provider Component
 export const EmiProvider = ({ children }) => {
-  // const [currency, setCurrency] = useState('₹');
-  // const [themeMode, setThemeMode] = useState('light'); // 'light', 'dark', 'blue'
-
   // State for Home Loan Details
   const [loanDetails, setLoanDetails] = useState({
     homeValue: 5000000,
@@ -183,8 +180,10 @@ export const EmiProvider = ({ children }) => {
       totalPrincipal += principalForMonth;
       totalPrepayments += prepayForMonth;
 
-      const totalPayment = principalForMonth + interestForMonth + prepayForMonth;
-      const paidPercent = loanAmount > 0 ? ((loanAmount - balance) / loanAmount) * 100 : 0;
+      const totalPayment =
+        principalForMonth + interestForMonth + prepayForMonth;
+      const paidPercent =
+        loanAmount > 0 ? ((loanAmount - balance) / loanAmount) * 100 : 0;
 
       schedule.push({
         month: i,

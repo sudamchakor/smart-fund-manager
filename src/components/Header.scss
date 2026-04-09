@@ -1,5 +1,5 @@
 .header-appbar {
-  background-color: dodgerblue !important;
+  background-color: var(--primary-color) !important;
 
   @media print {
     display: none !important;

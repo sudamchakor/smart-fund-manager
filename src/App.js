@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ThemeProvider, createTheme, CssBaseline, Box } from "@mui/material";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { HelmetProvider } from 'react-helmet-async'; // Import HelmetProvider
+import { HelmetProvider } from "react-helmet-async";
 
 // Context
 import { EmiProvider, useEmiContext } from "./context/EmiContext";
@@ -13,6 +13,7 @@ import Header from "./components/Header";
 import Calculator from "./pages/Calculator";
 import FAQ from "./pages/FAQ";
 import Settings from "./components/Settings";
+import { themes } from "./components/ThemeSelector";
 
 // Styles
 import "./App.css";
@@ -22,32 +23,36 @@ const AppContent = () => {
   const [muiTheme, setMuiTheme] = useState(() => createTheme());
 
   useEffect(() => {
-    // Set the data-theme attribute on the body
-    document.body.setAttribute("data-theme", themeMode);
+    let currentThemeValue = themeMode;
+    if (currentThemeValue === "light") {
+      currentThemeValue = "dodgerblue";
+    }
 
-    // After setting the attribute, the new CSS variables are active.
-    // Read the computed values of the CSS variables.
-    const computedStyle = getComputedStyle(document.body);
-    const primaryColor = computedStyle.getPropertyValue('--primary-color').trim();
-    const secondaryColor = computedStyle.getPropertyValue('--secondary-color').trim();
-    const backgroundColor = computedStyle.getPropertyValue('--background-color').trim();
-    const surfaceColor = computedStyle.getPropertyValue('--surface-color').trim();
-    const textPrimaryColor = computedStyle.getPropertyValue('--text-primary-color').trim();
-    const textSecondaryColor = computedStyle.getPropertyValue('--text-secondary-color').trim();
+    const selectedTheme = themes.find((t) => t.value === currentThemeValue) || themes[0];
+    const [primary, secondary, background, textPrimary, textSecondary] = selectedTheme.colors;
 
-    // Create a new MUI theme with the computed values
+    document.body.setAttribute("data-theme", String(currentThemeValue));
+    
+    // Set variables to ensure any vanilla CSS gets updated immediately
+    document.body.style.setProperty("--primary-color", primary);
+    document.body.style.setProperty("--secondary-color", secondary);
+    document.body.style.setProperty("--background-color", background);
+    document.body.style.setProperty("--surface-color", currentThemeValue === "dark" ? "#1C1B1F" : "#ffffff");
+    document.body.style.setProperty("--text-primary-color", textPrimary);
+    document.body.style.setProperty("--text-secondary-color", textSecondary);
+
     const newTheme = createTheme({
       palette: {
-        mode: themeMode === 'dark' ? 'dark' : 'light',
-        primary: { main: primaryColor || '#000' },
-        secondary: { main: secondaryColor || '#000' },
+        mode: currentThemeValue === "dark" ? "dark" : "light",
+        primary: { main: primary },
+        secondary: { main: secondary },
         background: {
-          default: backgroundColor,
-          paper: surfaceColor,
+          default: background,
+          paper: currentThemeValue === "dark" ? "#1C1B1F" : "#ffffff",
         },
         text: {
-          primary: textPrimaryColor,
-          secondary: textSecondaryColor,
+          primary: textPrimary,
+          secondary: textSecondary,
         },
       },
     });
@@ -76,7 +81,7 @@ function App() {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <EmiProvider>
-        <HelmetProvider> {/* Wrap AppContent with HelmetProvider */}
+        <HelmetProvider>
           <AppContent />
         </HelmetProvider>
       </EmiProvider>
