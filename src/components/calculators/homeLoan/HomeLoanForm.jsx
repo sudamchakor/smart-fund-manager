@@ -25,7 +25,7 @@ const HomeLoanForm = () => {
   const currency = useSelector(selectCurrency);
 
   const handleUnitChange = (unitField, amountField, event) => {
-    dispatch(changeLoanUnit({ unitField, amountField, value: event.target.value }));
+    dispatch(changeLoanUnit({ unitField, amountField, newUnit: event.target.value }));
   };
 
   const handleChange = (field, event) => {
@@ -35,7 +35,7 @@ const HomeLoanForm = () => {
   };
 
   const handleExpenseUnitChange = (unitField, amountField, event) => {
-    dispatch(changeExpenseUnit({ unitField, amountField, value: event.target.value }));
+    dispatch(changeExpenseUnit({ unitField, amountField, newUnit: event.target.value }));
   };
 
   const handleExpenseChange = (field, event) => {

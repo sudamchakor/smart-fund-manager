@@ -55,17 +55,6 @@ const BarChartComponent = () => {
       if (chunk.length > 1) {
         label = `${chunk[0].date} - ${chunk[chunk.length - 1].date}`;
       }
-      
-      // If chunk is exactly multiple of 12 months starting from month 1, we can use Year labels optionally
-      if (chunkSize >= 12 && (i % 12 === 0)) {
-         const startYear = Math.floor(i / 12) + 1;
-         const endYear = Math.floor((i + chunk.length - 1) / 12) + 1;
-         if (startYear === endYear) {
-             label = `Year ${startYear}`;
-         } else {
-             label = `Years ${startYear}-${endYear}`;
-         }
-      }
 
       groupedData.push({
         label,
