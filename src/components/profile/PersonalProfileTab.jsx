@@ -48,7 +48,7 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
 } from "recharts";
-import TotalMonthlyPayment from "../TotalMonthlyPayment"; // Import TotalMonthlyPayment
+import ExpenseReadOnlyItem from "../common/ExpenseReadOnlyItem";
 
 const COLORS = ["#ff6b6b", "#4ecdc4", "#9c27b0", "#2ecc71"];
 
@@ -71,8 +71,6 @@ export default function PersonalProfileTab() {
 
   // totalMonthlyPayment now only refers to the EMI part, as other expenses are in profileSlice
   const totalMonthlyPayment = monthlyEmi;
-
-  console.log("Sudam monthly payment", totalMonthlyPayment);
 
   const totalExpensesIncludingLoan = totalProfileExpenses + (monthlyEmi || 0); // Ensure monthlyEmi defaults to 0 for calculation
 
@@ -374,9 +372,31 @@ export default function PersonalProfileTab() {
               </Tooltip>
             )}
           </Typography>
+          {monthlyEmi > 0 && (
+            <ExpenseReadOnlyItem
+              item={{
+                name: "Home Loan EMI",
+                amount: monthlyEmi,
+                frequency: "monthly",
+              }}
+              currency={currency}
+              isExpense={true}
+              totalIncome={totalIncome}
+              expenseRatio={(monthlyEmi / totalIncome) * 100}
+              getExpenseColor={() => {
+                const ratio = (monthlyEmi / totalIncome) * 100;
+                if (ratio > 40) return "error.main";
+                if (ratio > 30) return "warning.main";
+                return "success.main";
+              }}
+              formatCurrency={formatCurrency}
+              onDelete={() => {}} // Read only
+              setIsEditing={() => {}} // Read only
+              isReadOnly={true}
+            />
+          )}
           {expenses &&
             expenses.map((exp) => {
-              console.log(exp, "Sudam");
               return (
                 <EditableIncomeExpenseItem
                   key={exp.id}
