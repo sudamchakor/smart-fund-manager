@@ -1,6 +1,19 @@
-import React, { createContext, useState, useContext, useMemo, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useMemo,
+  useEffect,
+} from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { selectThemeMode, selectCurrency, selectAutoSave, setThemeMode as reduxSetThemeMode, setCurrency as reduxSetCurrency, setAutoSave as reduxSetAutoSave } from "../store/emiSlice";
+import {
+  selectThemeMode,
+  selectCurrency,
+  selectAutoSave,
+  setThemeMode as reduxSetThemeMode,
+  setCurrency as reduxSetCurrency,
+  setAutoSave as reduxSetAutoSave,
+} from "../store/emiSlice";
 import dayjs from "dayjs";
 
 // Create the Context
@@ -64,9 +77,6 @@ export const EmiProvider = ({ children }) => {
     maintenance: 0, // monthly Rs
   });
 
-  // State for loading
-  const [isCalculating, setIsCalculating] = useState(false);
-
   const [saveTrigger, setSaveTrigger] = useState(0);
 
   const saveSettingsToLocal = (data) => {
@@ -85,7 +95,7 @@ export const EmiProvider = ({ children }) => {
     const feesInRs =
       loanDetails.feesUnit === "%"
         ? (loanAmount * loanDetails.loanFees) / 100
-        : loanDetails.loanFees;
+        : loanDetails.loanFees; // Corrected: should be loanDetails.loanFees directly if unit is 'Rs'
     const tenureInMonths =
       loanDetails.tenureUnit === "years"
         ? loanDetails.loanTenure * 12
@@ -214,7 +224,7 @@ export const EmiProvider = ({ children }) => {
       taxesYearlyInRs * (schedule.length / 12) +
       homeInsYearlyInRs * (schedule.length / 12) +
       expenses.maintenance * schedule.length;
-
+    
     return {
       marginInRs,
       loanAmount,
@@ -232,15 +242,11 @@ export const EmiProvider = ({ children }) => {
     };
   }, [loanDetails, expenses, prepayments]);
 
-  // Effect to handle loading state
-  useEffect(() => {
-    setIsCalculating(true);
-    const timer = setTimeout(() => setIsCalculating(false), 500); // Simulate loading for 500ms
-    return () => clearTimeout(timer);
-  }, [loanDetails, expenses, prepayments]);
-
   const updateLoanDetails = (key, value) => {
-    setLoanDetails((prev) => ({ ...prev, [key]: value }));
+    setLoanDetails((prev) => ({
+      ...prev,
+      [key]: key === "startDate" ? dayjs(value) : value,
+    }));
   };
 
   const updateExpenses = (key, value) => {
@@ -252,7 +258,7 @@ export const EmiProvider = ({ children }) => {
       ...prev,
       [type]: {
         ...prev[type],
-        [key]: value,
+        [key]: key === "startDate" || key === "date" ? dayjs(value) : value,
       },
     }));
   };
@@ -268,7 +274,7 @@ export const EmiProvider = ({ children }) => {
       if (newUnit === "months" && oldUnit === "years") {
         newTenure = Math.round(currentTenure * 12);
       } else if (newUnit === "years" && oldUnit === "months") {
-        newTenure = parseFloat((currentTenure / 12).toFixed(2));
+        newTenure = currentTenure / 12;
       }
 
       setLoanDetails((prev) => ({
@@ -299,7 +305,7 @@ export const EmiProvider = ({ children }) => {
       setLoanDetails((prev) => ({
         ...prev,
         [unitField]: newUnit,
-        [amountField]: Number(newAmount.toFixed(2)),
+        [amountField]: newAmount,
       }));
     }
   };
@@ -321,7 +327,7 @@ export const EmiProvider = ({ children }) => {
     setExpenses((prev) => ({
       ...prev,
       [unitField]: newUnit,
-      [amountField]: Number(newAmount.toFixed(2)),
+      [amountField]: newAmount,
     }));
   };
 
@@ -345,8 +351,6 @@ export const EmiProvider = ({ children }) => {
         setAutoSave,
         saveSettingsToLocal,
         saveTrigger,
-        isCalculating,
-        setIsCalculating,
       }}
     >
       {children}

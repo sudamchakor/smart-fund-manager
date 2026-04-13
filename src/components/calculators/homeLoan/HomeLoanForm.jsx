@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import { Box, Paper, Typography, Grid, Divider } from "@mui/material";
-import { useSelector, useDispatch } from 'react-redux';
-import { selectLoanDetails, selectExpenses, selectCalculatedValues, selectCurrency, updateLoanDetails, updateExpenses, changeLoanUnit, changeExpenseUnit } from "../../../store/emiSlice";
+// import { useSelector, useDispatch } from 'react-redux'; // Remove Redux imports
+// import { selectLoanDetails, selectExpenses, selectCalculatedValues, selectCurrency, updateLoanDetails, updateExpenses, changeLoanUnit, changeExpenseUnit } from "../../../store/emiSlice"; // Remove Redux imports
+import { useEmiContext } from "../../../context/EmiContext"; // Import useEmiContext
 import { AmountInput, AmountWithUnitInput, DatePickerInput } from "../../common/CommonComponents";
 
 const StyledPaper = styled(Paper)`
@@ -18,30 +19,46 @@ const SectionHeader = styled(Box)`
 `;
 
 const HomeLoanForm = () => {
-  const dispatch = useDispatch();
-  const loanDetails = useSelector(selectLoanDetails);
-  const expenses = useSelector(selectExpenses);
-  const calculatedValues = useSelector(selectCalculatedValues);
-  const currency = useSelector(selectCurrency);
+  // const dispatch = useDispatch(); // Remove useDispatch
+  // const loanDetails = useSelector(selectLoanDetails); // Remove useSelector
+  // const expenses = useSelector(selectExpenses); // Remove useSelector
+  // const calculatedValues = useSelector(selectCalculatedValues); // Remove useSelector
+  // const currency = useSelector(selectCurrency); // Remove useSelector
+
+  // Use useEmiContext to get state and update functions
+  const {
+    loanDetails,
+    expenses,
+    calculatedValues,
+    currency,
+    updateLoanDetails,
+    updateExpenses,
+    changeLoanUnit,
+    changeExpenseUnit,
+  } = useEmiContext();
 
   const handleUnitChange = (unitField, amountField, event) => {
-    dispatch(changeLoanUnit({ unitField, amountField, newUnit: event.target.value }));
+    // dispatch(changeLoanUnit({ unitField, amountField, newUnit: event.target.value })); // Old Redux dispatch
+    changeLoanUnit(unitField, amountField, event.target.value); // Use context function
   };
 
   const handleChange = (field, event) => {
     let value = parseFloat(event.target.value);
     if (isNaN(value)) value = 0;
-    dispatch(updateLoanDetails({ key: field, value }));
+    // dispatch(updateLoanDetails({ key: field, value })); // Old Redux dispatch
+    updateLoanDetails(field, value); // Use context function
   };
 
   const handleExpenseUnitChange = (unitField, amountField, event) => {
-    dispatch(changeExpenseUnit({ unitField, amountField, newUnit: event.target.value }));
+    // dispatch(changeExpenseUnit({ unitField, amountField, newUnit: event.target.value })); // Old Redux dispatch
+    changeExpenseUnit(unitField, amountField, event.target.value); // Use context function
   };
 
   const handleExpenseChange = (field, event) => {
     let value = parseFloat(event.target.value);
     if (isNaN(value)) value = 0;
-    dispatch(updateExpenses({ key: field, value }));
+    // dispatch(updateExpenses({ key: field, value })); // Old Redux dispatch
+    updateExpenses(field, value); // Use context function
   };
 
   return (
@@ -75,7 +92,7 @@ const HomeLoanForm = () => {
             placeholder="Enter margin amount"
           />
           <Typography variant="caption" color="textSecondary">
-            Value in {currency}: {calculatedValues.marginInRs.toFixed(2)}
+            Value in {currency}: {(calculatedValues?.marginInRs ?? 0).toFixed(2)}
           </Typography>
         </Grid>
 
@@ -92,7 +109,7 @@ const HomeLoanForm = () => {
         <Grid item xs={12} sm={6} md={6} lg={4} xl={3}>
           <AmountInput
             label="Loan Amount"
-            value={calculatedValues.loanAmount.toFixed(2)}
+            value={(calculatedValues?.loanAmount ?? 0).toFixed(2)}
             disabled={true}
             currency={currency}
           />
@@ -142,7 +159,7 @@ const HomeLoanForm = () => {
           <DatePickerInput
             label="Start Month & Year"
             value={loanDetails.startDate}
-            onChange={(newValue) => dispatch(updateLoanDetails({ key: "startDate", value: newValue }))}
+            onChange={(newValue) => updateLoanDetails("startDate", newValue)} // Use context function
           />
         </Grid>
       </Grid>
@@ -171,7 +188,7 @@ const HomeLoanForm = () => {
             placeholder="Enter yearly increase"
           />
            <Typography variant="caption" color="textSecondary">
-            Value in {currency}: {calculatedValues.yearlyIncreaseAmountRs.toFixed(2)}
+            Value in {currency}: {(calculatedValues?.yearlyIncreaseAmountRs ?? 0).toFixed(2)}
           </Typography>
         </Grid>
       </Grid>

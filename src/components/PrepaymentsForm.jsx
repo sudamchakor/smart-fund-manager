@@ -3,6 +3,8 @@ import styled from "styled-components";
 import { Box, Typography, Grid, Paper, CircularProgress } from "@mui/material";
 import { useEmiContext } from "../context/EmiContext";
 import { AmountInput, DatePickerInput } from "./common/CommonComponents";
+// import { useDispatch } from "react-redux"; // Remove useDispatch
+// import { updatePrepayments as reduxUpdatePrepayments } from "../store/emiSlice"; // Remove reduxUpdatePrepayments
 
 const StyledPaper = styled(Paper)`
   padding: 24px;
@@ -78,13 +80,13 @@ const PrepaymentSection = ({
 );
 
 const PrepaymentsForm = () => {
-  const { prepayments, updatePrepayments, currency, isCalculating } =
-    useEmiContext();
+  const { prepayments, currency, updatePrepayments } = useEmiContext(); // Removed isCalculating
+  // const dispatch = useDispatch(); // Remove useDispatch
 
   const handleAmountChange = (type, event) => {
     let value = parseFloat(event.target.value);
     if (isNaN(value)) value = 0;
-    updatePrepayments(type, "amount", value);
+    updatePrepayments(type, "amount", value); // Use context's updatePrepayments
   };
 
   const handleDateChange = (type, newValue) => {
@@ -92,7 +94,7 @@ const PrepaymentsForm = () => {
       type,
       type === "oneTime" ? "date" : "startDate",
       newValue,
-    );
+    ); // Use context's updatePrepayments
   };
 
   return (
@@ -112,11 +114,12 @@ const PrepaymentsForm = () => {
         role="region"
         aria-label="Prepayments section"
       >
-        {isCalculating && (
+        {/* Removed conditional rendering based on isCalculating */}
+        {/* {isCalculating && (
           <LoadingOverlay>
             <CircularProgress size={40} aria-label="Loading prepayments" />
           </LoadingOverlay>
-        )}
+        )} */}
         <PrepaymentSection
           title="Monthly Payment"
           amountValue={prepayments.monthly.amount}
