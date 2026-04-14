@@ -20,7 +20,7 @@ const TAB_ROUTES = [
   "/investment/lumpsum",
   "/investment/step-up-sip",
   "/investment/swp",
-  "/investment/fd", // New route for FD Calculator
+  "/investment/fd",
 ];
 
 const InvestmentCalculator = () => {
@@ -30,7 +30,7 @@ const InvestmentCalculator = () => {
   // Determine active tab based on current URL
   const currentTabIndex = TAB_ROUTES.indexOf(location.pathname);
   const [tabIndex, setTabIndex] = useState(
-    currentTabIndex !== -1 ? currentTabIndex : 0
+    currentTabIndex !== -1 ? currentTabIndex : 0,
   );
 
   // Sync tab with URL
@@ -73,7 +73,8 @@ const InvestmentCalculator = () => {
   const handleTabChange = (event, newValue) => {
     setTabIndex(newValue);
     navigate(TAB_ROUTES[newValue]);
-    // We intentionally DO NOT reset the data or shared state here 
+    console.log("sudam", newValue, TAB_ROUTES);
+    // We intentionally DO NOT reset the data or shared state here
     // so that the other forms can use the derived amounts.
   };
 
@@ -103,144 +104,156 @@ const InvestmentCalculator = () => {
             iconPosition="start"
           />
           <Tab icon={<SavingsIcon />} label="SWP" iconPosition="start" />
-          <Tab icon={<AccountBalanceIcon />} label="FD" iconPosition="start" /> {/* New Tab for FD */}
+          <Tab icon={<AccountBalanceIcon />} label="FD" iconPosition="start" />
         </Tabs>
-      
 
-      <Box sx={{ p: 3 }}>
-        <Grid container spacing={3}>
-          <Grid item xs={12} md={5}>
-            <Box sx={{ pr: { md: 2 }, borderRight: { md: '1px solid #eee' }, height: '100%' }}>
-              {tabIndex === 0 && (
-                <SipCalculatorForm 
-                  onCalculate={setInvestmentData} 
-                  sharedState={sharedState}
-                  onSharedStateChange={handleSharedStateChange}
-                />
-              )}
-              {tabIndex === 1 && (
-                <LumpsumCalculatorForm 
-                  onCalculate={setInvestmentData} 
-                  sharedState={sharedState}
-                  onSharedStateChange={handleSharedStateChange}
-                />
-              )}
-              {tabIndex === 2 && (
-                <StepUpSipCalculatorForm 
-                  onCalculate={setInvestmentData}
-                  sharedState={sharedState}
-                  onSharedStateChange={handleSharedStateChange}
-                />
-              )}
-              {tabIndex === 3 && (
-                <SwpCalculatorForm 
-                  onCalculate={setInvestmentData} 
-                  sharedState={sharedState}
-                  onSharedStateChange={handleSharedStateChange}
-                />
-              )}
-              {tabIndex === 4 && ( // New condition for FD Calculator
-                <FdCalculatorForm 
-                  onCalculate={setInvestmentData} 
-                  sharedState={sharedState}
-                  onSharedStateChange={handleSharedStateChange}
-                />
-              )}
-            </Box>
-          </Grid>
+        <Box sx={{ p: 3 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={5}>
+              <Box
+                sx={{
+                  pr: { md: 2 },
+                  borderRight: { md: "1px solid #eee" },
+                  height: "100%",
+                }}
+              >
+                {tabIndex === 0 && (
+                  <SipCalculatorForm
+                    onCalculate={setInvestmentData}
+                    sharedState={sharedState}
+                    onSharedStateChange={handleSharedStateChange}
+                  />
+                )}
+                {tabIndex === 1 && (
+                  <LumpsumCalculatorForm
+                    onCalculate={setInvestmentData}
+                    sharedState={sharedState}
+                    onSharedStateChange={handleSharedStateChange}
+                  />
+                )}
+                {tabIndex === 2 && (
+                  <StepUpSipCalculatorForm
+                    onCalculate={setInvestmentData}
+                    sharedState={sharedState}
+                    onSharedStateChange={handleSharedStateChange}
+                  />
+                )}
+                {tabIndex === 3 && (
+                  <SwpCalculatorForm
+                    onCalculate={setInvestmentData}
+                    sharedState={sharedState}
+                    onSharedStateChange={handleSharedStateChange}
+                  />
+                )}
+                {tabIndex === 4 && ( // New condition for FD Calculator
+                  <FdCalculatorForm
+                    onCalculate={setInvestmentData}
+                    sharedState={sharedState}
+                    onSharedStateChange={handleSharedStateChange}
+                  />
+                )}
+              </Box>
+            </Grid>
 
-          <Grid item xs={12} md={7}>
-            <Box
-              sx={{
-                pl: { md: 2 },
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Typography variant="h6" gutterBottom>
-                Investment Summary
-              </Typography>
+            <Grid item xs={12} md={7}>
+              <Box
+                sx={{
+                  pl: { md: 2 },
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  Investment Summary
+                </Typography>
 
-              {investmentData.totalValue > 0 || tabIndex === 3 || tabIndex === 4 ? ( // Added tabIndex 4 for FD
-                <Box sx={{ flexGrow: 1 }}>
-                  <Grid container spacing={2} sx={{ mb: 4 }}>
-                    <Grid item xs={12} sm={4}>
-                      <Box textAlign="center">
-                        <Typography variant="body2" color="textSecondary">
-                          {tabIndex === 3 ? "Total Investment" : "Total Investment"}
-                        </Typography>
-                        <Typography variant="h6">
-                          ₹{investmentData.investedAmount.toLocaleString("en-IN")}
-                        </Typography>
-                      </Box>
-                    </Grid>
-
-                    {tabIndex === 3 ? (
+                {investmentData.totalValue > 0 ||
+                tabIndex === 3 ||
+                tabIndex === 4 ? ( // Added tabIndex 4 for FD
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Grid container spacing={2} sx={{ mb: 4 }}>
                       <Grid item xs={12} sm={4}>
                         <Box textAlign="center">
                           <Typography variant="body2" color="textSecondary">
-                            Total Withdrawn
+                            {tabIndex === 3
+                              ? "Total Investment"
+                              : "Total Investment"}
                           </Typography>
-                          <Typography variant="h6" color="warning.main">
+                          <Typography variant="h6">
                             ₹
-                            {investmentData.totalWithdrawn
-                              ? investmentData.totalWithdrawn.toLocaleString(
-                                  "en-IN"
-                                )
-                              : 0}
-                          </Typography>
-                        </Box>
-                      </Grid>
-                    ) : (
-                      <Grid item xs={12} sm={4}>
-                        <Box textAlign="center">
-                          <Typography variant="body2" color="textSecondary">
-                            Est. Returns
-                          </Typography>
-                          <Typography variant="h6" color="success.main">
-                            ₹
-                            {investmentData.estimatedReturns.toLocaleString(
-                              "en-IN"
+                            {investmentData.investedAmount.toLocaleString(
+                              "en-IN",
                             )}
                           </Typography>
                         </Box>
                       </Grid>
-                    )}
 
-                    <Grid item xs={12} sm={4}>
-                      <Box textAlign="center">
-                        <Typography variant="body2" color="textSecondary">
-                          {tabIndex === 3 ? "Final Balance" : "Total Value"}
-                        </Typography>
-                        <Typography variant="h6" color="primary.main">
-                          ₹{investmentData.totalValue.toLocaleString("en-IN")}
-                        </Typography>
-                      </Box>
+                      {tabIndex === 3 ? (
+                        <Grid item xs={12} sm={4}>
+                          <Box textAlign="center">
+                            <Typography variant="body2" color="textSecondary">
+                              Total Withdrawn
+                            </Typography>
+                            <Typography variant="h6" color="warning.main">
+                              ₹
+                              {investmentData.totalWithdrawn
+                                ? investmentData.totalWithdrawn.toLocaleString(
+                                    "en-IN",
+                                  )
+                                : 0}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      ) : (
+                        <Grid item xs={12} sm={4}>
+                          <Box textAlign="center">
+                            <Typography variant="body2" color="textSecondary">
+                              Est. Returns
+                            </Typography>
+                            <Typography variant="h6" color="success.main">
+                              ₹
+                              {investmentData.estimatedReturns.toLocaleString(
+                                "en-IN",
+                              )}
+                            </Typography>
+                          </Box>
+                        </Grid>
+                      )}
+
+                      <Grid item xs={12} sm={4}>
+                        <Box textAlign="center">
+                          <Typography variant="body2" color="textSecondary">
+                            {tabIndex === 3 ? "Final Balance" : "Total Value"}
+                          </Typography>
+                          <Typography variant="h6" color="primary.main">
+                            ₹{investmentData.totalValue.toLocaleString("en-IN")}
+                          </Typography>
+                        </Box>
+                      </Grid>
                     </Grid>
-                  </Grid>
 
-                  <Box sx={{ height: 350 }}>
-                    <InvestmentChart data={investmentData.chartData} />
+                    <Box sx={{ height: 350 }}>
+                      <InvestmentChart data={investmentData.chartData} />
+                    </Box>
                   </Box>
-                </Box>
-              ) : (
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  height="100%"
-                  minHeight="300px"
-                >
-                  <Typography variant="body1" color="textSecondary">
-                    Enter values to see the investment projection
-                  </Typography>
-                </Box>
-              )}
-            </Box>
+                ) : (
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    height="100%"
+                    minHeight="300px"
+                  >
+                    <Typography variant="body1" color="textSecondary">
+                      Enter values to see the investment projection
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
+            </Grid>
           </Grid>
-        </Grid>
-      </Box>
+        </Box>
       </Paper>
     </Box>
   );

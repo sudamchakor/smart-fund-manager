@@ -26,7 +26,7 @@ import TaxCalculator from "./pages/TaxCalculator";
 
 // Styles
 import "./App.css";
-import FdCalculatorForm from "./components/calculators/investment/FdCalculatorForm";
+// import FdCalculatorForm from "./components/calculators/investment/FdCalculatorForm"; // This import is no longer needed here
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -137,7 +137,7 @@ const AppContent = () => {
               element={<InvestmentCalculator />}
             />
             <Route path="/investment/swp" element={<InvestmentCalculator />} />
-            <Route path="/investment/fd" element={<FdCalculatorForm />} />
+            <Route path="/investment/fd" element={<InvestmentCalculator />} /> {/* Changed to InvestmentCalculator */}
 
             <Route path="/personal-loan" element={<PersonalLoanCalculator />} />
             <Route path="/faq" element={<FAQ />} />
