@@ -149,6 +149,90 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
     return { ...plan, details: generatePlanSummary(plan) };
   };
 
+  // Helper function to calculate results and generate full summary for a single plan
+  const calculatePlanResults = (plan) => {
+    let result = {};
+    let investedAmount = 0;
+    let estimatedReturns = 0;
+    let totalValue = 0;
+
+    const formatAmount = (amount) =>
+      (amount || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+
+    switch (plan.type) {
+      case "sip":
+        result = calculateSip(
+          plan.monthlyInvestment,
+          plan.expectedReturnRate,
+          plan.timePeriod,
+        );
+        investedAmount = result.investedAmount;
+        estimatedReturns = result.estimatedReturns;
+        totalValue = result.totalValue;
+        break;
+      case "lumpsum":
+        result = calculateLumpsum(
+          plan.totalInvestment,
+          plan.expectedReturnRate,
+          plan.timePeriod,
+        );
+        investedAmount = result.investedAmount;
+        estimatedReturns = result.estimatedReturns;
+        totalValue = result.totalValue;
+        break;
+      case "stepUpSip":
+        result = calculateStepUpSip(
+          plan.monthlyInvestment,
+          plan.expectedReturnRate,
+          plan.timePeriod,
+          plan.stepUpPercentage,
+        );
+        investedAmount = result.investedAmount;
+        estimatedReturns = result.estimatedReturns;
+        totalValue = result.totalValue;
+        break;
+      case "swp":
+        result = calculateSwp(
+          plan.totalInvestment,
+          plan.expectedReturnRate,
+          plan.timePeriod,
+          plan.withdrawalPerMonth,
+        );
+        investedAmount = result.principal; // For SWP, principal is the invested amount
+        estimatedReturns = result.totalWithdrawn - result.principal; // Returns are total withdrawn minus principal
+        totalValue = result.totalValue; // Remaining balance
+        break;
+      case "fd":
+        result = calculateFd(
+          plan.principalAmount,
+          plan.interestRate,
+          plan.timePeriod,
+          plan.compoundingFrequency,
+        );
+        investedAmount = result.investedAmount;
+        estimatedReturns = result.estimatedReturns;
+        totalValue = result.totalValue;
+        break;
+      default:
+        break;
+    }
+
+    let fullSummary = "";
+    if (Object.keys(result).length > 0) {
+      const details = generatePlanSummary(plan); // Ensure details are up-to-date
+      fullSummary = `${details}\n\nInvested Amount: ₹${formatAmount(investedAmount)}\n\nEst. Returns: ₹${formatAmount(estimatedReturns)}\n\nTotal Value: ₹${formatAmount(totalValue)}`;
+    }
+
+    return {
+      ...plan,
+      ...result, // Spread result to include calculated values
+      investedAmount,
+      estimatedReturns,
+      totalValue,
+      fullSummary,
+    };
+  };
+
   const [editedGoal, setEditedGoal] = useState(() => {
     const initialTargetAmount = goal?.targetAmount || 0;
     const initialTimePeriod = goal?.targetYear
@@ -158,29 +242,34 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
     if (goal && goal.investmentPlans && goal.investmentPlans.length > 0) {
       return {
         ...goal,
-        investmentPlans: goal.investmentPlans.map((plan) => ({
-          ...plan,
-          details: generatePlanSummary(plan), // Ensure details are generated for existing plans
-        })),
+        investmentPlans: goal.investmentPlans.map((plan) => {
+          const planWithDetails = {
+            ...plan,
+            details: generatePlanSummary(plan),
+          };
+          return calculatePlanResults(planWithDetails); // Ensure fullSummary is generated
+        }),
       };
     } else if (goal && goal.investmentType) {
       // If an old goal has investmentType, convert it to a plan
+      const defaultPlan = getDefaultPlanState(
+        goal.investmentType,
+        initialTargetAmount,
+        initialTimePeriod,
+      );
       return {
         ...goal,
-        investmentPlans: [
-          getDefaultPlanState(
-            goal.investmentType,
-            initialTargetAmount,
-            initialTimePeriod,
-          ),
-        ],
+        investmentPlans: [calculatePlanResults(defaultPlan)], // Ensure fullSummary is generated
       };
     }
+    const defaultPlan = getDefaultPlanState(
+      "sip",
+      initialTargetAmount,
+      initialTimePeriod,
+    );
     return {
       ...goal,
-      investmentPlans: [
-        getDefaultPlanState("sip", initialTargetAmount, initialTimePeriod),
-      ],
+      investmentPlans: [calculatePlanResults(defaultPlan)], // Ensure fullSummary is generated
     };
   });
 
@@ -203,10 +292,13 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
       if (goal && goal.investmentPlans && goal.investmentPlans.length > 0) {
         newEditedGoal = {
           ...goal,
-          investmentPlans: goal.investmentPlans.map((plan) => ({
-            ...plan,
-            details: generatePlanSummary(plan), // Ensure details are generated for existing plans
-          })),
+          investmentPlans: goal.investmentPlans.map((plan) => {
+            const planWithDetails = {
+              ...plan,
+              details: generatePlanSummary(plan),
+            };
+            return calculatePlanResults(planWithDetails); // Ensure fullSummary is generated
+          }),
         };
       } else if (goal && goal.investmentType) {
         const defaultPlan = getDefaultPlanState(
@@ -216,7 +308,7 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
         );
         newEditedGoal = {
           ...goal,
-          investmentPlans: [defaultPlan],
+          investmentPlans: [calculatePlanResults(defaultPlan)], // Ensure fullSummary is generated
         };
       } else {
         const defaultPlan = getDefaultPlanState(
@@ -226,7 +318,7 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
         );
         newEditedGoal = {
           ...goal,
-          investmentPlans: [defaultPlan],
+          investmentPlans: [calculatePlanResults(defaultPlan)], // Ensure fullSummary is generated
         };
       }
       return newEditedGoal;
@@ -246,8 +338,10 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
       ...prev,
       investmentPlans: [
         ...prev.investmentPlans,
-        getDefaultPlanState("sip", currentTargetAmount, currentTimePeriod),
-      ], // Add a default SIP plan
+        calculatePlanResults(
+          getDefaultPlanState("sip", currentTargetAmount, currentTimePeriod),
+        ), // Add a default SIP plan with full summary
+      ],
     }));
   };
 
@@ -264,9 +358,29 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
     setEditedGoal((prev) => {
       const updatedPlans = prev.investmentPlans.map((plan) => {
         if (plan.id === id) {
-          const updatedPlan = { ...plan, [field]: value };
-          // Recalculate details string after updating the plan
-          return { ...updatedPlan, details: generatePlanSummary(updatedPlan) };
+          let updatedPlan = { ...plan, [field]: value };
+
+          if (field === "type") {
+            // When type changes, get default values for the new type
+            const currentTargetAmount = prev.targetAmount || 0;
+            const currentTimePeriod = prev.targetYear
+              ? prev.targetYear - currentYear
+              : 10;
+            const newDefaultPlan = getDefaultPlanState(
+              value,
+              currentTargetAmount,
+              currentTimePeriod,
+            );
+            // Merge new default values, but keep the original ID
+            updatedPlan = { ...newDefaultPlan, id: plan.id, type: value };
+          }
+
+          // Recalculate details string and full summary after updating the plan
+          const planWithDetails = {
+            ...updatedPlan,
+            details: generatePlanSummary(updatedPlan),
+          };
+          return calculatePlanResults(planWithDetails);
         }
         return plan;
       });
@@ -292,95 +406,12 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
       getDefaultPlanState("fd", targetAmount, totalTimePeriod),
     ];
 
+    // Calculate results and full summary for each new plan
+    const updatedInvestmentPlans = newPlans.map((plan) =>
+      calculatePlanResults(plan),
+    );
+
     // Update the editedGoal state with these newly generated plans
-    setEditedGoal((prev) => ({
-      ...prev,
-      investmentPlans: newPlans,
-    }));
-
-    // Use the newly generated plans for calculation
-    const plansToCalculate = newPlans;
-
-    const updatedInvestmentPlans = plansToCalculate.map((plan) => {
-      let result = {};
-      let investedAmount = 0;
-      let estimatedReturns = 0;
-      let totalValue = 0;
-      let fullSummary = "";
-
-      const formatAmount = (amount) =>
-        (amount || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
-
-      switch (plan.type) {
-        case "sip":
-          result = calculateSip(
-            plan.monthlyInvestment,
-            plan.expectedReturnRate,
-            plan.timePeriod,
-          );
-          investedAmount = result.investedAmount;
-          estimatedReturns = result.estimatedReturns;
-          totalValue = result.totalValue;
-          break;
-        case "lumpsum":
-          result = calculateLumpsum(
-            plan.totalInvestment,
-            plan.expectedReturnRate,
-            plan.timePeriod,
-          );
-          investedAmount = result.investedAmount;
-          estimatedReturns = result.estimatedReturns;
-          totalValue = result.totalValue;
-          break;
-        case "stepUpSip":
-          result = calculateStepUpSip(
-            plan.monthlyInvestment,
-            plan.expectedReturnRate,
-            plan.timePeriod,
-            plan.stepUpPercentage,
-          );
-          investedAmount = result.investedAmount;
-          estimatedReturns = result.estimatedReturns;
-          totalValue = result.totalValue;
-          break;
-        case "swp":
-          result = calculateSwp(
-            plan.totalInvestment,
-            plan.expectedReturnRate,
-            plan.timePeriod,
-            plan.withdrawalPerMonth,
-          );
-          investedAmount = result.principal; // For SWP, principal is the invested amount
-          estimatedReturns = result.totalWithdrawn - result.principal; // Returns are total withdrawn minus principal
-          totalValue = result.totalValue; // Remaining balance
-          break;
-        case "fd":
-          result = calculateFd(
-            plan.principalAmount,
-            plan.interestRate,
-            plan.timePeriod,
-            plan.compoundingFrequency,
-          );
-          investedAmount = result.investedAmount;
-          estimatedReturns = result.estimatedReturns;
-          totalValue = result.totalValue;
-          break;
-        default:
-          break;
-      }
-
-      if (Object.keys(result).length > 0) {
-        fullSummary = `${plan.details}\n\nInvested Amount: ₹${formatAmount(investedAmount)}\n\nEst. Returns: ₹${formatAmount(estimatedReturns)}\n\nTotal Value: ₹${formatAmount(totalValue)}`;
-        return {
-          ...plan,
-          ...result, // Spread result to include calculated values like investedAmount, estimatedReturns, totalValue
-          fullSummary: fullSummary,
-        };
-      }
-      return plan; // Return original plan if no calculation was made
-    });
-
-    // Update editedGoal with the new plans containing fullSummary and calculated values
     setEditedGoal((prev) => ({
       ...prev,
       investmentPlans: updatedInvestmentPlans,
@@ -516,9 +547,8 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
         {" "}
         {/* Added Grid container here */}
         {editedGoal.investmentPlans.map((plan, index) => (
-          <Grid item xs={12} sm={6} key={plan.id}>
-            {" "}
-            {/* Added Grid item here */}
+          <Grid item xs={6} key={plan.id}>
+            {/* Changed to xs={12} for full width */}
             <Box
               sx={{ border: "1px solid #ddd", p: 2, mb: 2, borderRadius: 2 }}
             >
