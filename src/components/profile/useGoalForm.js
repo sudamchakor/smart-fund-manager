@@ -214,7 +214,12 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
     );
     const calculatedLastPlan = calculatePlanResults(lastPlanRaw);
 
-    const updatedInvestmentPlans = [...calculatedFirstPlans, calculatedLastPlan];
+    const allGeneratedPlans = [...calculatedFirstPlans, calculatedLastPlan];
+    // Ensure all generated plans have a unique ID to prevent issues with keys and deletion.
+    const updatedInvestmentPlans = allGeneratedPlans.map((plan, index) => ({
+      ...plan,
+      id: `${Date.now()}-${index}`, // Simple unique ID generation
+    }));
 
     setEditedGoal(prevGoal => {
       return { ...prevGoal, investmentPlans: updatedInvestmentPlans };

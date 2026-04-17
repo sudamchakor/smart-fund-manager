@@ -409,6 +409,12 @@ export default function PersonalProfileTab({ onEditGoal }) { // Add onEditGoal p
           )}
           {/* Render individual goal investment contributions */}
           {individualGoalInvestments.map((investment) => {
+            const expenseRatio =
+              investment.frequency === "yearly" && totalIncome > 0
+                ? (investment.amount / (totalIncome * 12)) * 100
+                : totalIncome > 0
+                ? (investment.amount / totalIncome) * 100
+                : 0;
             return (
               <ExpenseReadOnlyItem
                 key={investment.id}
@@ -416,9 +422,9 @@ export default function PersonalProfileTab({ onEditGoal }) { // Add onEditGoal p
                 currency={currency}
                 isExpense={true}
                 totalIncome={totalIncome}
-                expenseRatio={(investment.amount / totalIncome) * 100}
+                expenseRatio={expenseRatio}
                 getExpenseColor={() => {
-                  const ratio = (investment.amount / totalIncome) * 100;
+                  const ratio = expenseRatio;
                   if (ratio > 40) return "error.main";
                   if (ratio > 30) return "warning.main";
                   return "success.main";

@@ -159,32 +159,44 @@ export const selectIndividualGoalInvestmentContributions = createSelector(
   [selectGoals],
   (goals) => {
     const contributions = [];
-    goals.forEach(goal => {
+    goals.forEach((goal) => {
       (goal.investmentPlans || []).forEach((plan, index) => {
-        // Removed the filter: if (plan.monthlyContribution > 0)
-        let planTypeName = "";
-        switch (plan.type) {
-          case "sip":
-            planTypeName = "SIP";
-            break;
-          case "step_up_sip":
-            planTypeName = `Step-up SIP (Step-up: ${plan.stepUpRate || 0}%)`;
-            break;
-          case "lumpsum":
-            planTypeName = "Lumpsum"; // Lumpsum plans usually don't have monthly contributions, but including for completeness
-            break;
-          default:
-            planTypeName = "Investment Plan";
+        const uniqueKey = plan.id || index;
+
+        // Handle monthly contributions
+        if (
+          (plan.type === "sip" || plan.type === "stepUpSip") &&
+          plan.monthlyContribution > 0
+        ) {
+          let planTypeName =
+            plan.type === "sip"
+              ? "SIP"
+              : `Step-up SIP (${plan.stepUpRate || 0}%)`;
+          contributions.push({
+            id: `goal-${goal.id}-plan-${uniqueKey}`,
+            name: `${goal.name} (${planTypeName})`,
+            amount: plan.monthlyContribution,
+            type: "monthly",
+            category: "investment",
+            frequency: "monthly",
+            goalId: goal.id,
+          });
+        } else if (
+          (plan.type === "lumpsum" || plan.type === "fd") &&
+          plan.investedAmount > 0
+        ) {
+          const planTypeName =
+            plan.type === "lumpsum" ? "Lumpsum" : "Fixed Deposit";
+          contributions.push({
+            id: `goal-${goal.id}-plan-${uniqueKey}`,
+            name: `${goal.name} (${planTypeName})`,
+            amount: plan.investedAmount,
+            type: "yearly", // Representing as yearly for display purposes
+            category: "investment",
+            frequency: "yearly",
+            goalId: goal.id,
+          });
         }
-        contributions.push({
-          id: `goal-${goal.id}-plan-${index}`, // Unique ID for each plan
-          name: `${goal.name} (${planTypeName})`,
-          amount: plan.monthlyContribution,
-          type: 'monthly',
-          category: 'investment',
-          frequency: 'monthly',
-          goalId: goal.id, // Keep goalId for potential future use (e.g., linking back to goal)
-        });
       });
     });
     return contributions;
