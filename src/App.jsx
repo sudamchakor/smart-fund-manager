@@ -14,6 +14,7 @@ import { EmiProvider } from "./context/EmiContext";
 // Components
 import Header from "./components/layout/Header";
 import Calculator from "./pages/Calculator";
+import Home from "./pages/Home";
 import FAQ from "./pages/FAQ";
 import { themes } from "./components/ThemeSelector";
 import UserProfile from "./pages/UserProfile";
@@ -118,7 +119,8 @@ const AppContent = () => {
         <Header />
         <Box component="main" className="main-content">
           <Routes>
-            <Route path="/" element={<Calculator />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/calculator" element={<Calculator />} />
             <Route path="/profile" element={<UserProfile />} />
             <Route
               path="/credit-card-emi"

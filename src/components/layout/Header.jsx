@@ -33,12 +33,18 @@ import { selectCalculatedValues } from "../../utils/emiCalculator"; // Corrected
 import { useSnackbar } from "notistack";
 import storage from "redux-persist/lib/storage"; // Import storage
 import "./Header.css";
+import OnboardingModal from "../../pages/OnboardingModal";
 
 const calculators = [
   {
     path: "/",
-    label: "Home Loan EMI Calculator",
+    label: "Home",
     icon: <HomeIcon fontSize="small" style={{ marginRight: 8 }} />,
+  },
+  {
+    path: "/calculator",
+    label: "Home Loan EMI Calculator",
+    icon: <CalculateIcon fontSize="small" style={{ marginRight: 8 }} />,
   },
   {
     path: "/credit-card-emi",
@@ -75,6 +81,7 @@ const Header = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const handleExport = (event) => {
     const value = event.target.value;
@@ -127,6 +134,7 @@ const Header = () => {
   const handleResetLocalData = async () => {
     dispatch(resetEmiState()); // Reset the Redux state for emi slice
     await storage.removeItem("persist:app_v1"); // Clear the persisted state from localStorage
+    localStorage.removeItem("hasOnboarded"); // Allow onboarding to show again
 
     enqueueSnackbar("All the local data has been reset.", {
       variant: "success",
@@ -185,20 +193,18 @@ const Header = () => {
           open={Boolean(anchorEl)}
           onClose={handleMenuClose}
         >
-          {calculators.map((calc) => (
-            <MenuItem
-              key={calc.path}
-              selected={
-                calc.path === "/"
-                  ? location.pathname === "/"
-                  : location.pathname.startsWith(calc.path)
-              }
-              onClick={() => handleCalculatorSelect(calc.path)}
-            >
-              {calc.icon}
-              {calc.label}
-            </MenuItem>
-          ))}
+          {calculators
+            .filter((calc) => calc.path !== "/")
+            .map((calc) => (
+              <MenuItem
+                key={calc.path}
+                selected={location.pathname.startsWith(calc.path)}
+                onClick={() => handleCalculatorSelect(calc.path)}
+              >
+                {calc.icon}
+                {calc.label}
+              </MenuItem>
+            ))}
         </Menu>
 
         <Box
@@ -245,6 +251,9 @@ const Header = () => {
               open={Boolean(profileAnchorEl)}
               onClose={handleProfileMenuClose}
             >
+              <MenuItem onClick={() => { setOnboardingOpen(true); handleProfileMenuClose(); }}>
+                Create Profile
+              </MenuItem>
               <MenuItem onClick={() => handleProfileSelect("personal")}>
                 Personal Profile
               </MenuItem>
@@ -259,6 +268,7 @@ const Header = () => {
             </Menu>
           </Box>
         </Box>
+        <OnboardingModal open={onboardingOpen} onClose={() => setOnboardingOpen(false)} />
       </Toolbar>
     </AppBar>
   );

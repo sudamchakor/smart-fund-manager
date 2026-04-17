@@ -6,6 +6,7 @@ import App from "./App";
 // 1. Mock the Pages and Components
 // We mock these so we are only testing App.jsx's routing and layout, not the children's logic.
 jest.mock("./components/layout/Header", () => () => <div data-testid="mock-header">Header</div>);
+jest.mock("./pages/Home", () => () => <div data-testid="mock-home">Home</div>);
 jest.mock("./pages/Calculator", () => () => <div data-testid="mock-calculator">Calculator</div>);
 jest.mock("./pages/UserProfile", () => () => <div data-testid="mock-user-profile">UserProfile</div>);
 jest.mock("./pages/CreditCardEmiCalculator", () => () => <div data-testid="mock-cc-emi">CreditCardEmiCalculator</div>);
@@ -46,7 +47,7 @@ describe("App Component", () => {
     jest.clearAllMocks();
   });
 
-  it('renders the Header and Calculator page on the default route ("/")', () => {
+  it('renders the Header and Home page on the default route ("/")', () => {
     render(
       <MemoryRouter initialEntries={["/"]}>
         <App />
@@ -54,9 +55,19 @@ describe("App Component", () => {
     );
 
     expect(screen.getByTestId("mock-header")).toBeInTheDocument();
-    expect(screen.getByTestId("mock-calculator")).toBeInTheDocument();
+    expect(screen.getByTestId("mock-home")).toBeInTheDocument();
     // FAQ should not be visible on the default route
     expect(screen.queryByTestId("mock-faq")).not.toBeInTheDocument();
+  });
+
+  it('renders the Calculator page on the "/calculator" route', () => {
+    render(
+      <MemoryRouter initialEntries={["/calculator"]}>
+        <App />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId("mock-calculator")).toBeInTheDocument();
   });
 
   it('renders the FAQ page on the "/faq" route', () => {
