@@ -60,9 +60,9 @@ const useGoalForm = (goal, currentYear, onSave) => {
     });
   }, [goal, currentYear]);
 
-  useEffect(() => {
+  const handleSaveGoal = () => {
     onSave(editedGoal);
-  }, [editedGoal, onSave]);
+  };
 
   const handleAddPlan = () => {
     const currentTargetAmount = editedGoal.targetAmount || 0;
@@ -169,6 +169,7 @@ const useGoalForm = (goal, currentYear, onSave) => {
     handleRemovePlan,
     handlePlanChange,
     handleGenerateInvestmentPlans,
+    handleSaveGoal,
   };
 };
 

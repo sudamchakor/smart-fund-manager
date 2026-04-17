@@ -121,10 +121,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
     }
   }, [goalToEditId, goals]);
 
-  const handleGoalFormChange = useCallback((goalData) => {
-    setCurrentGoalFormData(goalData);
-  }, []);
-
   const handleModalSave = useCallback(() => {
     if (!currentGoalFormData) return;
 
@@ -734,7 +730,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
             <GoalForm
               goal={currentGoalFormData}
               currentYear={currentYear}
-              onSave={handleGoalFormChange}
+              onSave={setCurrentGoalFormData}
             />
           )}
         </DialogContent>

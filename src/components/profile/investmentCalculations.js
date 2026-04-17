@@ -5,10 +5,10 @@ export const calculateSip = (monthlyInvestment, annualRate, timePeriod) => {
   if (monthlyRate === 0) {
     futureValue = monthlyInvestment * numberOfMonths;
   } else {
+    // Formula for Future Value of an ordinary annuity
     futureValue =
       monthlyInvestment *
-      ((Math.pow(1 + monthlyRate, numberOfMonths) - 1) / monthlyRate) *
-      (1 + monthlyRate);
+      ((Math.pow(1 + monthlyRate, numberOfMonths) - 1) / monthlyRate);
   }
   const investedAmount = monthlyInvestment * numberOfMonths;
   const estimatedReturns = futureValue - investedAmount;
@@ -35,8 +35,9 @@ export const calculateStepUpSip = (
 
   for (let year = 1; year <= timePeriod; year++) {
     for (let month = 1; month <= 12; month++) {
+      // Calculation for ordinary annuity (payment at the end of the period)
+      totalValue = totalValue * (1 + monthlyRate) + currentMonthlyInvestment;
       totalInvested += currentMonthlyInvestment;
-      totalValue = (totalValue + currentMonthlyInvestment) * (1 + monthlyRate);
     }
     if (year < timePeriod) {
       currentMonthlyInvestment *= 1 + stepUpPercentage / 100;

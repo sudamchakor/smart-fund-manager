@@ -22,7 +22,17 @@ const InvestmentPlanCard = ({
   handlePlanChange,
   handleRemovePlan,
   formatAmount,
+  targetAmount, // Add targetAmount to props
 }) => {
+  // This function is called by child calculators to signal that a recalculation is needed.
+  // It works by calling the parent's handlePlanChange function, which in turn
+  // triggers the calculatePlanResults function in the useGoalForm hook.
+  const handleCalculate = () => {
+    // We pass the current plan type to trigger the change handler.
+    // This forces a recalculation of the plan's values.
+    handlePlanChange(plan.id, "type", plan.type);
+  };
+
   return (
     <Box sx={{ border: "1px solid #ddd", p: 2, mb: 2, borderRadius: 2 }}>
       <Grid container spacing={2} alignItems="center">
@@ -93,6 +103,20 @@ const InvestmentPlanCard = ({
                 </Typography>
               </Typography>
             </Grid>
+            {targetAmount && ( // Display target amount if available
+              <Grid item xs={12} sm={4}>
+                <Typography variant="body2" color="text.secondary">
+                  Target Amount:{" "}
+                  <Typography
+                    component="span"
+                    fontWeight="bold"
+                    color="info.main"
+                  >
+                    ₹{formatAmount(targetAmount)}
+                  </Typography>
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         </Paper>
       </Box>
@@ -104,7 +128,7 @@ const InvestmentPlanCard = ({
             onSharedStateChange={(field, value) =>
               handlePlanChange(plan.id, field, value)
             }
-            onCalculate={() => {}} // Placeholder, actual calculation happens on button click
+            onCalculate={handleCalculate}
           />
         )}
         {plan.type === "lumpsum" && (
@@ -113,7 +137,7 @@ const InvestmentPlanCard = ({
             onSharedStateChange={(field, value) =>
               handlePlanChange(plan.id, field, value)
             }
-            onCalculate={() => {}}
+            onCalculate={handleCalculate}
           />
         )}
         {plan.type === "stepUpSip" && (
@@ -122,11 +146,7 @@ const InvestmentPlanCard = ({
             onSharedStateChange={(field, value) =>
               handlePlanChange(plan.id, field, value)
             }
-            onCalculate={(data) => {
-              handlePlanChange(plan.id, 'investedAmount', data.investedAmount);
-              handlePlanChange(plan.id, 'estimatedReturns', data.estimatedReturns);
-              handlePlanChange(plan.id, 'totalValue', data.totalValue);
-            }}
+            onCalculate={handleCalculate}
           />
         )}
         {plan.type === "swp" && (
@@ -135,7 +155,7 @@ const InvestmentPlanCard = ({
             onSharedStateChange={(field, value) =>
               handlePlanChange(plan.id, field, value)
             }
-            onCalculate={() => {}}
+            onCalculate={handleCalculate}
           />
         )}
         {plan.type === "fd" && (
@@ -144,7 +164,7 @@ const InvestmentPlanCard = ({
             onSharedStateChange={(field, value) =>
               handlePlanChange(plan.id, field, value)
             }
-            onCalculate={() => {}}
+            onCalculate={handleCalculate}
           />
         )}
       </Box>

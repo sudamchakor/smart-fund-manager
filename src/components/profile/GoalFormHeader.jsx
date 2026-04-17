@@ -1,13 +1,32 @@
 import React from "react";
 import { Grid, TextField, Button } from "@mui/material";
 import SliderInput from "../common/SliderInput";
+import InvestmentSummary from "./InvestmentSummary";
 
 const GoalFormHeader = ({
   editedGoal,
   setEditedGoal,
   currentYear,
   handleGenerateInvestmentPlans,
+  plans,
+  handleSaveGoal,
 }) => {
+  // Updated to use plan.totalValue for consistency with InvestmentSummary
+  const totalAmount = plans.reduce(
+    (sum, plan) => sum + (plan.totalValue || 0),
+    0,
+  );
+  const isMismatch = totalAmount !== editedGoal.targetAmount;
+
+  const onSave = () => {
+    if (isMismatch) {
+      alert(
+        "Warning: The total investment amount does not match the target amount.",
+      );
+    }
+    handleSaveGoal();
+  };
+
   return (
     <Grid container xs={12} spacing={2}>
       <Grid container xs={12} spacing={2}>
@@ -64,6 +83,14 @@ const GoalFormHeader = ({
           )}
         </Grid>
       </Grid>
+      {plans && plans.length > 0 && (
+        <Grid item xs={12}>
+          <InvestmentSummary
+            plans={plans}
+            targetAmount={editedGoal.targetAmount}
+          />
+        </Grid>
+      )}
     </Grid>
   );
 };

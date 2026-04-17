@@ -19,6 +19,7 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
     handleRemovePlan,
     handlePlanChange,
     handleGenerateInvestmentPlans,
+    handleSaveGoal,
   } = useGoalForm(goal, currentYear, onSave);
 
   const formatAmount = (amount) =>
@@ -39,6 +40,8 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
         setEditedGoal={setEditedGoal}
         currentYear={currentYear}
         handleGenerateInvestmentPlans={handleGenerateInvestmentPlans}
+        plans={editedGoal.investmentPlans}
+        handleSaveGoal={handleSaveGoal}
       />
 
       <Divider sx={{ my: 4 }} />
@@ -51,6 +54,7 @@ export const GoalForm = ({ goal, currentYear, onSave }) => {
           <Grid item xs={6} key={plan.id}>
             <InvestmentPlanCard
               plan={plan}
+              targetAmount={editedGoal.targetAmount}
               handlePlanChange={handlePlanChange}
               handleRemovePlan={handleRemovePlan}
               formatAmount={formatAmount}
