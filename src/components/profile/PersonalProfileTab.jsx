@@ -50,21 +50,15 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   Legend,
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
-  AreaChart,
-  Area,
   LineChart,
   Line,
 } from "recharts";
 import ExpenseReadOnlyItem from "../common/ExpenseReadOnlyItem";
  
 const PIE_CHART_COLORS = ["#ff6b6b", "#4ecdc4", "#9c27b0", "#2ecc71", "#f1c40f"];
-const INCOME_BAR_COLOR = "#4CAF50"; // Green for income
-const STACKED_EXPENSE_BAR_COLORS = ["#ff6b6b", "#4ecdc4", "#9c27b0", "#2ecc71", "#f1c40f"]; // Re-using for stacked expenses
 
 const currentYear = new Date().getFullYear();
 
@@ -251,23 +245,6 @@ export default function PersonalProfileTab({ onEditGoal }) {
     },
   ].filter((item) => item.value > 0);
 
-  // Data for the bar chart to show Income vs. Stacked Expenses
-  // This structure allows for two distinct bars on the X-axis: "Income" and "Expenses"
-  // The "Expenses" bar will be stacked by its components.
-  const barChartData = [
-    {
-      category: "Income",
-      value: totalIncome, // The total income value for the income bar
-    },
-    {
-      category: "Expenses",
-      Needs: needsValue,
-      Wants: wantsValue,
-      "Loan EMIs": monthlyEmi || 0,
-      "Future Wealth (Goals)": totalMonthlyGoalContributions,
-      // Surplus is not an expense, so it's not included in the 'Expenses' bar stack.
-    },
-  ]; // Ensure val is treated as number
   const formatCurrency = (val) =>
     `${currency}${Number(val || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`; // Ensure val is treated as number
 
@@ -375,18 +352,21 @@ export default function PersonalProfileTab({ onEditGoal }) {
             Income Details
             <InfoIcon fontSize="small" sx={{ opacity: 0.6 }} />
           </Typography>
-          {incomes &&
-            incomes.map((inc) => (
-              <EditableIncomeExpenseItem
-                key={inc.id}
-                item={inc}
-                currency={currency}
-                onEdit={() => handleEditIncome(inc)}
-                onDelete={(id) => dispatch(deleteIncome(id))}
-                totalIncome={totalIncome}
-                isIncome={true}
-              />
-            ))}
+          <Box sx={{ maxHeight: 400, overflowY: "auto", pr: 1 }}>
+            {incomes &&
+              incomes.map((inc) => (
+                <EditableIncomeExpenseItem
+                  key={inc.id}
+                  item={inc}
+                  currency={currency}
+                  onEdit={() => handleEditIncome(inc)}
+                  onUpdate={(updatedInc) => dispatch(updateIncome(updatedInc))}
+                  onDelete={(id) => dispatch(deleteIncome(id))}
+                  totalIncome={totalIncome}
+                  isIncome={true}
+                />
+              ))}
+          </Box>
           <Divider sx={{ my: 2 }} />
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
             {editingIncomeId ? "Edit Income" : "Add New Income"}
@@ -568,95 +548,139 @@ export default function PersonalProfileTab({ onEditGoal }) {
               </Tooltip>
             )}
           </Typography>
-          {monthlyEmi > 0 && (
-            <ExpenseReadOnlyItem
-              item={{
-                id: "home-loan-emi", // Unique ID for this item
-                name: "Home Loan EMI",
-                amount: monthlyEmi,
-                frequency: "monthly",
-              }}
-              currency={currency}
-              isExpense={true}
-              totalIncome={totalIncome}
-              expenseRatio={(monthlyEmi / totalIncome) * 100}
-              getExpenseColor={() => {
-                const ratio = (monthlyEmi / totalIncome) * 100;
-                if (ratio > 40) return "error.main";
-                if (ratio > 30) return "warning.main";
-                return "success.main";
-              }}
-              formatCurrency={formatCurrency}
-              onConfirmDelete={handleReadOnlyDelete} // Use the dummy handler for now
-              deletionImpactMessage="Deleting Home Loan EMI will remove it from your expenses and cash flow calculations. To adjust the EMI, please use the EMI Calculator tab."
-              isReadOnly={true}
-              onClick={handleHomeLoanEmiClick} // Make it clickable
-            />
-          )}
-          {/* Render individual goal investment contributions */}
-          {individualGoalInvestments.length > 0 && (
-            <Box>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Goal Investments</Typography>
-              {individualGoalInvestments.map((investment) => {
-                const expenseRatio =
-                  investment.frequency === "yearly" && totalIncome > 0
-                    ? (investment.amount / (totalIncome * 12)) * 100
-                    : totalIncome > 0
-                    ? (investment.amount / totalIncome) * 100
-                    : 0;
+          <Box sx={{ maxHeight: 400, overflowY: "auto", pr: 1 }}>
+            {monthlyEmi > 0 && (
+              <ExpenseReadOnlyItem
+                item={{
+                  id: "home-loan-emi", // Unique ID for this item
+                  name: "Home Loan EMI",
+                  amount: monthlyEmi,
+                  frequency: "monthly",
+                }}
+                currency={currency}
+                isExpense={true}
+                totalIncome={totalIncome}
+                expenseRatio={(monthlyEmi / totalIncome) * 100}
+                getExpenseColor={() => {
+                  const ratio = (monthlyEmi / totalIncome) * 100;
+                  if (ratio > 40) return "error.main";
+                  if (ratio > 30) return "warning.main";
+                  return "success.main";
+                }}
+                formatCurrency={formatCurrency}
+                onConfirmDelete={handleReadOnlyDelete} // Use the dummy handler for now
+                deletionImpactMessage="Deleting Home Loan EMI will remove it from your expenses and cash flow calculations. To adjust the EMI, please use the EMI Calculator tab."
+                isReadOnly={true}
+                onClick={handleHomeLoanEmiClick} // Make it clickable
+              />
+            )}
+            {/* Render individual goal investment contributions */}
+            {individualGoalInvestments.length > 0 && (
+              <Box>
+                <Divider sx={{ my: 2 }} />
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>Goal Investments</Typography>
+                {individualGoalInvestments.map((investment) => {
+                  const expenseRatio =
+                    investment.frequency === "yearly" && totalIncome > 0
+                      ? (investment.amount / (totalIncome * 12)) * 100
+                      : totalIncome > 0
+                      ? (investment.amount / totalIncome) * 100
+                      : 0;
+                  return (
+                    <ExpenseReadOnlyItem
+                      key={investment.id}
+                      item={investment}
+                      currency={currency}
+                      isExpense={true}
+                      totalIncome={totalIncome}
+                      expenseRatio={expenseRatio}
+                      getExpenseColor={() => {
+                        const ratio = expenseRatio;
+                        if (ratio > 40) return "error.main";
+                        if (ratio > 30) return "warning.main";
+                        return "success.main";
+                      }}
+                      formatCurrency={formatCurrency}
+                      onConfirmDelete={handleReadOnlyDelete} // Investments are not directly deletable from here
+                      deletionImpactMessage={`To stop this investment, please edit or delete the associated goal in the Future Goals tab.`}
+                      isReadOnly={true}
+                      onClick={() => onEditGoal(investment.goalId)} // Pass goal ID to parent for editing
+                    />
+                  );
+                })}
+              </Box>
+            )}
+
+            {expenses &&
+              expenses.map((exp) => {
                 return (
-                  <ExpenseReadOnlyItem
-                    key={investment.id}
-                    item={investment}
+                  <EditableIncomeExpenseItem
+                    key={exp.id}
+                    item={exp}
                     currency={currency}
+                    onEdit={() => handleEditExpense(exp)}
+                    onUpdate={(updatedExp) => dispatch(updateExpense(updatedExp))}
+                    onDelete={(id) => dispatch(deleteExpense(id))}
                     isExpense={true}
+                    isBudgetExceeded={isBudgetExceeded}
+                    budgetWarning={budgetWarning}
                     totalIncome={totalIncome}
-                    expenseRatio={expenseRatio}
-                    getExpenseColor={() => {
-                      const ratio = expenseRatio;
-                      if (ratio > 40) return "error.main";
-                      if (ratio > 30) return "warning.main";
-                      return "success.main";
-                    }}
-                    formatCurrency={formatCurrency}
-                    onConfirmDelete={handleReadOnlyDelete} // Investments are not directly deletable from here
-                    deletionImpactMessage={`To stop this investment, please edit or delete the associated goal in the Future Goals tab.`}
-                    isReadOnly={true}
-                    onClick={() => onEditGoal(investment.goalId)} // Pass goal ID to parent for editing
+                    totalExpenses={totalProfileExpenses}
                   />
                 );
               })}
-            </Box>
-          )}
-
-          {expenses &&
-            expenses.map((exp) => {
-              return (
-                <EditableIncomeExpenseItem
-                  key={exp.id}
-                  item={exp}
-                  currency={currency}
-                  onEdit={() => handleEditExpense(exp)}
-                  onDelete={(id) => dispatch(deleteExpense(id))}
-                  isExpense={true}
-                  isBudgetExceeded={isBudgetExceeded}
-                  budgetWarning={budgetWarning}
-                  totalIncome={totalIncome}
-                  totalExpenses={totalProfileExpenses}
-                />
-              );
-            })}
-
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-            {editingExpenseId ? "Edit Expense" : "Add New Expense"}
+          </Box>
+      <Divider sx={{ my: 2 }} />
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          Total Monthly Expenses
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          sx={{
+            fontWeight: 700,
+            color: isBudgetExceeded ? "error.main" : "text.primary",
+            fontSize: isBudgetExceeded ? "1.2rem" : "1rem",
+          }}
+        >
+          {formatCurrency(totalExpensesIncludingLoanAndGoals.toFixed(0))}
+        </Typography>
+      </Box>
+      {isBudgetExceeded && (
+        <Paper
+          sx={{
+            mt: 2,
+            p: 1.5,
+            backgroundColor: "#ffebee",
+            borderLeft: "4px solid #f44336",
+            borderRadius: 1,
+          }}
+        >
+          <Typography
+            variant="caption"
+            sx={{ color: "#c62828", fontWeight: 600 }}
+          >
+            ⚠️ {budgetWarning}
           </Typography>
-          <Typography variant="caption" color="textSecondary" sx={{ mb: 2, display: 'block' }}>
-            To add an "initial funding" source, simply use this form to add a new income stream with a descriptive name (e.g., "Starting Capital") and its monthly amount.
-          </Typography>
-
-          <Box
+        </Paper>
+      )}
+    </Paper>
+  </Grid>
+  <Grid item xs={12} md={6}>
+    <Paper sx={{ p: 3, height: "100%" }}>
+      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+        {editingExpenseId ? "Edit Expense" : "Add New Expense"}
+      </Typography>
+      <Typography variant="caption" color="textSecondary" sx={{ mb: 2, display: 'block' }}>
+        To add an "initial funding" source, simply use this form to add a new income stream with a descriptive name (e.g., "Starting Capital") and its monthly amount.
+      </Typography>
+      <Box
             sx={{
               display: "flex",
               gap: 2,
@@ -764,75 +788,6 @@ export default function PersonalProfileTab({ onEditGoal }) {
               </Grid>
             </Grid>
           </Box>
-          <Divider sx={{ my: 2 }} />
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
-              Total Monthly Expenses
-            </Typography>
-            <Typography
-              variant="subtitle1"
-              sx={{
-                fontWeight: 700,
-                color: isBudgetExceeded ? "error.main" : "text.primary",
-                fontSize: isBudgetExceeded ? "1.2rem" : "1rem",
-              }}
-            >
-              {formatCurrency(totalExpensesIncludingLoanAndGoals.toFixed(0))}
-            </Typography>
-          </Box>
-          {isBudgetExceeded && (
-            <Paper
-              sx={{
-                mt: 2,
-                p: 1.5,
-                backgroundColor: "#ffebee",
-                borderLeft: "4px solid #f44336",
-                borderRadius: 1,
-              }}
-            >
-              <Typography
-                variant="caption"
-                sx={{ color: "#c62828", fontWeight: 600 }}
-              >
-                ⚠️ {budgetWarning}
-              </Typography>
-            </Paper>
-          )}
-        </Paper>
-      </Grid>
-      <Grid item xs={12} md={6}>
-        <Paper sx={{ p: 3, height: "100%" }}>
-          <Typography variant="h6" align="center" gutterBottom>
-            Income vs. Expenses
-          </Typography>
-          {/* Bar Chart for Income vs. Expenses */}
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart
-              data={barChartData}
-              margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="category" /> {/* Shows "Income" and "Expenses" on X-axis */}
-              <YAxis tickFormatter={(val) => formatCurrency(val)} />
-              <RechartsTooltip formatter={(value, name) => [formatCurrency(value), name]} />
-              <Legend />
-              {/* Bar for Total Income */}
-              <Bar dataKey="value" name="Total Income" fill={INCOME_BAR_COLOR} />
-              {/* Stacked bars for Expenses. These will stack on top of each other for the "Expenses" category. */}
-              <Bar dataKey="Needs" stackId="expenses" fill={STACKED_EXPENSE_BAR_COLORS_MAP["Needs"]} name="Needs" />
-              <Bar dataKey="Wants" stackId="expenses" fill={STACKED_EXPENSE_BAR_COLORS_MAP["Wants"]} name="Wants" />
-              <Bar dataKey="Loan EMIs" stackId="expenses" fill={STACKED_EXPENSE_BAR_COLORS_MAP["Loan EMIs"]} name="Loan EMIs" />
-              <Bar dataKey="Future Wealth (Goals)" stackId="expenses" fill={STACKED_EXPENSE_BAR_COLORS_MAP["Future Wealth (Goals)"]} name="Future Wealth (Goals)" />
-              {/* Surplus is implicitly handled as the difference between Income and Expenses and is not part of the expense stack. */}
-
-            </BarChart>
-          </ResponsiveContainer>
         </Paper>
       </Grid>
       <Grid item xs={12}>
