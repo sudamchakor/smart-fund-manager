@@ -95,15 +95,27 @@ export default function UserProfile() {
         sx={{
           borderBottom: 1,
           borderColor: "divider",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          width: "100%", // Ensure the Box takes full width
         }}
       >
         <Tabs
           value={tabValue}
           onChange={handleTabChange}
           aria-label="profile tabs"
+          variant="scrollable" // Make tabs scrollable on smaller screens
+          scrollButtons="auto" // Show scroll buttons automatically
+          allowScrollButtonsMobile // Allow scroll buttons on mobile
+          sx={{
+            "& .MuiTabs-indicator": {
+              backgroundColor: "primary.main", // Ensure indicator color matches theme
+            },
+            "& .MuiTab-root": {
+              color: "text.secondary", // Default tab text color
+              "&.Mui-selected": {
+                color: "primary.main", // Selected tab text color
+              },
+            },
+          }}
         >
           <Tab label="Personal Profile" />
           <Tab label="Future Goals" />
@@ -139,18 +151,21 @@ export default function UserProfile() {
           color: "white",
           p: 2,
           display: "flex",
+          flexDirection: { xs: 'column', sm: 'row' }, // Stack vertically on extra small, row on small and up
           justifyContent: "space-around",
+          alignItems: { xs: 'flex-start', sm: 'center' }, // Align items for stacked layout
+          gap: { xs: 1, sm: 0 }, // Add gap when stacked
           zIndex: 1000,
           boxShadow: "0 -2px 10px rgba(0,0,0,0.1)",
         }}
       >
-        <Typography variant="h6">
+        <Typography variant="h6" sx={{ fontSize: { xs: '0.9rem', sm: '1.1rem' } }}>
           Current Surplus:{" "}
           <strong>
             {formatCurrency(investableSurplus.toFixed(0))} / month
           </strong>
         </Typography>
-        <Typography variant="h6">
+        <Typography variant="h6" sx={{ fontSize: { xs: '0.9rem', sm: '1.1rem' } }}>
           Debt-Free Countdown: <strong>{debtFreeCountdown}</strong>
         </Typography>
       </Box>

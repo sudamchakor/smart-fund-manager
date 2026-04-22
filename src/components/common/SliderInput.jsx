@@ -76,7 +76,7 @@ export const SliderInput = ({
     >
       <Typography
         variant="subtitle2"
-        sx={{ fontWeight: 600, whiteSpace: "nowrap" }}
+        sx={{ fontWeight: 600, whiteSpace: { xs: 'normal', sm: 'nowrap' } }} // Allow wrapping on xs
       >
         {label}
       </Typography>
@@ -181,9 +181,9 @@ export const SliderInput = ({
         ...(isInline
           ? {
               display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 2, // Gap between label, slider, input
+              flexDirection: { xs: 'column', sm: 'row' }, // Stack vertically on xs, row on sm and up
+              alignItems: { xs: 'flex-start', sm: 'center' }, // Align items for stacked layout
+              gap: { xs: 1, sm: 2 }, // Adjust gap for stacked layout
             }
           : {
               display: "block",
@@ -193,9 +193,18 @@ export const SliderInput = ({
       {isInline ? (
         // Inline layout: Label, Slider, Input
         <>
-          {labelComponent}
-          {sliderComponent}
-          {inputComponent}
+          <Box sx={{ display: 'flex', alignItems: 'center', width: { xs: '100%', sm: 'auto' }, justifyContent: { xs: 'space-between', sm: 'flex-start' } }}>
+            {labelComponent}
+            {inputComponent && (
+              <Box sx={{ display: { xs: 'block', sm: 'none' } }}>{inputComponent}</Box> // Show input next to label on xs, hide on sm+
+            )}
+          </Box>
+          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', gap: 2, width: { xs: '100%', sm: 'auto' } }}>
+            {sliderComponent}
+            {inputComponent && (
+              <Box sx={{ display: { xs: 'none', sm: 'block' } }}>{inputComponent}</Box> // Show input next to slider on sm+, hide on xs
+            )}
+          </Box>
         </>
       ) : (
         // Block layout: Label & Input (flex row), then Slider below

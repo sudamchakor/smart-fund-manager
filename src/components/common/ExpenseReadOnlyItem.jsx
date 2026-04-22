@@ -11,6 +11,7 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Grid, // Import Grid
 } from "@mui/material";
 import WarningIcon from "@mui/icons-material/Warning";
 import EditIcon from "@mui/icons-material/Edit";
@@ -41,8 +42,16 @@ const ExpenseReadOnlyItem = (props) => {
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (event) => {
+    event.stopPropagation(); // Prevent onClick of the Paper from firing
     setOpenConfirmDelete(true);
+  };
+
+  const handleEditClick = (event) => {
+    event.stopPropagation(); // Prevent onClick of the Paper from firing
+    if (!isReadOnly && setIsEditing) {
+      setIsEditing(true);
+    }
   };
 
   const handleCloseConfirmDelete = () => {
@@ -50,7 +59,8 @@ const ExpenseReadOnlyItem = (props) => {
   };
 
   const handleConfirmDelete = () => {
-    if (onConfirmDelete) onConfirmDelete(item.id); // Call the provided confirmation handler
+    if (onConfirmDelete)
+      onConfirmDelete(item.id); // Call the provided confirmation handler
     else if (onDelete) onDelete(item.id); // Fallback to standard onDelete prop
     handleCloseConfirmDelete();
   };
@@ -72,20 +82,51 @@ const ExpenseReadOnlyItem = (props) => {
         }}
         onClick={onClick} // Attach onClick handler to the Paper component
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
-        >
-          <Box sx={{ flex: 1 }}>
+        <Grid container spacing={1} alignItems="center">
+          <Grid item xs={12}> {/* Changed to xs={12} for full width */}
             <Box
-              sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 1,
+                mb: 0.5,
+                flexWrap: "wrap",
+              }} // Allow chips to wrap
             >
-              <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                {item.name}
-              </Typography>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  width: "100%", // Ensure this div takes full width of its parent
+                }}
+              >
+                <div>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {item.name}
+                  </Typography>
+                </div>
+                <div>
+                  {!isReadOnly && (
+                    <IconButton
+                      size="small"
+                      onClick={handleEditClick} // Use new handler
+                      color="primary"
+                    >
+                      <EditIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                  {(onConfirmDelete || onDelete) && (
+                    <IconButton
+                      size="small"
+                      onClick={handleDeleteClick} // Use new handler
+                      color="error"
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  )}
+                </div>
+              </div>
               {isExpense && totalIncome > 0 && (
                 <Typography variant="caption" color="textSecondary">
                   {expenseRatio ? expenseRatio.toFixed(1) : 0}% of income
@@ -128,30 +169,8 @@ const ExpenseReadOnlyItem = (props) => {
             >
               {formatCurrency(item.amount)}
             </Typography>
-          </Box>
-
-          <Box sx={{ display: "flex", gap: 0.5 }}>
-            {!isReadOnly && (
-              <IconButton
-                size="small"
-                onClick={() => setIsEditing(true)}
-                color="primary"
-              >
-                <EditIcon fontSize="small" />
-              </IconButton>
-            )}
-            {/* Always show delete for read-only items if onDelete is provided */}
-          {(onConfirmDelete || onDelete) && (
-              <IconButton
-                size="small"
-                onClick={handleDeleteClick}
-                color="error"
-              >
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            )}
-          </Box>
-        </Box>
+          </Grid>
+        </Grid>
       </Paper>
 
       <Dialog

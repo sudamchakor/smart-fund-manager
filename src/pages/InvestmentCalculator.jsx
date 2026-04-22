@@ -87,7 +87,9 @@ const InvestmentCalculator = () => {
         <Tabs
           value={tabIndex}
           onChange={handleTabChange}
-          variant="fullWidth"
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
           aria-label="investment calculators tabs"
           sx={{ borderBottom: 1, borderColor: "divider" }}
         >

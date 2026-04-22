@@ -24,8 +24,14 @@ export default function BasicInfoDisplay({
         </IconButton>
       </Box>
 
-      {/* Changed flexDirection to row and added gap */}
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+      {/* Changed flexDirection to be responsive */}
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" }, // Stack vertically on xs, row on sm and up
+          gap: 2,
+        }}
+      >
         <Box sx={{ flex: 1 }}>
           <Typography
             variant="subtitle2"

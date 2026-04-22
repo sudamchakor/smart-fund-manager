@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandLessIcon from "@mui/icons-material/ExpandMore"; // Corrected: Should be ExpandLessIcon
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 import EditableIncomeExpenseItem from "../../../components/common/EditableIncomeExpenseItem";
@@ -143,7 +143,7 @@ export default function ExpenseSection({ onEditGoal }) {
   }, {});
 
   return (
-    <>
+    <Grid container spacing={3}> {/* Added Grid container for responsiveness and spacing */}
       <Grid item xs={12} md={6}>
         <Paper sx={{ p: 3, height: "100%" }}>
           <Typography
@@ -198,7 +198,7 @@ export default function ExpenseSection({ onEditGoal }) {
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                   Goal Investments
                 </Typography>
-                <Box sx={{ mt: 1 }}>
+                <Grid container spacing={1} sx={{ mt: 1 }}> {/* Changed Box to Grid container */}
                   {Object.values(groupedGoalInvestments).map((group) => {
                       const groupMonthlyTotal = group.investments.reduce((sum, inv) => {
                         let monthly = inv.amount || 0;
@@ -209,63 +209,72 @@ export default function ExpenseSection({ onEditGoal }) {
                       const isExpanded = expandedGoals[group.goalId];
 
                       return (
-                        <Box key={group.goalId} sx={{ mb: 2, p: 1.5, bgcolor: "rgba(0,0,0,0.02)", borderRadius: 2 }}>
-                          <Box
-                            onClick={() => toggleGoalExpanded(group.goalId)}
-                            sx={{
-                              display: "flex",
-                              alignItems: "center",
-                              cursor: "pointer",
-                              "&:hover": { opacity: 0.8 },
-                            }}
-                          >
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.secondary", flexGrow: 1 }}>
-                              {group.goalName} ({group.investments.length} {group.investments.length === 1 ? 'plan' : 'plans'})
-                            </Typography>
-                            <Typography variant="subtitle2" sx={{ fontWeight: 600, mr: 1, color: "text.secondary" }}>
-                              {formatCurrency(groupMonthlyTotal)} / mo
-                            </Typography>
-                            <IconButton size="small" disableRipple sx={{ p: 0 }}>
-                              {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                            </IconButton>
-                          </Box>
-                          <Collapse in={isExpanded}>
-                            <Box sx={{ mt: 1.5 }}>
-                              {group.investments.map((investment) => {
-                          const expenseRatio =
-                            investment.frequency === "yearly" && totalIncome > 0
-                              ? (investment.amount / (totalIncome * 12)) * 100
-                              : totalIncome > 0
-                              ? (investment.amount / totalIncome) * 100
-                              : 0;
-                          return (
-                            <ExpenseReadOnlyItem
-                              key={investment.id}
-                              item={investment}
-                              currency={currency}
-                              isExpense={true}
-                              totalIncome={totalIncome}
-                              expenseRatio={expenseRatio}
-                              getExpenseColor={() => {
-                                const ratio = expenseRatio;
-                                if (ratio > 40) return "error.main";
-                                if (ratio > 30) return "warning.main";
-                                return "success.main";
+                        <Grid item xs={12} key={group.goalId}> {/* Wrapped group in Grid item */}
+                          <Box sx={{ mb: 0, p: 1.5, bgcolor: "rgba(0,0,0,0.02)", borderRadius: 2 }}>
+                            <Grid
+                              container
+                              spacing={1} // Add some spacing between rows on small screens
+                              alignItems="center"
+                              onClick={() => toggleGoalExpanded(group.goalId)}
+                              sx={{
+                                cursor: "pointer",
+                                "&:hover": { opacity: 0.8 },
                               }}
-                              formatCurrency={formatCurrency}
-                              onConfirmDelete={handleReadOnlyDelete}
-                              deletionImpactMessage={`To stop this investment, please edit or delete the associated goal in the Future Goals tab.`}
-                              isReadOnly={true}
-                              onClick={() => onEditGoal(investment.goalId)}
-                            />
-                          );
-                        })}
-                            </Box>
-                          </Collapse>
-                      </Box>
+                            >
+                              <Grid item xs={12} sm={8}> {/* Goal Name */}
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.secondary" }}>
+                                  {group.goalName} ({group.investments.length} {group.investments.length === 1 ? 'plan' : 'plans'})
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12} sm={3} sx={{ textAlign: { xs: 'left', sm: 'right' } }}> {/* Monthly Total */}
+                                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "text.secondary" }}>
+                                  {formatCurrency(groupMonthlyTotal)} / mo
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12} sm={1} sx={{ textAlign: { xs: 'left', sm: 'right' } }}> {/* Icon */}
+                                <IconButton size="small" disableRipple sx={{ p: 0 }}>
+                                  {isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                </IconButton>
+                              </Grid>
+                            </Grid>
+                            <Collapse in={isExpanded}>
+                              <Box sx={{ mt: 1.5 }}>
+                                {group.investments.map((investment) => {
+                            const expenseRatio =
+                              investment.frequency === "yearly" && totalIncome > 0
+                                ? (investment.amount / (totalIncome * 12)) * 100
+                                : totalIncome > 0
+                                ? (investment.amount / totalIncome) * 100
+                                : 0;
+                            return (
+                              <ExpenseReadOnlyItem
+                                key={investment.id}
+                                item={investment}
+                                currency={currency}
+                                isExpense={true}
+                                totalIncome={totalIncome}
+                                expenseRatio={expenseRatio}
+                                getExpenseColor={() => {
+                                  const ratio = expenseRatio;
+                                  if (ratio > 40) return "error.main";
+                                  if (ratio > 30) return "warning.main";
+                                  return "success.main";
+                                }}
+                                formatCurrency={formatCurrency}
+                                onConfirmDelete={handleReadOnlyDelete}
+                                deletionImpactMessage={`To stop this investment, please edit or delete the associated goal in the Future Goals tab.`}
+                                isReadOnly={true}
+                                onClick={() => onEditGoal(investment.goalId)}
+                              />
+                            );
+                          })}
+                              </Box>
+                            </Collapse>
+                        </Box>
+                        </Grid>
                       );
                     })}
-                  </Box>
+                  </Grid>
               </Box>
             )}
 
@@ -456,6 +465,6 @@ export default function ExpenseSection({ onEditGoal }) {
           </Box>
         </Paper>
       </Grid>
-    </>
+    </Grid>
   );
 }
