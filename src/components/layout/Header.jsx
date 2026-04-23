@@ -426,8 +426,6 @@ const Header = () => {
             <MenuItem onClick={() => handleProfileSelect("settings")}>
               Settings
             </MenuItem>
-            <Divider />
-            {/* Removed Reset Data from here, now it's an icon on mobile and in the drawer */}
           </Menu>
         </Box>
       </Toolbar>
