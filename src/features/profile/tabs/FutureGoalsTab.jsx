@@ -273,7 +273,11 @@ export default function FutureGoalsTab({ goalToEditId }) {
       name: "Child's Education",
       handler: applyEducationGoal,
     },
-    { icon: <TrendingUpIcon />, name: "Retirement", handler: applyRetirementGoal },
+    {
+      icon: <TrendingUpIcon />,
+      name: "Retirement",
+      handler: applyRetirementGoal,
+    },
     {
       icon: <AddIcon />,
       name: "New Custom Goal",
@@ -768,7 +772,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
               tooltipTitle={action.name}
               tooltipOpen
               onClick={action.handler}
-              disabled={action.name === 'New Custom Goal' && currentSurplus < 0}
+              disabled={action.name === "New Custom Goal" && currentSurplus < 0}
             />
           ))}
         </SpeedDial>
@@ -779,8 +783,11 @@ export default function FutureGoalsTab({ goalToEditId }) {
         onClose={handleCloseModal}
         fullWidth
         maxWidth="md"
-        fullScreen={isMediumScreen}
+        fullScreen
         TransitionComponent={Transition}
+        sx={{
+          marginTop: "5rem",
+        }}
       >
         <DialogTitle>
           {modalTitle}{" "}

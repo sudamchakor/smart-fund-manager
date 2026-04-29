@@ -10,6 +10,7 @@ import {
   Paper,
   Button,
   useMediaQuery,
+  Divider,
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import AddIcon from "@mui/icons-material/Add";
@@ -35,7 +36,11 @@ import { selectCurrency } from "../../../store/emiSlice";
 import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
 import { formatCurrency } from "../../../utils/formatting";
 
-export default function FinancialSection({ isIncome, onEditGoal, onOpenModal }) {
+export default function FinancialSection({
+  isIncome,
+  onEditGoal,
+  onOpenModal,
+}) {
   const dispatch = useDispatch();
   const currency = useSelector(selectCurrency);
   const theme = useTheme();
@@ -121,6 +126,7 @@ export default function FinancialSection({ isIncome, onEditGoal, onOpenModal }) 
               </Button>
             )}
           </Box>
+          <Divider sx={{ mb: 2 }} />
           <Box sx={{ maxHeight: 200, overflowY: "auto", pr: 1 }}>
             {isIncome
               ? items.map((item) => (
@@ -252,7 +258,9 @@ export default function FinancialSection({ isIncome, onEditGoal, onOpenModal }) 
                                     onConfirmDelete={() => {}}
                                     deletionImpactMessage={`To stop this investment, please edit or delete the associated goal in the Future Goals tab.`}
                                     isReadOnly={true}
-                                    onClick={() => onEditGoal(investment.goalId)}
+                                    onClick={() =>
+                                      onEditGoal(investment.goalId)
+                                    }
                                   />
                                 ))}
                               </Box>
@@ -279,36 +287,39 @@ export default function FinancialSection({ isIncome, onEditGoal, onOpenModal }) 
                   )),
                 ]}
           </Box>
+          <Paper
+            sx={{
+              mt: 2,
+              p: 2,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: isIncome
+                ? "primary.main"
+                : isBudgetExceeded
+                  ? "error.main"
+                  : "primary.main",
+              color: "primary.contrastText",
+              flexWrap: "wrap",
+              gap: 1,
+            }}
+          >
+            <Typography variant="subtitle1">{totalLabel}:</Typography>
+            <Typography
+              variant="h6"
+              component="span"
+              sx={{ fontWeight: "bold" }}
+            >
+              {formatCurrency(totalAmount)}
+            </Typography>
+            {isBudgetExceeded && (
+              <Tooltip title={budgetWarning}>
+                <InfoIcon fontSize="small" sx={{ cursor: "help" }} />
+              </Tooltip>
+            )}
+          </Paper>
         </CardContent>
       </Card>
-
-      <Paper
-        sx={{
-          mt: 2,
-          p: 2,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: isIncome
-            ? "primary.main"
-            : isBudgetExceeded
-            ? "error.main"
-            : "primary.main",
-          color: "primary.contrastText",
-          flexWrap: "wrap",
-          gap: 1,
-        }}
-      >
-        <Typography variant="subtitle1">{totalLabel}:</Typography>
-        <Typography variant="h6" component="span" sx={{ fontWeight: "bold" }}>
-          {formatCurrency(totalAmount)}
-        </Typography>
-        {isBudgetExceeded && (
-          <Tooltip title={budgetWarning}>
-            <InfoIcon fontSize="small" sx={{ cursor: "help" }} />
-          </Tooltip>
-        )}
-      </Paper>
     </>
   );
 }

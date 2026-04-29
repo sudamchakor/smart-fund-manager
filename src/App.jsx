@@ -27,6 +27,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy"; // Import PrivacyPolicy
 import TermsOfService from "./pages/TermsOfService"; // Import TermsOfService
 import ContactUs from "./pages/ContactUs"; // Import ContactUs
 import SettingsPage from "./pages/SettingsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 // Styles
 import "./App.css";
@@ -150,6 +151,9 @@ const AppContent = () => {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} /> {/* New route */}
             <Route path="/terms-of-service" element={<TermsOfService />} /> {/* New route */}
             <Route path="/contact-us" element={<ContactUs />} /> {/* New route */}
+            
+            {/* Catch-all route for 404 */}
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Box>
         <Footer /> {/* Add the Footer component here */}

@@ -221,7 +221,7 @@ const WealthProjectionEngine = () => {
         </Grid>
       </Grid>
 
-      {financialIndependence && (
+      {financialIndependence ? (
         <Typography
           variant="h5"
           align="center"
@@ -229,6 +229,14 @@ const WealthProjectionEngine = () => {
         >
           Financial Independence Achievable by Age{" "}
           <strong>{financialIndependence.age}</strong>!
+        </Typography>
+      ) : (
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ mt: 4, p: 2, bgcolor: "error.light", borderRadius: 2 }}
+        >
+          Financial Independence Not Achievable!
         </Typography>
       )}
     </Box>

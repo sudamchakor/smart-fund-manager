@@ -7,10 +7,10 @@ import {
 const useGoalForm = (initialGoal, currentYear, onSave) => {
   const [editedGoal, setEditedGoal] = useState(() => {
     const initialTargetAmount = initialGoal?.targetAmount || 0;
-    const initialTimePeriod = initialGoal?.targetYear
-      ? initialGoal.targetYear - currentYear
-      : 10;
     const initialStartYear = initialGoal?.startYear || currentYear; // Initialize startYear
+    const initialTimePeriod = initialGoal?.targetYear
+      ? initialGoal.targetYear - initialStartYear
+      : 10;
 
     if (initialGoal && initialGoal.investmentPlans && initialGoal.investmentPlans.length > 0) {
       // If goal has existing plans, recalculate them to ensure consistency
@@ -47,10 +47,10 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
     // and loss of unsaved edits if the same goal object reference is passed.
     if (initialGoal?.id !== editedGoal?.id) {
       const initialTargetAmount = initialGoal?.targetAmount || 0;
-      const initialTimePeriod = initialGoal?.targetYear
-        ? initialGoal.targetYear - currentYear
-        : 10;
       const initialStartYear = initialGoal?.startYear || currentYear; // Initialize startYear
+      const initialTimePeriod = initialGoal?.targetYear
+        ? initialGoal.targetYear - initialStartYear
+        : 10;
 
       if (initialGoal && initialGoal.investmentPlans && initialGoal.investmentPlans.length > 0) {
         setEditedGoal({
@@ -104,10 +104,10 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
 
   const handleAddPlan = useCallback(() => {
     const currentTargetAmount = editedGoal.targetAmount || 0;
-    const currentTimePeriod = editedGoal.targetYear
-      ? editedGoal.targetYear - currentYear
-      : 10;
     const currentStartYear = editedGoal.startYear || currentYear; // Use editedGoal.startYear
+    const currentTimePeriod = editedGoal.targetYear
+      ? editedGoal.targetYear - currentStartYear
+      : 10;
 
     const totalFutureValueOfExistingPlans = calculateTotalFutureValue(editedGoal.investmentPlans);
     const remainingBalance = Math.max(0, currentTargetAmount - totalFutureValueOfExistingPlans);
@@ -148,10 +148,10 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
           let tempUpdatedPlan;
           if (field === "type") {
             const currentTargetAmount = prevGoal.targetAmount || 0;
-            const currentTimePeriod = prevGoal.targetYear
-              ? prevGoal.targetYear - currentYear
-              : 10;
             const currentStartYear = prevGoal.startYear || currentYear; // Use prevGoal.startYear
+            const currentTimePeriod = prevGoal.targetYear
+              ? prevGoal.targetYear - currentStartYear
+              : 10;
 
             // Calculate total future value of OTHER plans
             const otherPlans = prevGoal.investmentPlans.filter(p => p.id !== planId);
@@ -181,13 +181,14 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
 
   const handleGenerateInvestmentPlans = useCallback(() => {
     const { targetAmount, targetYear, startYear } = editedGoal; // Destructure startYear
-    if (!targetAmount || !targetYear || targetYear <= currentYear) {
-      alert("Please set a valid Target Amount and Target Year.");
+    const planStartYear = startYear || currentYear; // Use startYear from editedGoal
+
+    if (!targetAmount || !targetYear || targetYear <= planStartYear) {
+      alert("Please set a valid Target Amount and Target Year (must be after Start Year).");
       return;
     }
 
-    const totalTimePeriod = targetYear - currentYear;
-    const planStartYear = startYear || currentYear; // Use startYear from editedGoal
+    const totalTimePeriod = targetYear - planStartYear;
 
     // Define plan types that accumulate towards a target
     const accumulatingPlanTypes = ["sip", "lumpsum", "stepUpSip", "fd"];
