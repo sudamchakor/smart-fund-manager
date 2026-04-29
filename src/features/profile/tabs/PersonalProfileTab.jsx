@@ -193,7 +193,7 @@ export default function PersonalProfileTab({ onEditGoal, onOpenModal }) {
       {isSmallScreen && (
         <SpeedDial
           ariaLabel="SpeedDial for financial actions"
-          sx={{ position: "fixed", bottom: 80, right: 16 }}
+          sx={{ position: "fixed", bottom: 80, right: 16, zIndex: 9999 }}
           icon={<SpeedDialIcon />}
           onClose={() => setSpeedDialOpen(false)}
           onOpen={() => setSpeedDialOpen(true)}

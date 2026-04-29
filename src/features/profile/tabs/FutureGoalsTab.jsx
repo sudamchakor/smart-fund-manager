@@ -15,12 +15,15 @@ import {
   Slide,
   useMediaQuery,
   useTheme,
-  Menu,
-  MenuItem,
   Fab,
+  SpeedDial,
+  SpeedDialAction,
+  SpeedDialIcon,
 } from "@mui/material";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import AddIcon from "@mui/icons-material/Add";
+import SchoolIcon from "@mui/icons-material/School";
+import HealthAndSafetyIcon from "@mui/icons-material/HealthAndSafety";
 import EditableGoalItem from "../../../components/common/EditableGoalItem";
 import GoalForm from "../components/GoalForm";
 import {
@@ -82,7 +85,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function FutureGoalsTab({ goalToEditId }) {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
 
   const goals = useSelector(selectGoals) || [];
   const considerInflation = useSelector(selectConsiderInflation) || false;
@@ -113,8 +116,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const [openModal, setOpenModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [modalTitle, setModalTitle] = useState("Add New Goal");
-  const [fabAnchorEl, setFabAnchorEl] = useState(null); // State for FAB menu anchor
-  const openFabMenu = Boolean(fabAnchorEl); // State for FAB menu open/close
 
   const [currentGoalFormData, setCurrentGoalFormData] = useState(null);
 
@@ -167,7 +168,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
     });
     setModalTitle("Add New Goal");
     setOpenModal(true);
-    handleCloseFabMenu(); // Close the FAB menu after selecting "New Goal"
   }, [currentYear]);
 
   const handleCloseModal = useCallback(() => {
@@ -176,19 +176,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
     setCurrentGoalFormData(null);
     setModalTitle("Add New Goal");
   }, []);
-
-  const handleOpenFabMenu = (event) => {
-    setFabAnchorEl(event.currentTarget);
-  };
-
-  const handleCloseFabMenu = () => {
-    setFabAnchorEl(null);
-  };
-
-  const handleSelectTemplate = (templateFunction) => {
-    templateFunction();
-    handleCloseFabMenu(); // Close the FAB menu after selecting a template
-  };
 
   const applyRetirementGoal = useCallback(() => {
     const yearsToRetirement = retirementAge - currentAge;
@@ -274,6 +261,25 @@ export default function FutureGoalsTab({ goalToEditId }) {
     setModalTitle("Add Emergency Fund Goal");
     setOpenModal(true);
   }, [profileExpenses, monthlyEmi, totalMonthlyGoalContributions, currentYear]);
+
+  const actions = [
+    {
+      icon: <HealthAndSafetyIcon />,
+      name: "Emergency Fund (6M)",
+      handler: applyEmergencyFundGoal,
+    },
+    {
+      icon: <SchoolIcon />,
+      name: "Child's Education",
+      handler: applyEducationGoal,
+    },
+    { icon: <TrendingUpIcon />, name: "Retirement", handler: applyRetirementGoal },
+    {
+      icon: <AddIcon />,
+      name: "New Custom Goal",
+      handler: handleOpenModalForNew,
+    },
+  ];
 
   const wealthData = useMemo(() => {
     const maxGoalYear = goals.reduce(
@@ -438,7 +444,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
         )}
       </Grid>
 
-      {!isSmallScreen && (
+      {!isMediumScreen && (
         <Grid item xs={12}>
           <Paper sx={{ p: 3, mb: 3 }}>
             <Grid container spacing={2} sx={{ mb: 2 }}>
@@ -749,59 +755,31 @@ export default function FutureGoalsTab({ goalToEditId }) {
         </Grid>
       </Grid>
 
-      {isSmallScreen && (
-        <>
-          <Fab
-            color="primary"
-            aria-label="add"
-            sx={{
-              position: "fixed",
-              bottom: 16,
-              right: 16,
-              zIndex: 99999, // Added zIndex
-            }}
-            onClick={handleOpenFabMenu}
-            disabled={currentSurplus < 0}
-          >
-            <AddIcon />
-          </Fab>
-          <Menu
-            anchorEl={fabAnchorEl}
-            open={openFabMenu}
-            onClose={handleCloseFabMenu}
-            MenuListProps={{
-              "aria-labelledby": "fab-add-button",
-            }}
-          >
-            <MenuItem onClick={handleOpenModalForNew}>
-              <AddIcon sx={{ mr: 1 }} /> New Goal
-            </MenuItem>
-            <MenuItem onClick={() => handleSelectTemplate(applyRetirementGoal)}>
-              🎯 Retirement
-            </MenuItem>
-            <MenuItem onClick={() => handleSelectTemplate(applyEducationGoal)}>
-              🎓 Child's Education
-            </MenuItem>
-            <MenuItem
-              onClick={() => handleSelectTemplate(applyEmergencyFundGoal)}
-            >
-              🛟 Emergency Fund (6M)
-            </MenuItem>
-          </Menu>
-        </>
+      {isMediumScreen && (
+        <SpeedDial
+          ariaLabel="SpeedDial for goals"
+          sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 99999 }}
+          icon={<SpeedDialIcon />}
+        >
+          {actions.map((action) => (
+            <SpeedDialAction
+              key={action.name}
+              icon={action.icon}
+              tooltipTitle={action.name}
+              onClick={action.handler}
+              disabled={action.name === 'New Custom Goal' && currentSurplus < 0}
+            />
+          ))}
+        </SpeedDial>
       )}
 
       <Dialog
         open={openModal}
         onClose={handleCloseModal}
         fullWidth
-        slots={{
-          transition: Transition,
-        }}
-        fullScreen
-        sx={{
-          ...(isSmallScreen ? {} : { marginTop: 10 }),
-        }}
+        maxWidth="md"
+        fullScreen={isMediumScreen}
+        TransitionComponent={Transition}
       >
         <DialogTitle>
           {modalTitle}{" "}
