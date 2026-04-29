@@ -17,6 +17,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useState } from "react";
+import FinancialModal from "../../features/profile/components/FinancialModal"; // Import FinancialModal
 
 const ReadOnlyItem = (props) => {
   const {
@@ -41,6 +42,7 @@ const ReadOnlyItem = (props) => {
   } = props;
 
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for FinancialModal
 
   const handleDeleteClick = (event) => {
     event.stopPropagation();
@@ -49,8 +51,8 @@ const ReadOnlyItem = (props) => {
 
   const handleEditClick = (event) => {
     event.stopPropagation();
-    if (!isReadOnly && setIsEditing) {
-      setIsEditing(true);
+    if (!isReadOnly) {
+      setIsModalOpen(true); // Open the FinancialModal
     }
   };
 
@@ -58,11 +60,18 @@ const ReadOnlyItem = (props) => {
     setOpenConfirmDelete(false);
   };
 
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   const handleConfirmDelete = () => {
     if (onConfirmDelete) onConfirmDelete(item.id);
     else if (onDelete) onDelete(item.id);
     handleCloseConfirmDelete();
   };
+
+  // Determine the type for FinancialModal based on props
+  const modalType = isIncome ? "income" : isExpense ? "expense" : "corpus";
 
   return (
     <>
@@ -207,6 +216,15 @@ const ReadOnlyItem = (props) => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* FinancialModal for editing */}
+      <FinancialModal
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        type={modalType}
+        asset={item} // Pass the item to be edited
+        mode="edit" // Set mode to "edit"
+      />
     </>
   );
 };

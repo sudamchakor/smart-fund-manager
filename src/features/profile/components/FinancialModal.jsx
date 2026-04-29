@@ -11,10 +11,10 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import IncomeExpenseForm from "../../../components/common/IncomeExpenseForm";
-import { addIncome, addExpense } from "../../../store/profileSlice";
-import { addAsset, updateAsset } from "../../corpus/corpusSlice"; // Import updateAsset
+import { addIncome, addExpense, updateIncome, updateExpense } from "../../../store/profileSlice"; // Import updateIncome, updateExpense
+import { addAsset, updateAsset } from "../../corpus/corpusSlice";
 
-const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => { // Added mode prop
+const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
   const [newAsset, setNewAsset] = useState({
     label: "",
     value: "",
@@ -23,7 +23,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => { // Added mode 
   });
 
   useEffect(() => {
-    if (assetToEdit && mode === "edit") { // Check mode for editing
+    if (assetToEdit && mode === "edit") {
       setNewAsset({
         id: assetToEdit.id,
         label: assetToEdit.label,
@@ -39,7 +39,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => { // Added mode 
         category: "Equity",
       });
     }
-  }, [assetToEdit, mode]); // Added mode to dependency array
+  }, [assetToEdit, mode]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -103,7 +103,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => { // Added mode 
   );
 };
 
-export default function FinancialModal({ open, onClose, type, asset, mode }) { // Added mode prop
+export default function FinancialModal({ open, onClose, type, asset, mode }) {
   const dispatch = useDispatch();
 
   const getTitle = () => {
@@ -119,19 +119,32 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) { /
     }
   };
 
-  const handleSave = (formData) => {
-    if (mode === "edit") { // Use mode to determine edit operation
-      dispatch(updateAsset({ ...formData, id: asset.id }));
-    } else { // Otherwise, it's an add operation
-      const payload = { ...formData, id: Date.now() }; // id will be generated in prepare for addAsset
-      dispatch(
-        addAsset(
-          payload.label,
-          payload.value,
-          payload.expectedReturn,
-          payload.category,
-        ),
-      );
+  const handleFormSave = (formData) => {
+    if (mode === "edit") {
+      if (type === "income") {
+        dispatch(updateIncome({ ...formData, id: asset.id }));
+      } else if (type === "expense") {
+        dispatch(updateExpense({ ...formData, id: asset.id }));
+      } else if (type === "corpus") {
+        dispatch(updateAsset({ ...formData, id: asset.id }));
+      }
+    } else {
+      // Add operation
+      if (type === "income") {
+        dispatch(addIncome(formData));
+      } else if (type === "expense") {
+        dispatch(addExpense(formData));
+      } else if (type === "corpus") {
+        const payload = { ...formData, id: Date.now() }; // id will be generated in prepare for addAsset
+        dispatch(
+          addAsset(
+            payload.label,
+            payload.value,
+            payload.expectedReturn,
+            payload.category,
+          ),
+        );
+      }
     }
     onClose();
   };
@@ -141,14 +154,15 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) { /
       <DialogTitle>{getTitle()}</DialogTitle>
       <Divider sx={{ mb: 2 }} />
       {type === "corpus" ? (
-        <CorpusForm onSave={handleSave} onCancel={onClose} assetToEdit={asset} mode={mode} /> // Pass assetToEdit and mode
+        <CorpusForm onSave={handleFormSave} onCancel={onClose} assetToEdit={asset} mode={mode} />
       ) : (
         <DialogContent>
           <IncomeExpenseForm
+            initialData={mode === "edit" ? asset : null} // Pass initialData for editing
             isExpense={type === "expense"}
-            onSave={handleSave}
+            onSave={handleFormSave}
             onCancel={onClose}
-            submitLabel={mode === "edit" ? "Update" : "Add"} // Use mode for submitLabel
+            submitLabel={mode === "edit" ? "Update" : "Add"}
           />
         </DialogContent>
       )}
