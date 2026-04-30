@@ -31,6 +31,31 @@ import {
 import { formatCurrency } from "../../../utils/formatting";
 import { selectCurrency } from "../../../store/emiSlice";
 
+// Helper function to format large numbers for Y-axis ticks
+const formatLargeNumber = (num, currency) => {
+  const absNum = Math.abs(num);
+  let formattedNum;
+
+  if (absNum >= 10000000) { // Crores
+    formattedNum = `${(num / 10000000).toFixed(1)}Cr`;
+  } else if (absNum >= 100000) { // Lakhs
+    formattedNum = `${(num / 100000).toFixed(1)}L`;
+  } else if (absNum >= 1000) { // Thousands
+    formattedNum = `${(num / 1000).toFixed(1)}K`;
+  } else {
+    formattedNum = num.toString();
+  }
+
+  // Prepend currency symbol if available
+  if (currency === "INR") {
+    return `₹${formattedNum}`;
+  } else if (currency === "USD") {
+    return `$${formattedNum}`;
+  }
+  // Default or other currencies
+  return `${currency} ${formattedNum}`;
+};
+
 const DataCard = ({ title, value, subValue }) => (
   <Card sx={{ height: "100%" }}>
     <CardContent>
@@ -72,7 +97,6 @@ const WealthProjectionEngine = () => {
   const expectedReturnRate = useSelector(selectExpectedReturnRate);
   const stepUpPercentage = useSelector(selectStepUpPercentage);
   const currency = useSelector(selectCurrency);
-  console.log(projectionData, "Sudam");
   const handleReturnRateChange = (event, newValue) => {
     dispatch(setExpectedReturnRate(newValue / 100));
   };
@@ -164,7 +188,7 @@ const WealthProjectionEngine = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="age" />
                   <YAxis
-                    tickFormatter={(tick) => formatCurrency(tick, currency)}
+                    tickFormatter={(tick) => formatLargeNumber(tick, currency)}
                   />
                   <Tooltip content={<CustomTooltip currency={currency} />} />
                   <Legend />
@@ -199,7 +223,7 @@ const WealthProjectionEngine = () => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="age" />
                   <YAxis
-                    tickFormatter={(tick) => formatCurrency(tick, currency)}
+                    tickFormatter={(tick) => formatLargeNumber(tick, currency)}
                   />
                   <Tooltip content={<CustomTooltip currency={currency} />} />
                   <Legend />

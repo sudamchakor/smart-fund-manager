@@ -196,10 +196,7 @@ const Header = () => {
     location.pathname === "/" ? calculators[0] : currentCalculator;
 
   const drawerContent = (
-    <Box
-      sx={{ width: 250 }}
-      role="presentation"
-    >
+    <Box sx={{ width: 250 }} role="presentation">
       <List>
         <ListItem disablePadding>
           <ListItemButton onClick={() => navigate("/")}>
@@ -262,6 +259,14 @@ const Header = () => {
                 <ListItemText primary="Settings" />
               </ListItemButton>
             </ListItem>
+            <ListItem disablePadding sx={{ pl: 4 }}>
+              <ListItemButton onClick={handleResetLocalData}>
+                <ListItemIcon>
+                  <RestartAltIcon />
+                </ListItemIcon>
+                <ListItemText primary="Reset Data" />
+              </ListItemButton>
+            </ListItem>
           </List>
         </Collapse>
         <Divider />
@@ -314,8 +319,12 @@ const Header = () => {
               open={Boolean(exportAnchorEl)}
               onClose={handleExportMenuClose}
             >
-              <MenuItem onClick={() => handleExport("pdf")}>Export to PDF</MenuItem>
-              <MenuItem onClick={() => handleExport("excel")}>Export to Excel</MenuItem>
+              <MenuItem onClick={() => handleExport("pdf")}>
+                Export to PDF
+              </MenuItem>
+              <MenuItem onClick={() => handleExport("excel")}>
+                Export to Excel
+              </MenuItem>
             </Menu>
 
             {/* FAQ Icon for Mobile */}
@@ -403,6 +412,16 @@ const Header = () => {
                   FAQ
                 </Link>
               </Typography>
+
+              {/* Reset Data button for large screens */}
+              <IconButton
+                color="inherit"
+                onClick={handleResetLocalData}
+                sx={{ mr: 1 }}
+                title="Reset All Data"
+              >
+                <RestartAltIcon />
+              </IconButton>
             </Box>
           </>
         )}
@@ -430,10 +449,15 @@ const Header = () => {
             <MenuItem onClick={() => handleProfileSelect("settings")}>
               Settings
             </MenuItem>
+            <MenuItem onClick={handleResetLocalData}>Reset Data</MenuItem>
           </Menu>
         </Box>
       </Toolbar>
-      <Drawer anchor="left" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
         {drawerContent}
       </Drawer>
     </AppBar>

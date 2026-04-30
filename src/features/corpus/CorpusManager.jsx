@@ -41,7 +41,7 @@ const CorpusManager = ({ onOpenModal }) => {
   const handleRemoveAsset = (id) => {
     dispatch(removeAsset(id));
   };
-
+  console.log(assets, "Sudam");
   return (
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <CardHeader
@@ -82,35 +82,38 @@ const CorpusManager = ({ onOpenModal }) => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {assets.map((asset) => (
-                <TableRow key={asset.id}>
-                  <TableCell>{asset.label}</TableCell>
-                  <TableCell align="right">
-                    {formatCurrency(asset.value)}
-                  </TableCell>
-                  <TableCell align="right">
-                    {asset.expectedReturn.toFixed(2)}%
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      edge="end"
-                      aria-label="edit"
-                      color="primary"
-                      onClick={() => onOpenModal("corpus", asset, "edit")}
-                    >
-                      <EditIcon fontSize="small" />
-                    </IconButton>
-                    <IconButton
-                      edge="end"
-                      aria-label="delete"
-                      onClick={() => handleRemoveAsset(asset.id)}
-                      color="error"
-                    >
-                      <DeleteIcon fontSize="small" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {assets.map((asset) => {
+                const expectedReturnNum = parseFloat(asset.expectedReturn);
+                return (
+                  <TableRow key={asset.id}>
+                    <TableCell>{asset.label}</TableCell>
+                    <TableCell align="right">
+                      {formatCurrency(asset.value)}
+                    </TableCell>
+                    <TableCell align="right">
+                      {!isNaN(expectedReturnNum) ? expectedReturnNum.toFixed(2) : '0.00'}%
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        edge="end"
+                        aria-label="edit"
+                        color="primary"
+                        onClick={() => onOpenModal("corpus", asset, "edit")}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton
+                        edge="end"
+                        aria-label="delete"
+                        onClick={() => handleRemoveAsset(asset.id)}
+                        color="error"
+                      >
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
