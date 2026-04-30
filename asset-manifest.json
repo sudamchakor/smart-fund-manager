@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/smart-fund-manager/static/css/main.c2fde05a.css",
-    "main.js": "/smart-fund-manager/static/js/main.c8a29323.js",
+    "main.js": "/smart-fund-manager/static/js/main.c3713699.js",
     "index.html": "/smart-fund-manager/index.html",
     "main.c2fde05a.css.map": "/smart-fund-manager/static/css/main.c2fde05a.css.map",
-    "main.c8a29323.js.map": "/smart-fund-manager/static/js/main.c8a29323.js.map"
+    "main.c3713699.js.map": "/smart-fund-manager/static/js/main.c3713699.js.map"
   },
   "entrypoints": [
     "static/css/main.c2fde05a.css",
-    "static/js/main.c8a29323.js"
+    "static/js/main.c3713699.js"
   ]
 }
