@@ -11,6 +11,8 @@ import {
   Stack,
 } from "@mui/material";
 import { Toll as LumpsumIcon } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { selectCurrency } from "../../../store/emiSlice";
 
 const LumpsumCalculatorForm = ({
   onCalculate,
@@ -18,26 +20,32 @@ const LumpsumCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
+  // Wire up the global currency setting
+  const currency = useSelector(selectCurrency) || "₹";
+
   const { totalInvestment, expectedReturnRate, timePeriod } = sharedState;
 
   const calculateLumpsum = useCallback(() => {
-    const P = totalInvestment;
-    const r = expectedReturnRate / 100;
-    const n = timePeriod;
+    // Safe fallbacks to prevent NaN crashes if inputs are cleared
+    const P = totalInvestment || 0;
+    const r = (expectedReturnRate || 0) / 100;
+    const n = timePeriod || 0;
 
     // Formula: A = P(1 + r)^n
-    const totalValue = P * Math.pow(1 + r, n);
+    const totalValue = P > 0 && n > 0 ? P * Math.pow(1 + r, n) : P;
     const estimatedReturns = totalValue - P;
 
     let chartData = [];
-    for (let year = 1; year <= timePeriod; year++) {
-      let yearlyValue = P * Math.pow(1 + r, year);
-      chartData.push({
-        year: year,
-        invested: Math.round(P),
-        returns: Math.round(yearlyValue - P),
-        total: Math.round(yearlyValue),
-      });
+    if (P > 0 && n > 0) {
+      for (let year = 1; year <= n; year++) {
+        let yearlyValue = P * Math.pow(1 + r, year);
+        chartData.push({
+          year: year,
+          invested: Math.round(P),
+          returns: Math.round(yearlyValue - P),
+          total: Math.round(yearlyValue),
+        });
+      }
     }
 
     onCalculate({
@@ -102,9 +110,15 @@ const LumpsumCalculatorForm = ({
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "primary.main",
+                      },
+                    }}
                   >
-                    ₹
+                    {currency}
                   </InputAdornment>
                 ),
                 disableUnderline: true,
@@ -114,6 +128,7 @@ const LumpsumCalculatorForm = ({
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right", // Keeps numbers aligned neatly
                 },
               }}
               fullWidth
@@ -168,6 +183,7 @@ const LumpsumCalculatorForm = ({
                   bgcolor: alpha(theme.palette.success.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -219,6 +235,7 @@ const LumpsumCalculatorForm = ({
                   bgcolor: alpha(theme.palette.info.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth

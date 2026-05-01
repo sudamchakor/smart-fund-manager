@@ -11,6 +11,8 @@ import {
   Stack,
 } from "@mui/material";
 import { AccountBalanceWallet as SwpIcon } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { selectCurrency } from "../../../store/emiSlice";
 
 const SwpCalculatorForm = ({
   onCalculate,
@@ -18,6 +20,9 @@ const SwpCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
+  // Wire up the global currency setting
+  const currency = useSelector(selectCurrency) || "₹";
+
   const {
     totalInvestment,
     withdrawalPerMonth,
@@ -26,32 +31,35 @@ const SwpCalculatorForm = ({
   } = sharedState;
 
   const calculateSwp = useCallback(() => {
-    const P = totalInvestment;
-    const W = withdrawalPerMonth;
-    const n = timePeriod * 12;
-    const i = expectedReturnRate / 100 / 12;
+    // Safe fallbacks to prevent NaN crashes if inputs are cleared
+    const P = totalInvestment || 0;
+    const W = withdrawalPerMonth || 0;
+    const n = (timePeriod || 0) * 12;
+    const i = (expectedReturnRate || 0) / 100 / 12;
 
     let currentBalance = P;
     let totalWithdrawn = 0;
     let chartData = [];
 
-    for (let month = 1; month <= n; month++) {
-      if (currentBalance > 0) {
-        let interest = currentBalance * i;
-        currentBalance += interest;
+    if (P > 0 && n > 0) {
+      for (let month = 1; month <= n; month++) {
+        if (currentBalance > 0) {
+          let interest = currentBalance * i;
+          currentBalance += interest;
 
-        let actualWithdrawal = Math.min(W, currentBalance);
-        currentBalance -= actualWithdrawal;
-        totalWithdrawn += actualWithdrawal;
-      }
+          let actualWithdrawal = Math.min(W, currentBalance);
+          currentBalance -= actualWithdrawal;
+          totalWithdrawn += actualWithdrawal;
+        }
 
-      if (month % 12 === 0) {
-        chartData.push({
-          year: month / 12,
-          invested: Math.round(P),
-          withdrawn: Math.round(totalWithdrawn),
-          total: Math.round(Math.max(0, currentBalance)),
-        });
+        if (month % 12 === 0) {
+          chartData.push({
+            year: month / 12,
+            invested: Math.round(P),
+            withdrawn: Math.round(totalWithdrawn),
+            total: Math.round(Math.max(0, currentBalance)),
+          });
+        }
       }
     }
 
@@ -127,9 +135,15 @@ const SwpCalculatorForm = ({
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "primary.main",
+                      },
+                    }}
                   >
-                    ₹
+                    {currency}
                   </InputAdornment>
                 ),
                 disableUnderline: true,
@@ -139,6 +153,7 @@ const SwpCalculatorForm = ({
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -155,6 +170,7 @@ const SwpCalculatorForm = ({
             py: 1,
             "& .MuiSlider-thumb": { width: 12, height: 12 },
             "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
           }}
         />
       </Box>
@@ -180,9 +196,15 @@ const SwpCalculatorForm = ({
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "warning.main",
+                      },
+                    }}
                   >
-                    ₹
+                    {currency}
                   </InputAdornment>
                 ),
                 disableUnderline: true,
@@ -192,6 +214,7 @@ const SwpCalculatorForm = ({
                   bgcolor: alpha(theme.palette.warning.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -205,7 +228,12 @@ const SwpCalculatorForm = ({
           step={500}
           onChange={(e, val) => onSharedStateChange("withdrawalPerMonth", val)}
           color="warning"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          }}
         />
       </Box>
 
@@ -230,7 +258,13 @@ const SwpCalculatorForm = ({
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "success.main",
+                      },
+                    }}
                   >
                     %
                   </InputAdornment>
@@ -242,6 +276,7 @@ const SwpCalculatorForm = ({
                   bgcolor: alpha(theme.palette.success.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -255,7 +290,12 @@ const SwpCalculatorForm = ({
           step={0.1}
           onChange={(e, val) => onSharedStateChange("expectedReturnRate", val)}
           color="success"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          }}
         />
       </Box>
 
@@ -277,7 +317,13 @@ const SwpCalculatorForm = ({
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "info.main",
+                      },
+                    }}
                   >
                     Yr
                   </InputAdornment>
@@ -289,6 +335,7 @@ const SwpCalculatorForm = ({
                   bgcolor: alpha(theme.palette.info.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -302,7 +349,12 @@ const SwpCalculatorForm = ({
           step={1}
           onChange={(e, val) => onSharedStateChange("timePeriod", val)}
           color="info"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          }}
         />
       </Box>
     </Box>

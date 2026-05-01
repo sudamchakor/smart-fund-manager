@@ -18,17 +18,19 @@ const SipCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
-  const { monthlyContribution, expectedReturnRate, timePeriod } = sharedState;
+
+  // FIX: Destructure 'monthlyInvestment' instead of 'monthlyContribution' to match parent state
+  const { monthlyInvestment, expectedReturnRate, timePeriod } = sharedState;
 
   const calculateSip = useCallback(() => {
-    const P = monthlyContribution;
-    const years = timePeriod;
-    const annualRate = expectedReturnRate / 100;
+    const P = monthlyInvestment || 0; // Fallback to 0 if undefined
+    const years = timePeriod || 0;
+    const annualRate = expectedReturnRate || 0;
     const n = years * 12;
-    const i = annualRate / 12;
+    const i = annualRate / 100 / 12;
 
     let totalValue = 0;
-    if (i > 0) {
+    if (i > 0 && n > 0) {
       totalValue = P * ((Math.pow(1 + i, n) - 1) / i) * (1 + i);
     } else {
       totalValue = P * n;
@@ -38,28 +40,32 @@ const SipCalculatorForm = ({
     const estimatedReturns = totalValue - investedAmount;
 
     let chartData = [];
-    for (let year = 1; year <= years; year++) {
-      const months = year * 12;
-      const currentInvested = P * months;
-      let yearlyTotalValue =
-        i > 0 ? P * ((Math.pow(1 + i, months) - 1) / i) * (1 + i) : P * months;
+    if (P > 0 && years > 0) {
+      for (let year = 1; year <= years; year++) {
+        const months = year * 12;
+        const currentInvested = P * months;
+        let yearlyTotalValue =
+          i > 0
+            ? P * ((Math.pow(1 + i, months) - 1) / i) * (1 + i)
+            : P * months;
 
-      chartData.push({
-        year: year,
-        invested: Math.round(currentInvested),
-        returns: Math.round(yearlyTotalValue - currentInvested),
-        total: Math.round(yearlyTotalValue),
-      });
+        chartData.push({
+          year: year,
+          invested: Math.round(currentInvested),
+          returns: Math.round(yearlyTotalValue - currentInvested),
+          total: Math.round(yearlyTotalValue),
+        });
+      }
     }
 
     onCalculate({
       investedAmount: Math.round(investedAmount),
       estimatedReturns: Math.round(estimatedReturns),
       totalValue: Math.round(totalValue),
-      monthlyContribution: monthlyContribution,
+      monthlyInvestment: monthlyInvestment,
       chartData: chartData,
     });
-  }, [monthlyContribution, expectedReturnRate, timePeriod, onCalculate]);
+  }, [monthlyInvestment, expectedReturnRate, timePeriod, onCalculate]);
 
   useEffect(() => {
     calculateSip();
@@ -108,12 +114,9 @@ const SipCalculatorForm = ({
             <TextField
               variant="standard"
               size="small"
-              value={monthlyContribution}
+              value={monthlyInvestment}
               onChange={(e) =>
-                onSharedStateChange(
-                  "monthlyContribution",
-                  Number(e.target.value),
-                )
+                onSharedStateChange("monthlyInvestment", Number(e.target.value))
               }
               InputProps={{
                 startAdornment: (
@@ -139,11 +142,11 @@ const SipCalculatorForm = ({
           </Grid>
         </Grid>
         <Slider
-          value={monthlyContribution}
+          value={monthlyInvestment}
           min={500}
           max={100000}
           step={500}
-          onChange={(e, val) => onSharedStateChange("monthlyContribution", val)}
+          onChange={(e, val) => onSharedStateChange("monthlyInvestment", val)}
           sx={{
             py: 1,
             "& .MuiSlider-thumb": { width: 12, height: 12 },

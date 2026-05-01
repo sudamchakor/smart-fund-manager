@@ -3,26 +3,19 @@ import {
   Box,
   Slider,
   Typography,
-  Card,
   Grid,
   Stack,
   TextField,
   InputAdornment,
+  useTheme,
+  alpha,
+  Divider,
 } from "@mui/material";
-import { useSelector } from "react-redux";
-import { selectThemeMode } from "../store/emiSlice";
-import { themes } from "../components/common/ThemeSelector";
+import { CreditCard as CreditCardIcon } from "@mui/icons-material";
 
 const CreditCardEMICalculator = () => {
-  const themeMode = useSelector(selectThemeMode);
-  const getThemeColor = () => {
-    let currentThemeValue = themeMode;
-    if (currentThemeValue === "light") {
-      currentThemeValue = "dodgerblue";
-    }
-    const selectedTheme = themes.find((t) => t.value === currentThemeValue) || themes[0];
-    return selectedTheme.colors[0]; // primary color
-  };
+  const theme = useTheme();
+
   // State for inputs
   const [amount, setAmount] = useState(500000);
   const [interest, setInterest] = useState(10.5);
@@ -71,72 +64,132 @@ const CreditCardEMICalculator = () => {
     setter(value);
   };
 
+  // Shared styles for the "Command Center" labels
+  const labelStyle = {
+    fontWeight: 800,
+    textTransform: "uppercase",
+    fontSize: "0.75rem",
+    color: "text.secondary",
+    letterSpacing: 0.5,
+  };
+
+  // Shared styles for the tinted input wells
+  const inputWellStyle = {
+    fontWeight: 900,
+    fontSize: "0.95rem",
+    bgcolor: alpha(theme.palette.primary.main, 0.05),
+    color: "primary.main",
+    px: 1.5,
+    py: 0.5,
+    borderRadius: 2,
+    border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  };
+
   return (
-    <Card
+    <Box
       sx={{
         p: { xs: 2, md: 4 },
-        borderRadius: 4,
-        boxShadow: "0 8px 40px rgba(0,0,0,0.12)",
-        bgcolor: "background.paper",
+        borderRadius: 3,
+        border: "1px solid",
+        borderColor: alpha(theme.palette.divider, 0.1),
+        bgcolor: theme.palette.background.paper,
+        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+
+        mx: "auto",
       }}
     >
-      <Grid container spacing={4}>
-        {/* Input Section */}
-        <Grid item xs={12} md={7}>
+      {/* Technical Header */}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            color: "primary.main",
+          }}
+        >
+          <CreditCardIcon fontSize="medium" />
+        </Box>
+        <Box>
           <Typography
             variant="h5"
-            gutterBottom
-            sx={{ fontWeight: 700, color: getThemeColor(), mb: 3 }}
+            sx={{ fontWeight: 900, color: "text.primary", letterSpacing: -0.5 }}
           >
             Credit Card EMI Calculator
           </Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 600, color: "text.secondary" }}
+          >
+            Simulate the exact cost and monthly liability of converting card
+            purchases to EMI.
+          </Typography>
+        </Box>
+      </Stack>
 
+      <Grid container spacing={5}>
+        {/* Input Configuration Section */}
+        <Grid item xs={12} md={7}>
           <Stack spacing={4}>
-            {/* Amount Slider */}
+            {/* 1. Amount Configuration */}
             <Box>
               <Stack
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
-                mb={1}
+                mb={1.5}
               >
-                <Typography variant="subtitle1" fontWeight="500">
-                  Loan Amount
-                </Typography>
+                <Typography sx={labelStyle}>Principal Amount</Typography>
                 <TextField
+                  variant="standard"
                   size="small"
                   value={amount}
                   onChange={handleInputChange(setAmount, minAmount, maxAmount)}
                   InputProps={{
                     startAdornment: (
-                      <InputAdornment position="start">₹</InputAdornment>
+                      <InputAdornment
+                        position="start"
+                        sx={{
+                          "& p": { fontWeight: 900, color: "primary.main" },
+                        }}
+                      >
+                        ₹
+                      </InputAdornment>
                     ),
+                    disableUnderline: true,
+                    sx: inputWellStyle,
                   }}
-                  sx={{ width: 130 }}
+                  sx={{ width: 140 }}
                 />
               </Stack>
-               <Slider
-                 value={amount}
-                 min={minAmount}
-                 max={maxAmount}
-                 step={5000}
-                 onChange={(e, v) => setAmount(v)}
-                 sx={{ color: getThemeColor() }}
-               />
+              <Slider
+                value={amount}
+                min={minAmount}
+                max={maxAmount}
+                step={5000}
+                onChange={(e, v) => setAmount(v)}
+                color="primary"
+                sx={{
+                  py: 1,
+                  "& .MuiSlider-thumb": { width: 14, height: 14 },
+                  "& .MuiSlider-track": { height: 4 },
+                  "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+                }}
+              />
             </Box>
 
-            {/* Interest Slider */}
+            {/* 2. Interest Configuration */}
             <Box>
               <Stack
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
-                mb={1}
+                mb={1.5}
               >
-                <Typography variant="subtitle1" fontWeight="500">
-                  Interest Rate (p.a %)
-                </Typography>
+                <Typography sx={labelStyle}>Interest Rate (P.A.)</Typography>
                 <TextField
+                  variant="standard"
                   size="small"
                   value={interest}
                   onChange={handleInputChange(
@@ -146,102 +199,181 @@ const CreditCardEMICalculator = () => {
                   )}
                   InputProps={{
                     endAdornment: (
-                      <InputAdornment position="end">%</InputAdornment>
+                      <InputAdornment
+                        position="end"
+                        sx={{
+                          "& p": { fontWeight: 900, color: "primary.main" },
+                        }}
+                      >
+                        %
+                      </InputAdornment>
                     ),
+                    disableUnderline: true,
+                    sx: inputWellStyle,
                   }}
-                  sx={{ width: 130 }}
+                  sx={{ width: 140 }}
                 />
               </Stack>
-               <Slider
-                 value={interest}
-                 min={minInterest}
-                 max={maxInterest}
-                 step={0.1}
-                 onChange={(e, v) => setInterest(v)}
-                 sx={{ color: getThemeColor() }}
-               />
+              <Slider
+                value={interest}
+                min={minInterest}
+                max={maxInterest}
+                step={0.1}
+                onChange={(e, v) => setInterest(v)}
+                color="primary"
+                sx={{
+                  py: 1,
+                  "& .MuiSlider-thumb": { width: 14, height: 14 },
+                  "& .MuiSlider-track": { height: 4 },
+                  "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+                }}
+              />
             </Box>
 
-            {/* Tenure Slider */}
+            {/* 3. Tenure Configuration */}
             <Box>
               <Stack
                 direction="row"
                 justifyContent="space-between"
                 alignItems="center"
-                mb={1}
+                mb={1.5}
               >
-                <Typography variant="subtitle1" fontWeight="500">
-                  Tenure (Years)
-                </Typography>
+                <Typography sx={labelStyle}>Tenure (Years)</Typography>
                 <TextField
+                  variant="standard"
                   size="small"
                   value={tenure}
                   onChange={handleInputChange(setTenure, minTenure, maxTenure)}
-                  sx={{ width: 130 }}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment
+                        position="end"
+                        sx={{
+                          "& p": { fontWeight: 900, color: "primary.main" },
+                        }}
+                      >
+                        YRS
+                      </InputAdornment>
+                    ),
+                    disableUnderline: true,
+                    sx: inputWellStyle,
+                  }}
+                  sx={{ width: 140 }}
                 />
               </Stack>
-               <Slider
-                 value={tenure}
-                 min={minTenure}
-                 max={maxTenure}
-                 onChange={(e, v) => setTenure(v)}
-                 sx={{ color: getThemeColor() }}
-               />
+              <Slider
+                value={tenure}
+                min={minTenure}
+                max={maxTenure}
+                onChange={(e, v) => setTenure(v)}
+                color="primary"
+                sx={{
+                  py: 1,
+                  "& .MuiSlider-thumb": { width: 14, height: 14 },
+                  "& .MuiSlider-track": { height: 4 },
+                  "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+                }}
+              />
             </Box>
           </Stack>
         </Grid>
 
-        {/* Results Section */}
+        {/* Dynamic Status Output Terminal */}
         <Grid item xs={12} md={5}>
           <Box
-             sx={{
-               bgcolor: "background.paper",
-               borderRadius: 3,
-               p: 3,
-               height: "100%",
-               display: "flex",
-               flexDirection: "column",
-               justifyContent: "center",
-               border: "1px solid",
-               borderColor: "divider",
-             }}
-           >
+            sx={{
+              bgcolor: alpha(theme.palette.primary.main, 0.03),
+              borderRadius: 3,
+              p: 3,
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              border: "1px dashed",
+              borderColor: alpha(theme.palette.primary.main, 0.2),
+            }}
+          >
             <Typography
-              variant="h6"
+              variant="caption"
               align="center"
-              color="textSecondary"
+              sx={{
+                fontWeight: 800,
+                textTransform: "uppercase",
+                color: "text.secondary",
+                letterSpacing: 1,
+              }}
               gutterBottom
             >
-              Loan Summary
+              Liability Summary
             </Typography>
 
             <Box textAlign="center" sx={{ my: 3 }}>
               <Typography
-                variant="body2"
-                color="textSecondary"
-                sx={{ textTransform: "uppercase", letterSpacing: 1 }}
+                variant="caption"
+                sx={{
+                  textTransform: "uppercase",
+                  fontWeight: 700,
+                  color: "text.disabled",
+                  letterSpacing: 0.5,
+                  display: "block",
+                  mb: 0.5,
+                }}
               >
                 Monthly EMI
               </Typography>
-              <Typography variant="h3" color="#2e7d32" sx={{ fontWeight: 800 }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 900,
+                  color: "primary.main",
+                  letterSpacing: -1,
+                }}
+              >
                 ₹ {emi.toLocaleString("en-IN")}
               </Typography>
             </Box>
 
             <Stack spacing={2} sx={{ mt: 2 }}>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography color="textSecondary">Total Interest</Typography>
-                <Typography fontWeight="700">
-                  ₹ {totalInterest.toLocaleString("en-IN")}
-                </Typography>
-              </Stack>
+              {/* Interest Burden */}
               <Stack
                 direction="row"
                 justifyContent="space-between"
-                sx={{ pt: 2, borderTop: "1px solid #eee" }}
+                alignItems="center"
               >
-                <Typography color="textSecondary">Total Payable</Typography>
-                <Typography fontWeight="700">
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 700, color: "text.secondary" }}
+                >
+                  Total Interest Burden
+                </Typography>
+                <Typography
+                  variant="subtitle1"
+                  sx={{ fontWeight: 900, color: "error.main" }}
+                >
+                  ₹ {totalInterest.toLocaleString("en-IN")}
+                </Typography>
+              </Stack>
+
+              <Divider
+                sx={{ borderColor: alpha(theme.palette.divider, 0.1) }}
+              />
+
+              {/* Total Payable */}
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="center"
+              >
+                <Typography
+                  variant="subtitle2"
+                  sx={{ fontWeight: 800, color: "text.primary" }}
+                >
+                  Total Amount Payable
+                </Typography>
+                <Typography
+                  variant="h6"
+                  sx={{ fontWeight: 900, color: "text.primary" }}
+                >
                   ₹ {totalPayable.toLocaleString("en-IN")}
                 </Typography>
               </Stack>
@@ -249,7 +381,7 @@ const CreditCardEMICalculator = () => {
           </Box>
         </Grid>
       </Grid>
-    </Card>
+    </Box>
   );
 };
 

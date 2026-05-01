@@ -1,94 +1,123 @@
 import React, { useState } from "react";
-import styled from "styled-components";
 import {
   TextField,
   InputAdornment,
   Box,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import dayjs from "dayjs";
 
-export const InputGroup = styled(Box)`
-  display: flex;
-  align-items: stretch;
-`;
+// Shared Metadata Label Component
+const InputLabel = ({ children }) => (
+  <Typography
+    variant="caption"
+    sx={{
+      fontWeight: 800,
+      textTransform: "uppercase",
+      fontSize: "0.65rem",
+      color: "text.secondary",
+      letterSpacing: 0.5,
+      display: "block",
+      mb: 0.5,
+    }}
+  >
+    {children}
+  </Typography>
+);
 
-export const StyledToggleButtonGroup = styled(ToggleButtonGroup)`
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  margin-left: -1px;
+// Shared "Data Well" Input Styling
+const getWellStyle = (theme) => ({
+  fontWeight: 900,
+  fontSize: "0.95rem",
+  bgcolor: alpha(theme.palette.primary.main, 0.05),
+  color: "primary.main",
+  px: 1.5,
+  py: 0.5,
+  borderRadius: 1.5,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  transition: "all 0.2s ease-in-out",
+  "&:hover": {
+    bgcolor: alpha(theme.palette.primary.main, 0.08),
+  },
+  "&.Mui-focused": {
+    bgcolor: alpha(theme.palette.primary.main, 0.1),
+    borderColor: alpha(theme.palette.primary.main, 0.3),
+  },
+});
 
-  .MuiToggleButtonGroup-grouped {
-    border-radius: 0;
-    margin: 0;
-    border-left: 1px solid rgba(0, 0, 0, 0.23);
-    padding: 0 8px;
-    height: 100%;
-
-    &:first-of-type {
-      border-left: 1px solid rgba(0, 0, 0, 0.23);
-    }
-
-    &:last-of-type {
-      border-top-right-radius: 4px;
-      border-bottom-right-radius: 4px;
-    }
-  }
-`;
-
-export const AmountInput = ({ label, value, onChange, currency, disabled, placeholder }) => {
+export const AmountInput = ({
+  label,
+  value,
+  onChange,
+  currency,
+  disabled,
+  placeholder,
+}) => {
+  const theme = useTheme();
   const isPercentage = currency === "%";
+
   return (
-    <TextField
-      fullWidth
-      disabled={disabled}
-      label={label}
-      type="number"
-      value={value || ""}
-      onChange={onChange}
-      onFocus={(e) => e.target.select()}
-      placeholder={placeholder}
-      inputProps={{
-        "aria-label": label,
-        min: "0",
-        step: "0.01",
-      }}
-      sx={{
-        "& .MuiOutlinedInput-root": {
-          "& fieldset": {
-            borderColor: "rgba(0, 0, 0, 0.23)",
-          },
-          "&:hover fieldset": {
-            borderColor: "rgba(0, 0, 0, 0.4)",
-          },
-          "&.Mui-focused fieldset": {
-            borderWidth: 2,
-            borderColor: "primary.main",
-          },
-        },
-        "& .MuiInputBase-input": {
-          // Improve contrast for better readability
-          color: "text.primary",
-        },
-        "& .MuiInputLabel-root": {
-          color: "text.secondary",
-          "&.Mui-focused": {
-            color: "primary.main",
-          },
-        },
-      }}
-      InputProps={{
-        startAdornment:
-          !isPercentage && currency ? (
-            <InputAdornment position="start" sx={{ fontWeight: 600 }}>{currency}</InputAdornment>
+    <Box sx={{ width: "100%", opacity: disabled ? 0.6 : 1 }}>
+      {label && <InputLabel>{label}</InputLabel>}
+      <TextField
+        variant="standard"
+        fullWidth
+        disabled={disabled}
+        type="number"
+        value={value || ""}
+        onChange={onChange}
+        onFocus={(e) => e.target.select()}
+        placeholder={placeholder}
+        inputProps={{
+          min: "0",
+          step: "0.01",
+        }}
+        InputProps={{
+          disableUnderline: true,
+          startAdornment:
+            !isPercentage && currency ? (
+              <InputAdornment
+                position="start"
+                sx={{
+                  "& p": {
+                    fontWeight: 900,
+                    fontSize: "0.85rem",
+                    color: "primary.main",
+                  },
+                }}
+              >
+                {currency}
+              </InputAdornment>
+            ) : null,
+          endAdornment: isPercentage ? (
+            <InputAdornment
+              position="end"
+              sx={{
+                "& p": {
+                  fontWeight: 900,
+                  fontSize: "0.85rem",
+                  color: "primary.main",
+                },
+              }}
+            >
+              %
+            </InputAdornment>
           ) : null,
-        endAdornment: isPercentage ? (
-          <InputAdornment position="end" sx={{ fontWeight: 600 }}>%</InputAdornment>
-        ) : null,
-      }}
-    />
+          sx: getWellStyle(theme),
+        }}
+        sx={{
+          "& input": { textAlign: "right" },
+          "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+            { display: "none" },
+          MozAppearance: "textfield",
+        }}
+      />
+    </Box>
   );
 };
 
@@ -100,97 +129,101 @@ export const AmountWithUnitInput = ({
   onUnitChange,
   unitOptions,
   placeholder,
-}) => (
-  <InputGroup>
-    <TextField
-      sx={{
-        flex: 1,
-        minWidth: 0,
-        "& .MuiOutlinedInput-root": {
-          borderTopRightRadius: 0,
-          borderBottomRightRadius: 0,
-          "& fieldset": {
-            borderColor: "rgba(0, 0, 0, 0.23)",
+}) => {
+  const theme = useTheme();
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      {label && <InputLabel>{label}</InputLabel>}
+
+      {/* Unified Control Strip */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "stretch",
+          borderRadius: 1.5,
+          border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+          bgcolor: alpha(theme.palette.primary.main, 0.05),
+          overflow: "hidden",
+          transition: "all 0.2s",
+          "&:focus-within": {
+            borderColor: alpha(theme.palette.primary.main, 0.3),
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
           },
-          "&:hover fieldset": {
-            borderColor: "rgba(0, 0, 0, 0.4)",
-          },
-          "&.Mui-focused fieldset": {
-            borderWidth: 2,
-            borderColor: "primary.main",
-          },
-        },
-        "& .MuiInputBase-input": {
-          color: "text.primary",
-        },
-        "& .MuiInputLabel-root": {
-          color: "text.secondary",
-          "&.Mui-focused": {
-            color: "primary.main",
-          },
-        },
-      }}
-      fullWidth
-      label={label}
-      type="number"
-      value={value || ""}
-      onChange={onAmountChange}
-      onFocus={(e) => e.target.select()}
-      placeholder={placeholder}
-      inputProps={{
-        "aria-label": label,
-        min: "0",
-        step: "0.01",
-      }}
-    />
-    <StyledToggleButtonGroup
-      value={unitValue}
-      exclusive
-      onChange={(e, newUnit) => {
-        if (newUnit !== null) {
-          onUnitChange({ target: { value: newUnit } });
-        }
-      }}
-      aria-label="unit selection"
-    >
-      {unitOptions.map((option) => (
-        <ToggleButton
-          key={option.value}
-          value={option.value}
-          aria-label={option.label}
+        }}
+      >
+        <TextField
+          variant="standard"
           sx={{
-            px: 1,
-            minWidth: "auto",
-            fontWeight: 600,
-            whiteSpace: "nowrap",
-            // State-based coloring with better contrast
-            "&.Mui-selected": {
-              bgcolor: "primary.main",
-              color: "primary.contrastText",
-              fontWeight: 700,
-              "&:hover": { bgcolor: "primary.dark" },
+            flex: 1,
+            minWidth: 0,
+            "& input": {
+              textAlign: "right",
+              px: 1.5,
+              py: 1,
+              fontWeight: 900,
+              color: "primary.main",
             },
-            "color": "text.primary",
-            "&:hover": {
-              bgcolor: "action.hover",
+            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+              { display: "none" },
+            MozAppearance: "textfield",
+          }}
+          type="number"
+          value={value || ""}
+          onChange={onAmountChange}
+          onFocus={(e) => e.target.select()}
+          placeholder={placeholder}
+          inputProps={{ min: "0", step: "0.01" }}
+          InputProps={{ disableUnderline: true }}
+        />
+
+        <ToggleButtonGroup
+          value={unitValue}
+          exclusive
+          onChange={(e, newUnit) => {
+            if (newUnit !== null) {
+              onUnitChange({ target: { value: newUnit } });
+            }
+          }}
+          sx={{
+            borderLeft: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+            "& .MuiToggleButton-root": {
+              border: "none",
+              borderRadius: 0,
+              px: 2,
+              fontWeight: 800,
+              fontSize: "0.75rem",
+              color: "text.secondary",
+              "&.Mui-selected": {
+                bgcolor: alpha(theme.palette.primary.main, 0.15),
+                color: "primary.main",
+                "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+              },
             },
           }}
         >
-          {option.label}
-        </ToggleButton>
-      ))}
-    </StyledToggleButtonGroup>
-  </InputGroup>
-);
+          {unitOptions.map((option) => (
+            <ToggleButton key={option.value} value={option.value}>
+              {option.label}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
+      </Box>
+    </Box>
+  );
+};
 
 export const DatePickerInput = ({ label, value, onChange }) => {
+  const theme = useTheme();
   const [open, setOpen] = useState(false);
-  // Convert ISO string to Dayjs object if needed
-  const dayjsValue = value ? (typeof value === 'string' ? dayjs(value) : value) : null;
+  const dayjsValue = value
+    ? typeof value === "string"
+      ? dayjs(value)
+      : value
+    : null;
 
   const handleChange = (newValue) => {
     if (newValue) {
-      // Convert Dayjs object to ISO string before passing to parent
       onChange(newValue.toISOString());
     } else {
       onChange(null);
@@ -198,48 +231,32 @@ export const DatePickerInput = ({ label, value, onChange }) => {
   };
 
   return (
-    <DatePicker
-      label={label}
-      views={["year", "month"]}
-      openTo="month"
-      open={open}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      value={dayjsValue}
-      onChange={handleChange}
-      slotProps={{
-        textField: {
-          fullWidth: true,
-          onClick: () => setOpen(true),
-          inputProps: {
-            "aria-label": label,
-          },
-          sx: {
-            "& .MuiOutlinedInput-root": {
-              "& fieldset": {
-                borderColor: "rgba(0, 0, 0, 0.23)",
-              },
-              "&:hover fieldset": {
-                borderColor: "rgba(0, 0, 0, 0.4)",
-              },
-              "&.Mui-focused fieldset": {
-                borderWidth: 2,
-                borderColor: "primary.main",
-              },
-            },
-            "& .MuiInputBase-input": {
-              color: "text.primary",
-              cursor: "pointer",
-            },
-            "& .MuiInputLabel-root": {
-              color: "text.secondary",
-              "&.Mui-focused": {
-                color: "primary.main",
+    <Box sx={{ width: "100%" }}>
+      {label && <InputLabel>{label}</InputLabel>}
+      <DatePicker
+        views={["year", "month"]}
+        openTo="month"
+        open={open}
+        onOpen={() => setOpen(true)}
+        onClose={() => setOpen(false)}
+        value={dayjsValue}
+        onChange={handleChange}
+        slotProps={{
+          textField: {
+            variant: "standard",
+            fullWidth: true,
+            onClick: () => setOpen(true),
+            InputProps: {
+              disableUnderline: true,
+              sx: {
+                ...getWellStyle(theme),
+                cursor: "pointer",
+                "& input": { cursor: "pointer", textAlign: "right" },
               },
             },
           },
-        },
-      }}
-    />
+        }}
+      />
+    </Box>
   );
 };

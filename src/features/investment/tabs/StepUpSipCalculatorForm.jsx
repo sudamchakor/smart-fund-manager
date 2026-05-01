@@ -11,6 +11,8 @@ import {
   Stack,
 } from "@mui/material";
 import { QueryStats as StepUpIcon } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { selectCurrency } from "../../../store/emiSlice";
 
 const StepUpSipCalculatorForm = ({
   onCalculate,
@@ -18,53 +20,66 @@ const StepUpSipCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
+  // Wire up the global currency setting
+  const currency = useSelector(selectCurrency) || "₹";
+
+  // FIX: Destructure 'monthlyInvestment' instead of 'monthlyContribution'
   const {
-    monthlyContribution,
+    monthlyInvestment,
     stepUpPercentage,
     expectedReturnRate,
     timePeriod,
   } = sharedState;
 
   const calculateStepUpSip = useCallback(() => {
-    let currentMonthlySIP = monthlyContribution;
-    const i = expectedReturnRate / 100 / 12;
+    // Safe fallbacks to prevent NaN crashes if inputs are cleared
+    let currentMonthlySIP = monthlyInvestment || 0;
+    const stepUp = stepUpPercentage || 0;
+    const period = timePeriod || 0;
+    const i = (expectedReturnRate || 0) / 100 / 12;
 
     let totalInvestedAmount = 0;
     let finalCorpus = 0;
     let chartData = [];
 
-    for (let year = 1; year <= timePeriod; year++) {
-      let yearlyInvested = currentMonthlySIP * 12;
-      totalInvestedAmount += yearlyInvested;
+    if (currentMonthlySIP > 0 && period > 0) {
+      for (let year = 1; year <= period; year++) {
+        let yearlyInvested = currentMonthlySIP * 12;
+        totalInvestedAmount += yearlyInvested;
 
-      // Compound existing corpus for the year
-      finalCorpus = finalCorpus * Math.pow(1 + i, 12);
+        // Compound existing corpus for the year
+        if (i > 0) {
+          finalCorpus = finalCorpus * Math.pow(1 + i, 12);
+          // Add maturity of this year's SIP contributions
+          let yearlySipMaturity =
+            currentMonthlySIP * ((Math.pow(1 + i, 12) - 1) / i) * (1 + i);
+          finalCorpus += yearlySipMaturity;
+        } else {
+          finalCorpus += yearlyInvested;
+        }
 
-      // Add maturity of this year's SIP contributions
-      let yearlySipMaturity =
-        currentMonthlySIP * ((Math.pow(1 + i, 12) - 1) / i) * (1 + i);
-      finalCorpus += yearlySipMaturity;
+        chartData.push({
+          year: year,
+          invested: Math.round(totalInvestedAmount),
+          returns: Math.round(finalCorpus - totalInvestedAmount),
+          total: Math.round(finalCorpus),
+        });
 
-      chartData.push({
-        year: year,
-        invested: Math.round(totalInvestedAmount),
-        returns: Math.round(finalCorpus - totalInvestedAmount),
-        total: Math.round(finalCorpus),
-      });
-
-      currentMonthlySIP += currentMonthlySIP * (stepUpPercentage / 100);
+        // Apply Step-Up for the next year
+        currentMonthlySIP += currentMonthlySIP * (stepUp / 100);
+      }
     }
 
     onCalculate({
       investedAmount: Math.round(totalInvestedAmount),
       estimatedReturns: Math.round(finalCorpus - totalInvestedAmount),
       totalValue: Math.round(finalCorpus),
-      monthlyContribution: monthlyContribution,
+      monthlyInvestment: monthlyInvestment,
       chartData: chartData,
       totalWithdrawn: 0,
     });
   }, [
-    monthlyContribution,
+    monthlyInvestment,
     stepUpPercentage,
     expectedReturnRate,
     timePeriod,
@@ -117,20 +132,23 @@ const StepUpSipCalculatorForm = ({
             <TextField
               variant="standard"
               size="small"
-              value={monthlyContribution}
+              value={monthlyInvestment}
               onChange={(e) =>
-                onSharedStateChange(
-                  "monthlyContribution",
-                  Number(e.target.value),
-                )
+                onSharedStateChange("monthlyInvestment", Number(e.target.value))
               }
               InputProps={{
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "primary.main",
+                      },
+                    }}
                   >
-                    ₹
+                    {currency}
                   </InputAdornment>
                 ),
                 disableUnderline: true,
@@ -140,6 +158,7 @@ const StepUpSipCalculatorForm = ({
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -147,15 +166,16 @@ const StepUpSipCalculatorForm = ({
           </Grid>
         </Grid>
         <Slider
-          value={monthlyContribution}
+          value={monthlyInvestment}
           min={500}
           max={100000}
           step={500}
-          onChange={(e, val) => onSharedStateChange("monthlyContribution", val)}
+          onChange={(e, val) => onSharedStateChange("monthlyInvestment", val)}
           sx={{
             py: 1,
             "& .MuiSlider-thumb": { width: 12, height: 12 },
             "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
           }}
         />
       </Box>
@@ -190,6 +210,7 @@ const StepUpSipCalculatorForm = ({
                   bgcolor: alpha(theme.palette.secondary.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -203,7 +224,11 @@ const StepUpSipCalculatorForm = ({
           step={1}
           onChange={(e, val) => onSharedStateChange("stepUpPercentage", val)}
           color="secondary"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+          }}
         />
       </Box>
 
@@ -240,6 +265,7 @@ const StepUpSipCalculatorForm = ({
                   bgcolor: alpha(theme.palette.success.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -253,7 +279,11 @@ const StepUpSipCalculatorForm = ({
           step={0.1}
           onChange={(e, val) => onSharedStateChange("expectedReturnRate", val)}
           color="success"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+          }}
         />
       </Box>
 
@@ -287,6 +317,7 @@ const StepUpSipCalculatorForm = ({
                   bgcolor: alpha(theme.palette.info.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -300,7 +331,11 @@ const StepUpSipCalculatorForm = ({
           step={1}
           onChange={(e, val) => onSharedStateChange("timePeriod", val)}
           color="info"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+          }}
         />
       </Box>
     </Box>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Typography,
   Container,
@@ -6,210 +6,246 @@ import {
   AccordionSummary,
   AccordionDetails,
   Stack,
+  Box,
+  useTheme,
+  alpha,
+  Divider,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import "./FAQ.scss";
+import {
+  ExpandMore as ExpandMoreIcon,
+  HelpOutline as HelpIcon,
+  Functions as MathIcon,
+} from "@mui/icons-material";
+
+// Structured FAQ Data for clean rendering
+const faqData = [
+  {
+    category: "System Overview",
+    items: [
+      {
+        q: "What calculators are available on this platform?",
+        a: "We offer multiple precision engines to help you plan your finances:\n\n• Home Loan EMI: Calculate your monthly EMI, total interest, and view detailed payment schedules. Includes prepayment and tracking.\n• Credit Card EMI: Understand the exact cost of credit card conversions.\n• Personal Loan & BNPL: Flexible tenure calculations for unsecured debt.\n• Investment Projections: SIP, Lumpsum, Step-Up SIP, and SWP calculators for long-term wealth planning.",
+      },
+    ],
+  },
+  {
+    category: "Loan Mechanics",
+    items: [
+      {
+        q: "How is the EMI calculated?",
+        a: "EMI (Equated Monthly Installment) is calculated using the standard amortization formula. Where E is EMI, P is Principal, r is the monthly interest rate, and n is the tenure in months.",
+        formula: "E = P × r × (1 + r)^n / ((1 + r)^n - 1)",
+      },
+      {
+        q: "What is Loan Margin or Down Payment?",
+        a: "The margin or down payment is the portion of the asset's purchase price that you pay out of pocket. Lenders typically finance up to 80-90% of the value; the remainder is your required margin.",
+      },
+      {
+        q: "Does Home Loan Interest Rate vary?",
+        a: "Yes. Floating interest rates change over time based on the lender's benchmark (like the repo rate), whereas fixed rates remain locked for a specified period or the entire tenure.",
+      },
+      {
+        q: "What are prepayments and how do they affect my loan?",
+        a: "Prepayments are surplus payments made directly towards your principal balance. Because interest is calculated on the outstanding principal, prepayments drastically reduce the total interest paid and accelerate your debt-free timeline.",
+      },
+      {
+        q: "Can I change my EMI amount later?",
+        a: "Regular EMIs are fixed at origination. However, lenders offer 'Step-Up' or 'Step-Down' options. If a floating rate changes, you usually have the choice to alter the EMI amount or adjust the remaining tenure.",
+      },
+      {
+        q: "How is Credit Card EMI different from Personal Loan EMI?",
+        a: "• Interest Rate: Personal Loans typically offer lower rates.\n• Processing: Credit Card EMI is instant against your existing limit; Personal Loans require approval.\n• Repayment: The mathematical calculation is identical, but Personal Loans offer wider tenure flexibility.",
+      },
+      {
+        q: "What is BNPL (Buy Now Pay Later)?",
+        a: "BNPL is a micro-financing option for specific retail purchases. It often features zero or promotional low-interest rates if paid strictly within the short agreed tenure.",
+      },
+    ],
+  },
+  {
+    category: "Investment Engines",
+    items: [
+      {
+        q: "What are Investment Calculators and why are they important?",
+        a: "They simulate the mathematical power of compound interest:\n\n• SIP: Regular, fixed contributions over time.\n• Lumpsum: Future value of a single, upfront capital deployment.\n• Step-Up SIP: Automatically increasing contributions to match career/salary growth.\n• SWP: Safe withdrawal mechanics for passive income during retirement.",
+      },
+    ],
+  },
+];
 
 const FAQ = () => {
+  const theme = useTheme();
+  const [expanded, setExpanded] = useState(false);
+
+  const handleChange = (panel) => (event, isExpanded) => {
+    setExpanded(isExpanded ? panel : false);
+  };
+
   return (
-    <Container maxWidth="md">
-      <Typography variant="h4" gutterBottom className="faq-title">
-        Frequently Asked Questions
-      </Typography>
-      <Typography variant="body1" paragraph>
-        Find answers to common questions about our EMI and financial calculators.
-      </Typography>
+    <Container maxWidth="md" sx={{ py: 4 }}>
+      {/* Technical Header */}
+      <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            display: "flex",
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: alpha(theme.palette.info.main, 0.1),
+            color: "info.main",
+          }}
+        >
+          <HelpIcon fontSize="medium" />
+        </Box>
+        <Box>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: 900, color: "text.primary", letterSpacing: -0.5 }}
+          >
+            Knowledge Base
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 600, color: "text.secondary" }}
+          >
+            Operational guidelines and financial calculation methodologies.
+          </Typography>
+        </Box>
+      </Stack>
 
-      <Stack spacing={2}>
-        {/* General Questions */}
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What calculators are available on this platform?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              We offer multiple financial calculators to help you plan your finances:
-              <ul>
-                <li>
-                  <strong>Home Loan EMI Calculator:</strong> Calculate your monthly EMI, total interest, and view detailed payment schedules for home loans. Includes prepayment options and additional expense tracking.
-                </li>
-                <li>
-                  <strong>Credit Card EMI Calculator:</strong> Understand the EMI for credit card purchases and calculate total interest payable.
-                </li>
-                <li>
-                  <strong>Personal Loan & BNPL Calculator:</strong> Calculate EMI for personal loans and Buy Now Pay Later products with flexible interest rates and tenures.
-                </li>
-                <li>
-                  <strong>Investment Calculators:</strong> Includes SIP (Systematic Investment Plan), Lumpsum Investment, Step-Up SIP, and SWP (Systematic Withdrawal Plan) calculators to help you plan your investments.
-                </li>
-              </ul>
+      <Stack spacing={4}>
+        {faqData.map((section, sectionIndex) => (
+          <Box key={sectionIndex}>
+            {/* Category Header */}
+            <Typography
+              variant="caption"
+              sx={{
+                fontWeight: 800,
+                textTransform: "uppercase",
+                color: "text.disabled",
+                letterSpacing: 1,
+                mb: 1,
+                display: "block",
+                pl: 1,
+              }}
+            >
+              {section.category}
             </Typography>
-          </AccordionDetails>
-        </Accordion>
 
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>How is the EMI calculated?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              EMI (Equated Monthly Installment) is calculated using the standard
-              formula:
-              <br />
-              <code>E = P x r x (1 + r)^n / ((1 + r)^n - 1)</code>
-              <br />
-              Where:
-              <ul>
-                <li>
-                  <strong>E</strong> is EMI
-                </li>
-                <li>
-                  <strong>P</strong> is Principal Loan Amount
-                </li>
-                <li>
-                  <strong>r</strong> is rate of interest calculated on monthly
-                  basis (i.e., r = Rate of Annual interest/12/100)
-                </li>
-                <li>
-                  <strong>n</strong> is loan term / tenure / duration in number of
-                  months
-                </li>
-              </ul>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+            {/* Category Accordions */}
+            <Box
+              sx={{
+                border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+                borderRadius: 3,
+                overflow: "hidden",
+                bgcolor: theme.palette.background.paper,
+                boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+              }}
+            >
+              {section.items.map((item, itemIndex) => {
+                const panelId = `panel-${sectionIndex}-${itemIndex}`;
+                const isExpanded = expanded === panelId;
 
-        {/* Home Loan Specific Questions */}
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What is Loan Margin or Down Payment?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              The margin or down payment is the portion of the property's purchase
-              price that you pay out of pocket, rather than financing through the
-              loan. Typically, banks finance up to 80-90% of the property value,
-              and the rest is paid as a down payment.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+                return (
+                  <Accordion
+                    key={itemIndex}
+                    expanded={isExpanded}
+                    onChange={handleChange(panelId)}
+                    disableGutters
+                    elevation={0}
+                    square
+                    sx={{
+                      bgcolor: "transparent",
+                      borderBottom:
+                        itemIndex !== section.items.length - 1
+                          ? `1px solid ${alpha(theme.palette.divider, 0.1)}`
+                          : "none",
+                      "&:before": { display: "none" }, // Removes default MUI top border
+                      transition: "background-color 0.2s ease",
+                      ...(isExpanded && {
+                        bgcolor: alpha(theme.palette.primary.main, 0.02),
+                      }),
+                    }}
+                  >
+                    <AccordionSummary
+                      expandIcon={
+                        <ExpandMoreIcon
+                          sx={{
+                            color: isExpanded
+                              ? "primary.main"
+                              : "text.secondary",
+                          }}
+                        />
+                      }
+                      sx={{
+                        px: 2.5,
+                        py: 0.5,
+                        "& .MuiAccordionSummary-content": { my: 1.5 },
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{
+                          fontWeight: isExpanded ? 800 : 700,
+                          color: isExpanded ? "primary.main" : "text.primary",
+                          transition: "color 0.2s",
+                        }}
+                      >
+                        {item.q}
+                      </Typography>
+                    </AccordionSummary>
 
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Does Home Loan Interest Rate vary?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Yes, home loan interest rates can be fixed or floating. Floating
-              interest rates change over time based on the lender's benchmark
-              rate, whereas fixed rates remain constant for a specified period or
-              the entire loan duration.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+                    <AccordionDetails sx={{ px: 2.5, pb: 2.5, pt: 0 }}>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: "text.secondary",
+                          lineHeight: 1.6,
+                          fontWeight: 500,
+                          whiteSpace: "pre-wrap", // Allows \n to render as line breaks
+                        }}
+                      >
+                        {item.a}
+                      </Typography>
 
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>
-              What are prepayments and how do they affect my loan?
-            </Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Prepayments are extra payments made towards your loan principal over
-              and above your regular EMI. By making prepayments, you reduce your
-              outstanding principal faster, which in turn reduces the total
-              interest you pay over the life of the loan. This can significantly
-              shorten your loan tenure.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What are property taxes and home insurance?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Property taxes are levied by your local government on your property.
-              Home insurance protects your home against damages and is often
-              required by lenders. Both can be substantial ongoing costs that
-              should be factored into your budget.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>Can I change my EMI amount later?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Generally, your regular EMI is fixed at the start of the loan.
-              However, some banks offer step-up or step-down EMI options. Also, if
-              the interest rate on a floating rate loan changes, you can request
-              to alter your EMI or adjust the tenure.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Other Loan Types Questions */}
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What is a Credit Card EMI?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              A Credit Card EMI allows you to convert your credit card purchase into fixed monthly installments. Instead of paying the entire bill at once, you can pay it in smaller, equal monthly payments with a specific interest rate. This is useful for large purchases and helps manage cash flow better.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>How is Credit Card EMI different from Personal Loan EMI?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              <ul>
-                <li><strong>Interest Rate:</strong> Personal Loans typically have lower interest rates compared to Credit Card EMIs.</li>
-                <li><strong>Loan Amount:</strong> Personal Loans usually offer higher loan amounts compared to Credit Card EMIs.</li>
-                <li><strong>Processing:</strong> Credit Card EMI is processed instantly on your credit card, while Personal Loans require application and approval.</li>
-                <li><strong>Repayment:</strong> Both follow the same EMI calculation, but Personal Loans offer more flexible repayment terms.</li>
-              </ul>
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What is BNPL (Buy Now Pay Later)?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Buy Now Pay Later (BNPL) is a payment option that allows you to purchase products and pay for them later, usually in installments. It's similar to a Personal Loan but is offered for specific purchases from retailers or online platforms. BNPL options often come with zero or low interest rates if paid within the agreed tenure.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
-
-        {/* Investment Specific Questions */}
-        <Accordion>
-          <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-            <Typography>What are Investment Calculators and why are they important?</Typography>
-          </AccordionSummary>
-          <AccordionDetails>
-            <Typography>
-              Investment Calculators help you plan and visualize your financial investments:
-              <ul>
-                <li><strong>SIP (Systematic Investment Plan):</strong> Invest a fixed amount regularly and see how your wealth grows over time with compound returns.</li>
-                <li><strong>Lumpsum Calculator:</strong> Invest a one-time amount and calculate the future value based on expected returns.</li>
-                <li><strong>Step-Up SIP:</strong> Start with a small investment and increase it over time, perfect for growing investments with salary increments.</li>
-                <li><strong>SWP (Systematic Withdrawal Plan):</strong> Withdraw a fixed amount regularly from your investments for a steady income stream.</li>
-              </ul>
-              These calculators help you understand the power of compound interest and plan your long-term financial goals.
-            </Typography>
-          </AccordionDetails>
-        </Accordion>
+                      {/* Optional Terminal-style Formula Block */}
+                      {item.formula && (
+                        <Box
+                          sx={{
+                            mt: 2,
+                            p: 1.5,
+                            borderRadius: 2,
+                            bgcolor: alpha(
+                              theme.palette.common.black || "#000",
+                              0.04,
+                            ),
+                            border: `1px dashed ${alpha(theme.palette.divider, 0.2)}`,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1.5,
+                          }}
+                        >
+                          <MathIcon
+                            sx={{ color: "text.disabled", fontSize: "1rem" }}
+                          />
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              fontFamily: "monospace",
+                              fontWeight: 700,
+                              color: "text.primary",
+                            }}
+                          >
+                            {item.formula}
+                          </Typography>
+                        </Box>
+                      )}
+                    </AccordionDetails>
+                  </Accordion>
+                );
+              })}
+            </Box>
+          </Box>
+        ))}
       </Stack>
     </Container>
   );

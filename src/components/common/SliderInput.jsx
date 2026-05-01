@@ -5,9 +5,14 @@ import {
   TextField,
   Typography,
   Tooltip,
-  Paper,
+  useTheme,
+  alpha,
+  Stack,
 } from "@mui/material";
-import InfoIcon from "@mui/icons-material/Info";
+import {
+  InfoOutlined as InfoIcon,
+  WarningAmber as WarningIcon,
+} from "@mui/icons-material";
 
 export const SliderInput = ({
   label,
@@ -23,22 +28,21 @@ export const SliderInput = ({
   showInput = true,
   color = "primary",
   isInline = true,
-  warning = false, // New prop for external warning
+  warning = false,
 }) => {
-  // Internal state for the slider's value during drag or text input
+  const theme = useTheme();
   const [internalValue, setInternalValue] = useState(Number(value) || 0);
 
-  // Synchronize internal state with external value prop
-  // This ensures that if the parent component updates the 'value' prop,
-  // our internal state also reflects that change.
   useEffect(() => {
     setInternalValue(Number(value) || 0);
   }, [value]);
 
-  const numValue = Number(value) || 0; // Use the external value for warning calculation
-  // Combine internal warning logic with external 'warning' prop
-  const isWarning = (warningThreshold !== null && numValue > warningThreshold) || warning;
-  const sliderColor = isWarning ? "error" : color;
+  const numValue = Number(value) || 0;
+  const isWarning =
+    (warningThreshold !== null && numValue > warningThreshold) || warning;
+
+  // Dynamically map the color token to ensure the Data Well and Slider match
+  const activeColorToken = isWarning ? "error" : color;
 
   const handleInputChange = (e) => {
     const val = e.target.value;
@@ -48,53 +52,51 @@ export const SliderInput = ({
     if (newVal !== "" && newVal > max) {
       newVal = max;
     }
-    // Update internal state immediately for TextField visual feedback
     setInternalValue(newVal);
-    // Also call external onChange immediately for TextField changes
     onChange(newVal);
   };
 
   const handleSliderChange = (e, newValue) => {
-    // Update internal state immediately during slider drag for smooth visual feedback
     setInternalValue(newValue);
   };
 
   const handleSliderChangeCommitted = (e, newValue) => {
-    // Only call external onChange when slider drag is committed
-    // This prevents frequent re-renders of the parent during drag
     onChange(newValue);
   };
 
-  // --- Reusable Components for Conditional Rendering ---
+  // --- Reusable Component Blocks ---
 
   const renderLabelComponent = () => (
-    <Box
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 1,
-        flexShrink: 0, // Prevent label from shrinking
-      }}
+    <Stack
+      direction="row"
+      alignItems="center"
+      spacing={0.5}
+      sx={{ flexShrink: 0 }}
     >
       <Typography
-        variant="subtitle2"
-        sx={{ fontWeight: 600, whiteSpace: 'normal' }} // Allow wrapping on all screen sizes
+        variant="caption"
+        sx={{
+          fontWeight: 800,
+          textTransform: "uppercase",
+          color: "text.secondary",
+          letterSpacing: 0.5,
+          whiteSpace: "normal",
+        }}
       >
         {label}
       </Typography>
       {tooltipText && (
-        <Tooltip title={tooltipText}>
+        <Tooltip title={tooltipText} arrow placement="top">
           <InfoIcon
-            fontSize="small"
             sx={{
-              color: isWarning ? "error.main" : "info.main",
+              fontSize: "1rem",
+              color: isWarning ? "error.main" : "text.disabled",
               cursor: "help",
-              opacity: 0.7,
             }}
           />
         </Tooltip>
       )}
-    </Box>
+    </Stack>
   );
 
   const renderSliderComponent = () => (
@@ -106,89 +108,101 @@ export const SliderInput = ({
       max={max}
       step={step}
       marks={marks}
-      valueLabelDisplay="auto"
-      color={sliderColor}
+      color={activeColorToken}
       sx={{
-        flexGrow: 1, // Allow slider to grow
-        "& .MuiSlider-track": {
-          backgroundColor: isWarning ? "error.main" : undefined,
-        },
-        "& .MuiSlider-thumb": {
-          backgroundColor: isWarning ? "error.main" : undefined,
-        },
+        flexGrow: 1,
+        py: 1,
+        "& .MuiSlider-thumb": { width: 14, height: 14 },
+        "& .MuiSlider-track": { height: 4 },
+        "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
       }}
     />
   );
 
-  const renderInputComponent = () => showInput && (
-    <TextField
-      type="number"
-      value={internalValue}
-      onChange={handleInputChange}
-      onKeyDown={(e) => {
-        if (["e", "E", "+", "-"].includes(e.key)) {
-          e.preventDefault();
-        }
-      }}
-      size="small"
-      inputProps={{
-        min,
-        max,
-        step,
-        style: {
-          MozAppearance: "textfield",
-          textAlign: "right",
-        },
-      }}
-      sx={{
-        minWidth: 100,
-        "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-          {
-            display: "none",
+  const renderInputComponent = () =>
+    showInput && (
+      <TextField
+        variant="standard"
+        type="number"
+        value={internalValue}
+        onChange={handleInputChange}
+        onKeyDown={(e) => {
+          if (["e", "E", "+", "-"].includes(e.key)) {
+            e.preventDefault();
+          }
+        }}
+        size="small"
+        InputProps={{
+          disableUnderline: true,
+          inputProps: {
+            min,
+            max,
+            step,
           },
-      }}
-      error={isWarning} // Use isWarning for TextField error state
-    />
-  );
+          sx: {
+            fontWeight: 900,
+            fontSize: "0.95rem",
+            bgcolor: alpha(theme.palette[activeColorToken].main, 0.05),
+            color: `${activeColorToken}.main`,
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1.5,
+            border: `1px solid ${alpha(theme.palette[activeColorToken].main, 0.1)}`,
+            textAlign: "right",
+            minWidth: 100,
+            "& input": { textAlign: "right", p: 0 },
+            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
+              { display: "none" },
+            MozAppearance: "textfield",
+          },
+        }}
+      />
+    );
 
-  const renderWarningComponent = () => isWarning && warningText && (
-    <Paper
-      sx={{
-        mt: 1.5,
-        p: 1.5,
-        backgroundColor: "#ffebee",
-        borderLeft: "4px solid #f44336",
-        borderRadius: 1,
-        ...(isInline && {
-          position: "absolute",
-          width: "calc(100% - 32px)",
-          left: 16,
-          top: "100%",
-          zIndex: 1,
-        }),
-      }}
-    >
-      <Typography variant="body2" sx={{ color: "#c62828" }}>
-        {warningText}
-      </Typography>
-    </Paper>
-  );
+  const renderWarningComponent = () =>
+    isWarning &&
+    warningText && (
+      <Box
+        sx={{
+          mt: 1.5,
+          p: 1.5,
+          borderRadius: 2,
+          bgcolor: alpha(theme.palette.error.main, 0.05),
+          border: `1px dashed ${alpha(theme.palette.error.main, 0.3)}`,
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 1,
+          ...(isInline && {
+            position: "absolute",
+            width: "calc(100% - 32px)",
+            left: 16,
+            top: "100%",
+            zIndex: 1,
+            boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || "#000", 0.05)}`,
+          }),
+        }}
+      >
+        <WarningIcon
+          sx={{ color: "error.main", fontSize: "1.2rem", mt: 0.2 }}
+        />
+        <Typography
+          variant="caption"
+          sx={{ color: "error.dark", fontWeight: 700, lineHeight: 1.5 }}
+        >
+          {warningText}
+        </Typography>
+      </Box>
+    );
 
   return (
-    <Box
-      sx={{
-        width: "100%",
-        paddingX: 2,
-        position: "relative", // Needed for absolute positioning of warning
-      }}
-    >
+    <Box sx={{ width: "100%", px: 2, position: "relative" }}>
       {isInline ? (
         <Box
           sx={{
             display: "flex",
-            flexDirection: { xs: "column", sm: "row" }, 
-            alignItems: { xs: "flex-start", sm: "center" }, // Align items
-            gap: { xs: 1, sm: 2 }, // Adjust gap
+            flexDirection: { xs: "column", sm: "row" },
+            alignItems: { xs: "flex-start", sm: "center" },
+            gap: { xs: 1, sm: 2 },
             width: "100%",
           }}
         >
@@ -197,14 +211,16 @@ export const SliderInput = ({
           {renderInputComponent()}
         </Box>
       ) : (
-        // Block layout: Label & Input (flex row), then Slider below
         <>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="flex-end"
+            sx={{ mb: 0.5 }}
+          >
             {renderLabelComponent()}
-            {renderInputComponent() && (
-              <Box sx={{ marginLeft: "auto" }}>{renderInputComponent()}</Box>
-            )}
-          </Box>
+            {renderInputComponent()}
+          </Stack>
           {renderSliderComponent()}
         </>
       )}

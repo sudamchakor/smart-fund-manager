@@ -13,6 +13,8 @@ import {
   Stack,
 } from "@mui/material";
 import { AccountBalance as FdIcon } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { selectCurrency } from "../../../store/emiSlice";
 
 const FdCalculatorForm = ({
   onCalculate,
@@ -20,6 +22,8 @@ const FdCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
+  // Wire up the global currency setting
+  const currency = useSelector(selectCurrency) || "₹";
 
   // Provide fallbacks in case the plan is newly created
   const {
@@ -30,6 +34,7 @@ const FdCalculatorForm = ({
   } = sharedState || {};
 
   const calculateFd = useCallback(() => {
+    // Safe fallbacks to prevent NaN crashes if inputs are cleared
     const P = principalAmount || 0;
     const r = (interestRate || 0) / 100;
     const t = timePeriod || 0;
@@ -41,18 +46,20 @@ const FdCalculatorForm = ({
     else if (compoundingFrequency === "monthly") n = 12;
 
     // Compound Interest Formula: A = P(1 + r/n)^(nt)
-    const totalValue = P * Math.pow(1 + r / n, n * t);
+    const totalValue = P > 0 && t > 0 ? P * Math.pow(1 + r / n, n * t) : P;
     const estimatedReturns = totalValue - P;
 
     let chartData = [];
-    for (let year = 1; year <= t; year++) {
-      let yearlyValue = P * Math.pow(1 + r / n, n * year);
-      chartData.push({
-        year: year,
-        invested: Math.round(P),
-        returns: Math.round(yearlyValue - P),
-        total: Math.round(yearlyValue),
-      });
+    if (P > 0 && t > 0) {
+      for (let year = 1; year <= t; year++) {
+        let yearlyValue = P * Math.pow(1 + r / n, n * year);
+        chartData.push({
+          year: year,
+          invested: Math.round(P),
+          returns: Math.round(yearlyValue - P),
+          total: Math.round(yearlyValue),
+        });
+      }
     }
 
     if (typeof onCalculate === "function") {
@@ -125,9 +132,15 @@ const FdCalculatorForm = ({
                 startAdornment: (
                   <InputAdornment
                     position="start"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "primary.main",
+                      },
+                    }}
                   >
-                    ₹
+                    {currency}
                   </InputAdornment>
                 ),
                 disableUnderline: true,
@@ -137,6 +150,7 @@ const FdCalculatorForm = ({
                   bgcolor: alpha(theme.palette.primary.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -176,7 +190,13 @@ const FdCalculatorForm = ({
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "success.main",
+                      },
+                    }}
                   >
                     %
                   </InputAdornment>
@@ -188,6 +208,7 @@ const FdCalculatorForm = ({
                   bgcolor: alpha(theme.palette.success.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -201,7 +222,12 @@ const FdCalculatorForm = ({
           step={0.1}
           onChange={(e, val) => onSharedStateChange("interestRate", val)}
           color="success"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          }}
         />
       </Box>
 
@@ -223,7 +249,13 @@ const FdCalculatorForm = ({
                 endAdornment: (
                   <InputAdornment
                     position="end"
-                    sx={{ "& p": { fontWeight: 900, fontSize: "0.8rem" } }}
+                    sx={{
+                      "& p": {
+                        fontWeight: 900,
+                        fontSize: "0.8rem",
+                        color: "info.main",
+                      },
+                    }}
                   >
                     Yr
                   </InputAdornment>
@@ -235,6 +267,7 @@ const FdCalculatorForm = ({
                   bgcolor: alpha(theme.palette.info.main, 0.05),
                   px: 1,
                   borderRadius: 1,
+                  textAlign: "right",
                 },
               }}
               fullWidth
@@ -248,7 +281,12 @@ const FdCalculatorForm = ({
           step={1}
           onChange={(e, val) => onSharedStateChange("timePeriod", val)}
           color="info"
-          sx={{ py: 1, "& .MuiSlider-thumb": { width: 12, height: 12 } }}
+          sx={{
+            py: 1,
+            "& .MuiSlider-thumb": { width: 12, height: 12 },
+            "& .MuiSlider-track": { height: 4 },
+            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          }}
         />
       </Box>
 
@@ -271,11 +309,11 @@ const FdCalculatorForm = ({
                 fontWeight: 900,
                 fontSize: "0.85rem",
                 bgcolor: alpha(theme.palette.secondary.main, 0.05),
-                color: theme.palette.secondary.dark,
+                color: theme.palette.secondary.main,
                 px: 1.5,
                 py: 0.5,
                 borderRadius: 1,
-                "& .MuiSelect-select": { paddingRight: "24px !important" }, // Adjusts for the dropdown arrow
+                "& .MuiSelect-select": { paddingRight: "24px !important" },
               }}
             >
               <MenuItem value="annually">Annually</MenuItem>
