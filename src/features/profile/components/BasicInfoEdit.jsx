@@ -78,11 +78,7 @@ export default function BasicInfoEdit({
   };
 
   return (
-    <Paper sx={{ p: 3, mb: 3 }}>
-      <Typography variant="h6" gutterBottom sx={{ fontWeight: 600, mb: 3 }}>
-        Edit Basic Info
-      </Typography>
-
+    <>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={6}>
           <TextField
@@ -178,6 +174,6 @@ export default function BasicInfoEdit({
           Cancel
         </Button>
       </Box>
-    </Paper>
+    </>
   );
 }

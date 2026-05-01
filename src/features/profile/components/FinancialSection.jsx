@@ -106,6 +106,7 @@ export default function FinancialSection({
     <>
       <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
         <CardHeader
+          sx={{ py: 1.5, px: 2 }}
           title={
             <Typography variant="h6" sx={{ fontWeight: "bold" }}>
               {sectionTitle}

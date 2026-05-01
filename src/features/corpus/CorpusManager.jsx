@@ -44,6 +44,7 @@ const CorpusManager = ({ onOpenModal }) => {
   return (
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <CardHeader
+        sx={{ py: 1.5, px: 2 }}
         title={
           <Typography variant="h6" sx={{ fontWeight: "bold" }}>
             Investment Corpus
@@ -90,7 +91,10 @@ const CorpusManager = ({ onOpenModal }) => {
                       {formatCurrency(asset.value)}
                     </TableCell>
                     <TableCell align="right">
-                      {!isNaN(expectedReturnNum) ? expectedReturnNum.toFixed(2) : '0.00'}%
+                      {!isNaN(expectedReturnNum)
+                        ? expectedReturnNum.toFixed(2)
+                        : "0.00"}
+                      %
                     </TableCell>
                     <TableCell align="right">
                       <IconButton

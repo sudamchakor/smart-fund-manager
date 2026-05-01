@@ -149,30 +149,38 @@ export default function PersonalProfileTab({ onEditGoal }) {
 
   return (
     <>
-      <Grid container spacing={3}>
+      <Grid container spacing={2}>
+        {/* Card 1: Basic Information */}
         <Grid item xs={12} md={6}>
           <Card
-            sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+            sx={{
+              height: "520px", // Matches Financial Settings
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: 1,
+              borderRadius: 2,
+            }}
           >
             <CardHeader
+              sx={{ py: 1.5, px: 2 }}
               title={
-                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                   Basic Information
                 </Typography>
               }
               action={
                 !editingBasicInfo && (
                   <IconButton
-                    aria-label="edit basic info"
+                    size="small"
                     onClick={() => setEditingBasicInfo(true)}
                   >
-                    <EditIcon />
+                    <EditIcon fontSize="small" />
                   </IconButton>
                 )
               }
             />
             <Divider />
-            <CardContent sx={{ flexGrow: 1 }}>
+            <CardContent sx={{ flexGrow: 1, p: 2, overflowY: "auto" }}>
               {editingBasicInfo ? (
                 <BasicInfoEdit
                   currentAge={currentAge}
@@ -190,11 +198,12 @@ export default function PersonalProfileTab({ onEditGoal }) {
           </Card>
         </Grid>
 
-        {/* Financial Settings */}
+        {/* Card 2: Financial Settings */}
         <Grid item xs={12} md={6}>
           <FinancialSettings />
         </Grid>
 
+        {/* Following sections: Corpus, Income, Expenses */}
         <Grid item xs={12} md={6}>
           <CorpusManager onOpenModal={handleOpenFinancialModal} />
         </Grid>
@@ -205,17 +214,19 @@ export default function PersonalProfileTab({ onEditGoal }) {
             onOpenModal={handleOpenFinancialModal}
           />
         </Grid>
+
         <Grid item xs={12} md={6}>
           <FinancialSection
             isIncome={false}
             onEditGoal={onEditGoal}
-            goalsWithFunding={goalsWithFunding} // Pass goalsWithFunding to FinancialSection
+            goalsWithFunding={goalsWithFunding}
             onOpenModal={handleOpenFinancialModal}
           />
         </Grid>
 
+        {/* Charts Section */}
         <Grid item xs={12} md={6}>
-          <Box sx={{ width: "100%", minHeight: 300 }}>
+          <Box sx={{ width: "100%", height: 320 }}>
             <ProjectedCashFlowChart
               currentAge={currentAge}
               retirementAge={retirementAge}
@@ -231,12 +242,14 @@ export default function PersonalProfileTab({ onEditGoal }) {
             />
           </Box>
         </Grid>
+
         <Grid item xs={12} md={6}>
-          <Box sx={{ width: "100%", minHeight: 300 }}>
+          <Box sx={{ width: "100%", height: 320 }}>
             <CashFlowDonutChart donutData={donutData} />
           </Box>
         </Grid>
       </Grid>
+
       {isSmallScreen && (
         <SpeedDial
           ariaLabel="SpeedDial for financial actions"
@@ -257,7 +270,6 @@ export default function PersonalProfileTab({ onEditGoal }) {
           ))}
         </SpeedDial>
       )}
-
       <FinancialModal
         open={modalOpen}
         onClose={handleCloseFinancialModal}
