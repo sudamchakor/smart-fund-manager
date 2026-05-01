@@ -38,6 +38,18 @@ const AutoBalancer = () => {
     const basicExpenses = expenses.filter(e => e.category === 'basic');
     const totalBasic = basicExpenses.reduce((sum, e) => sum + e.amount, 0);
 
+    if (totalBasic === 0) {
+        return {
+            achievable: false,
+            message: "You have a deficit but no 'Basic Needs' expenses were found to reduce. Please adjust other expense categories or increase your income.",
+            deficit,
+            requiredReduction: 0,
+            newStepUp: currentStepUp,
+            basicExpenses: [],
+            totalBasic: 0,
+        };
+    }
+
     const maxAllowedReduction = totalBasic * (maxReductionPercent / 100);
 
     let newStepUp = currentStepUp;
@@ -58,6 +70,7 @@ const AutoBalancer = () => {
       }
     } else {
       requiredReduction = maxAllowedReduction;
+      achievable = false;
       message = `Even with a maximum ${maxReductionPercent}% reduction in Basic Needs, you still have a deficit of ${formatCurrency(deficit - requiredReduction, currency)}. You need to increase income or reduce goals/discretionary spending.`;
     }
 
@@ -67,28 +80,30 @@ const AutoBalancer = () => {
       achievable,
       message,
       newStepUp,
-      basicExpenses
+      basicExpenses,
+      totalBasic,
     };
   }, [surplus, expenses, currentStepUp, maxReductionPercent, currency]);
 
   const applySimulation = () => {
     if (!simulation || !simulation.achievable) return;
-
-    // Distribute reduction proportionally among basic expenses
-    const totalBasic = simulation.basicExpenses.reduce((sum, e) => sum + e.amount, 0);
     
-    simulation.basicExpenses.forEach(exp => {
-        const proportion = exp.amount / totalBasic;
-        const reductionForThisExp = simulation.requiredReduction * proportion;
-        
-        dispatch(updateExpense({
-            ...exp,
-            amount: Math.max(0, Math.round(exp.amount - reductionForThisExp))
-        }));
-    });
+    const { totalBasic, basicExpenses, requiredReduction, newStepUp } = simulation;
 
-    if (simulation.newStepUp !== currentStepUp) {
-        dispatch(setStepUpPercentage(simulation.newStepUp));
+    if (totalBasic > 0) {
+        basicExpenses.forEach(exp => {
+            const proportion = exp.amount / totalBasic;
+            const reductionForThisExp = requiredReduction * proportion;
+            
+            dispatch(updateExpense({
+                ...exp,
+                amount: Math.max(0, Math.round(exp.amount - reductionForThisExp))
+            }));
+        });
+    }
+
+    if (newStepUp !== currentStepUp) {
+        dispatch(setStepUpPercentage(newStepUp));
     }
     
     setHasSucceeded(true);
@@ -158,7 +173,12 @@ const AutoBalancer = () => {
                                 Apply Auto-Balance
                             </Button>
                         ) : (
-                             <Alert severity="error">Simulation failed to find a zero deficit path within the allowed constraints.</Alert>
+                             <Alert severity="error">
+                                {simulation.totalBasic === 0 
+                                    ? "Cannot proceed without 'Basic Needs' expenses to adjust."
+                                    : "Auto-balance could not be achieved with the current reduction limit."
+                                }
+                             </Alert>
                         )}
                     </Box>
                 )}

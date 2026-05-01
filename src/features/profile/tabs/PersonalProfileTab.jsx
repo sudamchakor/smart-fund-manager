@@ -33,6 +33,7 @@ import {
   selectTotalMonthlyGoalContributions,
   selectIndividualGoalInvestmentContributions,
   selectGoals,
+  selectPrioritizedGoalFunding, // Import selectPrioritizedGoalFunding
   selectCurrentSurplus,
   selectCareerGrowthRate,
   selectIncomes,
@@ -81,6 +82,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
   const individualGoalInvestments = useSelector(
     selectIndividualGoalInvestmentContributions,
   );
+  const goalsWithFunding = useSelector(selectPrioritizedGoalFunding) || []; // Get goals with funding details
   const goals = useSelector(selectGoals) || [];
 
   const needsValue = expenses
@@ -207,6 +209,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
           <FinancialSection
             isIncome={false}
             onEditGoal={onEditGoal}
+            goalsWithFunding={goalsWithFunding} // Pass goalsWithFunding to FinancialSection
             onOpenModal={handleOpenFinancialModal}
           />
         </Grid>

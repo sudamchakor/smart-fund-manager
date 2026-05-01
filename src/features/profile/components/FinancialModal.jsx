@@ -11,7 +11,12 @@ import {
 } from "@mui/material";
 import { useDispatch } from "react-redux";
 import IncomeExpenseForm from "../../../components/common/IncomeExpenseForm";
-import { addIncome, addExpense, updateIncome, updateExpense } from "../../../store/profileSlice"; // Import updateIncome, updateExpense
+import {
+  addIncome,
+  addExpense,
+  updateIncome,
+  updateExpense,
+} from "../../../store/profileSlice"; // Import updateIncome, updateExpense
 import { addAsset, updateAsset } from "../../corpus/corpusSlice";
 
 const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
@@ -139,7 +144,7 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
         dispatch(
           addAsset(
             payload.label,
-            payload.value,
+            +payload.value,
             payload.expectedReturn,
             payload.category,
           ),
@@ -154,7 +159,12 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
       <DialogTitle>{getTitle()}</DialogTitle>
       <Divider sx={{ mb: 2 }} />
       {type === "corpus" ? (
-        <CorpusForm onSave={handleFormSave} onCancel={onClose} assetToEdit={asset} mode={mode} />
+        <CorpusForm
+          onSave={handleFormSave}
+          onCancel={onClose}
+          assetToEdit={asset}
+          mode={mode}
+        />
       ) : (
         <DialogContent>
           <IncomeExpenseForm

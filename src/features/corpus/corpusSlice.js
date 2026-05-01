@@ -45,7 +45,7 @@ export const { addAsset, removeAsset, updateAsset } = corpusSlice.actions;
 export const selectAllAssets = (state) => state.corpus.assets;
 
 export const selectTotalCorpus = (state) =>
-  state.corpus.assets.reduce((total, asset) => total + asset.value, 0);
+  state.corpus.assets.reduce((total, asset) => (total) + (+asset.value), 0);
 
 export const selectWeightedAverageReturn = (state) => {
   const totalCorpus = selectTotalCorpus(state);

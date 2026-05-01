@@ -18,7 +18,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useState } from "react";
 
-const ExpenseReadOnlyItem = (props) => {
+const ExpenseReadOnlyItem = (props) => { // Re-added the component function declaration
   const {
     item,
     currency,
@@ -32,16 +32,14 @@ const ExpenseReadOnlyItem = (props) => {
     budgetWarning = "",
     totalIncome = 0,
     isEditing,
-    setIsEditing,
+    setIsEditing, // This prop is used to control the parent's modal
     expenseRatio,
     getExpenseColor,
     formatCurrency,
     isReadOnly = false,
     onClick,
   } = props;
-
   const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
-
   const handleDeleteClick = (event) => {
     event.stopPropagation();
     setOpenConfirmDelete(true);
@@ -50,20 +48,17 @@ const ExpenseReadOnlyItem = (props) => {
   const handleEditClick = (event) => {
     event.stopPropagation();
     if (!isReadOnly && setIsEditing) {
-      setIsEditing(true);
+      setIsEditing(true); // Trigger the parent's modal
     }
   };
-
   const handleCloseConfirmDelete = () => {
     setOpenConfirmDelete(false);
   };
-
   const handleConfirmDelete = () => {
     if (onConfirmDelete) onConfirmDelete(item.id);
     else if (onDelete) onDelete(item.id);
     handleCloseConfirmDelete();
   };
-
   return (
     <>
       <Paper

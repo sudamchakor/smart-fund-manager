@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Paper } from "@mui/material";
-import ReadOnlyItem from "./ReadOnlyItem";
+import ReadOnlyItem from "./ReadOnlyItem"; // Ensure this is the correct ReadOnlyItem
 import FinancialModal from "../../features/profile/components/FinancialModal"; // Import FinancialModal
 
 export const EditableIncomeExpenseItem = ({
@@ -14,6 +14,9 @@ export const EditableIncomeExpenseItem = ({
   budgetWarning = "",
   totalIncome = 0,
   totalExpenses = 0,
+  isGoal = false, // Add isGoal prop
+  isReadOnly = false, // Add isReadOnly prop
+  onEditGoal, // Add onEditGoal prop
 }) => {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -58,6 +61,9 @@ export const EditableIncomeExpenseItem = ({
         totalExpenses={totalExpenses}
         isEditing={isEditing} // Pass isEditing state
         setIsEditing={setIsEditing} // Pass setIsEditing to ReadOnlyItem
+        isGoal={isGoal} // Pass isGoal to ReadOnlyItem
+        isReadOnly={isReadOnly} // Pass isReadOnly to ReadOnlyItem
+        onEditGoal={onEditGoal} // Pass onEditGoal to ReadOnlyItem
         expenseRatio={expenseRatio}
         getExpenseColor={getExpenseColor}
         formatCurrency={formatCurrency}

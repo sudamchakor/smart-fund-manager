@@ -41,7 +41,6 @@ const CorpusManager = ({ onOpenModal }) => {
   const handleRemoveAsset = (id) => {
     dispatch(removeAsset(id));
   };
-  console.log(assets, "Sudam");
   return (
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <CardHeader
