@@ -85,6 +85,19 @@ const Footer = () => {
             >
               Terms of Service
             </Link>
+            <Link
+              onClick={() => navigate("/contact-us")}
+              underline="none"
+              sx={{
+                color: "text.secondary",
+                fontWeight: 600,
+                fontSize: "0.75rem",
+                cursor: "pointer",
+                "&:hover": { color: "primary.main" },
+              }}
+            >
+              Contact Us
+            </Link>
           </Stack>
 
           <Typography

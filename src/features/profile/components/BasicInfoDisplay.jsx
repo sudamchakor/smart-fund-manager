@@ -1,10 +1,7 @@
 import React from "react";
 import {
   Box,
-  Paper,
   Typography,
-  Tooltip,
-  IconButton,
   Grid,
   Chip,
   LinearProgress,
@@ -13,7 +10,7 @@ import {
   Avatar,
 } from "@mui/material";
 import ShieldIcon from "@mui/icons-material/Shield";
-import InfoIcon from "@mui/icons-material/Info";
+
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import GraphicEqIcon from "@mui/icons-material/GraphicEq";
 import { useSelector } from "react-redux";
@@ -25,73 +22,7 @@ import {
   selectGeneralInflationRate,
 } from "../../../store/profileSlice";
 
-const InfoItem = ({ label, value, icon, tooltip }) => (
-  <Grid item xs={6}>
-    <Typography
-      variant="caption"
-      color="text.secondary"
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        gap: 0.5,
-        textTransform: "uppercase",
-        fontWeight: 500,
-      }}
-    >
-      {icon}
-      {label}
-      {tooltip && (
-        <Tooltip title={tooltip}>
-          <InfoIcon fontSize="inherit" sx={{ opacity: 0.6 }} />
-        </Tooltip>
-      )}
-    </Typography>
-    <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-      {value}
-    </Typography>
-  </Grid>
-);
-
-const RiskToleranceBadge = ({ riskTolerance }) => {
-  const getRiskColor = (risk) => {
-    const lowerRisk = risk?.toLowerCase();
-    if (lowerRisk === "low") {
-      return { backgroundColor: "#e8f5e9", color: "#2e7d32" };
-    }
-    if (lowerRisk === "medium") {
-      return { backgroundColor: "#fff3e0", color: "#ef6c00" };
-    }
-    if (lowerRisk === "high") {
-      return { backgroundColor: "#ffebee", color: "#c62828" };
-    }
-    return { backgroundColor: "#f5f5f5", color: "#616161" };
-  };
-
-  const style = getRiskColor(riskTolerance);
-
-  return (
-    <Box>
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        sx={{
-          textTransform: "uppercase",
-          fontWeight: 500,
-          mb: 0.5,
-        }}
-      >
-        Risk Tolerance
-      </Typography>
-      <Chip
-        label={riskTolerance || "N/A"}
-        sx={{ ...style, fontWeight: "bold", borderRadius: "6px" }}
-      />
-    </Box>
-  );
-};
-
 const RetirementTimeline = ({ currentAge, retirementAge }) => {
-  const yearsLeft = retirementAge - currentAge;
   const careerStartAge = 25;
   const totalCareerSpan = retirementAge - careerStartAge;
   const yearsCompleted = currentAge - careerStartAge;

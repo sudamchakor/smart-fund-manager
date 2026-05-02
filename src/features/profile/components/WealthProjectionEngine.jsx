@@ -6,7 +6,6 @@ import {
   Grid,
   Slider,
   Tooltip as MuiTooltip,
-  IconButton,
   Switch,
   FormControlLabel,
   useTheme,

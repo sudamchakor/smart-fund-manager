@@ -41,7 +41,6 @@ import {
   setRetirementAge,
   setCareerGrowthRate,
   setGeneralInflationRate,
-  selectProfileExpenses,
   selectEducationInflationRate,
 } from "../../../store/profileSlice";
 import SliderInput from "../../../components/common/SliderInput";
@@ -58,7 +57,6 @@ export default function OnboardingModal({ open, onClose }) {
   const theme = useTheme();
   const [activeStep, setActiveStep] = useState(0);
   const dispatch = useDispatch();
-  const profileExpenses = useSelector(selectProfileExpenses);
   const educationInflationRate = useSelector(selectEducationInflationRate);
 
   const currentYear = new Date().getFullYear();

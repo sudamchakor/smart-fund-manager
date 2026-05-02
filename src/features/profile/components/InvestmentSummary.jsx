@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Grid, alpha, useTheme, Stack } from "@mui/material";
+import { Box, Typography, Grid, alpha, useTheme } from "@mui/material";
 import {
   ErrorOutline as WarningIcon,
   CheckCircleOutline as SuccessIcon,

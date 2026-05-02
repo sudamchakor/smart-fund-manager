@@ -1,7 +1,6 @@
 import React from "react";
 import { Box, Typography, Grid, Stack, useTheme, alpha } from "@mui/material";
 import {
-  Payments as PaymentsIcon,
   EventRepeat as RepeatIcon,
   CalendarMonth as MonthlyIcon,
   EventAvailable as OneTimeIcon,

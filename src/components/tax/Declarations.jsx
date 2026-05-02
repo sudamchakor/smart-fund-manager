@@ -7,7 +7,6 @@ import {
   Divider,
   alpha,
   useTheme,
-  Box,
 } from "@mui/material";
 import DataCard from "../common/DataCard";
 import ExemptionRow from "../common/ExemptionRow";

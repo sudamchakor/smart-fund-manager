@@ -9,7 +9,6 @@ import {
   Box,
   useTheme,
   alpha,
-  Divider,
 } from "@mui/material";
 import {
   ExpandMore as ExpandMoreIcon,

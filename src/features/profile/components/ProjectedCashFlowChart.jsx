@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Paper, Typography } from "@mui/material";
+import {  Typography } from "@mui/material";
 import {
   ComposedChart,
   Area,
@@ -149,7 +149,6 @@ export default function ProjectedCashFlowChart({
   const projectionData = [];
   if (projectionYears > 0) {
     for (let year = currentYear; year <= endProjectionYear; year++) {
-      const yearsFromNow = year - currentYear;
 
       let annualIncome = 0;
       let hasActiveIncome = false;

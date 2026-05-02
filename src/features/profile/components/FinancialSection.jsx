@@ -19,11 +19,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   selectIncomes,
   deleteIncome,
-  updateIncome,
   selectTotalMonthlyIncome,
   selectProfileExpenses,
   deleteExpense,
-  updateExpense,
   selectTotalMonthlyExpenses,
   selectTotalMonthlyGoalContributions,
   selectIndividualGoalInvestmentContributions,

@@ -10,7 +10,6 @@ import {
   alpha,
 } from "@mui/material";
 import {
-  Home as HomeIcon,
   Payments as PaymentsIcon,
   PieChart as PieChartIcon,
   TableChart as TableIcon,

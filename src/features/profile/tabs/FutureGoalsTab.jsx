@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import {
   Box,
   Grid,
@@ -67,7 +67,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip as RechartsTooltip,
-  Legend,
   ResponsiveContainer,
   ReferenceLine,
   AreaChart,
@@ -148,7 +147,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const totalMonthlyGoalContributions =
     useSelector(selectTotalMonthlyGoalContributions) || 0;
   const { emi: monthlyEmi } = useSelector(selectCalculatedValues);
-  const emiState = useSelector((state) => state.emi || {});
 
   // UI State
   const [realValueToggle, setRealValueToggle] = useState(false);
@@ -162,8 +160,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const currentYear = new Date().getFullYear();
   const calculatedRetirementYear = currentYear + (retirementAge - currentAge);
 
-  const formatCurrency = (val) =>
-    `${currency}${Number(val).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 
   // --- Handlers ---
   const handleCloseModal = useCallback(() => {
