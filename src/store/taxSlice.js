@@ -213,7 +213,6 @@ const taxSlice = createSlice({
 
 export const {
   updateMonthData,
-  populateRowFromFirstMonth,
   updateSettings,
   updateDeclaration,
   addDynamicRow,
@@ -435,17 +434,11 @@ export const selectCalculatedDeclarations = createSelector(
       deductions: {
         sec80D: {
           ...ded.sec80D,
-          limited: Math.min(
-            parseFloat(ded.sec80D?.produced) || 0,
-            sec80DLimit,
-          ),
+          limited: Math.min(parseFloat(ded.sec80D?.produced) || 0, sec80DLimit),
         },
         sec80DD_DDB: {
           ...ded.sec80DD_DDB,
-          limited: Math.min(
-            parseFloat(ded.sec80DD_DDB?.produced) || 0,
-            125000,
-          ),
+          limited: Math.min(parseFloat(ded.sec80DD_DDB?.produced) || 0, 125000),
         },
         sec80E_EEB: {
           ...ded.sec80E_EEB,
