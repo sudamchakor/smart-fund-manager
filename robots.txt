@@ -1,0 +1,14 @@
+# Allow all bots to crawl the educational content
+User-agent: *
+Allow: /
+Allow: /faq
+
+# Protect private functional routes
+# This reinforces your "Zero-Data" privacy brand
+Disallow: /profile
+Disallow: /wealth-dashboard
+Disallow: /financial-goals
+Disallow: /settings
+
+# Use your actual GitHub Pages URL here
+Sitemap: https://sudamchakor.github.io/smart-fund-manager/sitemap.xml
