@@ -157,6 +157,8 @@ export default function IncomeStreams({
             mt: 3,
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             borderRadius: 2,
+            maxHeight: 200,
+            overflow: "auto",
           }}
         >
           {incomesList.map((inc, index) => (

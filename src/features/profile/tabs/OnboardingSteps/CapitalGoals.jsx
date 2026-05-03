@@ -216,6 +216,8 @@ export default function CapitalGoals({
             mt: 3,
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             borderRadius: 2,
+            maxHeight: 200,
+            overflow: "auto",
           }}
         >
           {goalsList.map((goal, index) => (
