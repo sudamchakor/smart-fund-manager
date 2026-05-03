@@ -14,11 +14,12 @@ import {
   ListItemIcon,
   ListItemText,
   useMediaQuery,
-  Collapse, // Added for collapsible groups
+  Collapse,
   Button,
   Stack,
   useTheme,
   alpha,
+  Tooltip,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -35,13 +36,12 @@ import {
   Dashboard as WealthIcon,
   Settings as SettingsIcon,
   RestartAlt as ResetIcon,
-  ExpandLess, // Icon for open
-  ExpandMore, // Icon for closed
+  ExpandLess,
+  ExpandMore,
   HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectCalculatedValues } from '../../features/emiCalculator/utils/emiCalculator';
+import { useDispatch } from 'react-redux';
 import { resetEmiState } from '../../store/emiSlice';
 import storage from 'redux-persist/lib/storage';
 
@@ -68,23 +68,17 @@ const Header = () => {
   const location = useLocation();
   const dispatch = useDispatch();
 
-  // --- STATE FOR COLLAPSIBLE GROUPS ---
+  // State Management
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openCalculators, setOpenCalculators] = useState(true); // Default open
+  const [openCalculators, setOpenCalculators] = useState(true);
   const [openAccount, setOpenAccount] = useState(false);
-
-  // Desktop Menu States
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [calcAnchorEl, setCalcAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
-
-  const contrastColor = theme.palette.getContrastText(
-    theme.palette.primary.main,
-  );
 
   const handleNavigation = (path) => {
     navigate(path);
-    setDrawerOpen(false); // Close drawer on click
-    setAnchorEl(null);
+    setDrawerOpen(false);
+    setCalcAnchorEl(null);
     setProfileAnchorEl(null);
   };
 
@@ -101,16 +95,23 @@ const Header = () => {
     calculators.find((c) => location.pathname.startsWith(c.path)) ||
     calculators[0];
 
+  // Consistent Menu Styling
   const menuStyle = {
     paper: {
       elevation: 0,
       sx: {
         mt: 1.5,
-        minWidth: 220,
-        borderRadius: `${theme.shape.borderRadius}px`,
-        backgroundColor: alpha(theme.palette.background.paper, 0.9),
-        backdropFilter: 'blur(12px)',
-        border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
+        minWidth: 240,
+        borderRadius: 2,
+        bgcolor: 'background.paper',
+        border: `1px solid ${theme.palette.divider}`,
+        boxShadow: theme.shadows[8],
+        '& .MuiMenuItem-root': {
+          typography: 'body2',
+          py: 1.2,
+          borderRadius: 1,
+          mx: 0.5,
+        },
       },
     },
   };
@@ -122,25 +123,27 @@ const Header = () => {
         elevation={0}
         sx={{
           bgcolor: 'primary.main',
-          color: contrastColor,
-          zIndex: isMobile ? theme.zIndex.drawer - 1 : theme.zIndex.drawer + 1,
+          color: 'primary.contrastText',
+          zIndex: theme.zIndex.drawer + 1,
+          borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
         }}
       >
         <Toolbar>
           <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={2} alignItems="center">
               {isMobile && (
                 <IconButton onClick={() => setDrawerOpen(true)} color="inherit">
                   <MenuIcon />
                 </IconButton>
               )}
+
               <Box
                 onClick={() => handleNavigation('/')}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   cursor: 'pointer',
-                  gap: 1,
+                  gap: 1.5,
                 }}
               >
                 <CalculateIcon sx={{ fontSize: 32 }} />
@@ -151,13 +154,45 @@ const Header = () => {
                   SmartFund Manager
                 </Typography>
               </Box>
+
+              {!isMobile && (
+                <Button
+                  color="inherit"
+                  endIcon={<ArrowDownIcon />}
+                  onClick={(e) => setCalcAnchorEl(e.currentTarget)}
+                  sx={{
+                    ml: 2,
+                    textTransform: 'none',
+                    bgcolor: alpha(theme.palette.common.white, 0.1),
+                    '&:hover': {
+                      bgcolor: alpha(theme.palette.common.white, 0.2),
+                    },
+                  }}
+                >
+                  {currentCalc.label}
+                </Button>
+              )}
             </Stack>
           </Box>
 
           <Stack direction="row" spacing={1} alignItems="center">
+            {!isMobile && (
+              <Tooltip title="Help & FAQ">
+                <IconButton
+                  color="inherit"
+                  onClick={() => handleNavigation('/faq')}
+                >
+                  <HelpIcon />
+                </IconButton>
+              </Tooltip>
+            )}
+
             <IconButton
               onClick={(e) => setProfileAnchorEl(e.currentTarget)}
-              sx={{ bgcolor: alpha(contrastColor, 0.1), color: 'inherit' }}
+              sx={{
+                bgcolor: alpha(theme.palette.common.white, 0.1),
+                color: 'inherit',
+              }}
             >
               <ProfileIcon />
             </IconButton>
@@ -165,149 +200,41 @@ const Header = () => {
         </Toolbar>
       </AppBar>
 
-      {/* --- RESTRUCTURED DRAWER WITH COLLAPSIBLE GROUPS --- */}
-      <Drawer
-        anchor="left"
-        open={drawerOpen}
-        onClose={() => setDrawerOpen(false)}
-        PaperProps={{
-          sx: { width: 300, backgroundColor: theme.palette.background.paper },
-        }}
+      {/* --- DESKTOP CALCULATOR MENU --- */}
+      <Menu
+        anchorEl={calcAnchorEl}
+        open={Boolean(calcAnchorEl)}
+        onClose={() => setCalcAnchorEl(null)}
+        SlotProps={menuStyle}
+        disableScrollLock // Prevents layout shifting
       >
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-          <CalculateIcon color="primary" sx={{ fontSize: 30 }} />
-          <Typography variant="h6" sx={{ fontWeight: 900 }}>
-            SmartFund{' '}
-            <span style={{ color: theme.palette.primary.main }}>Manager</span>
-          </Typography>
-        </Box>
-        <Divider />
-
-        <List sx={{ p: 1 }}>
-          {/* GROUP 1: CALCULATORS */}
-          <ListItemButton onClick={() => setOpenCalculators(!openCalculators)}>
-            <ListItemIcon>
-              <CalculateIcon color="primary" />
+        <Typography
+          variant="overline"
+          sx={{ px: 2, fontWeight: 800, color: 'text.secondary' }}
+        >
+          Select Calculator
+        </Typography>
+        {calculators.map((calc) => (
+          <MenuItem
+            key={calc.path}
+            onClick={() => handleNavigation(calc.path)}
+            selected={location.pathname === calc.path}
+          >
+            <ListItemIcon sx={{ color: 'primary.main' }}>
+              {calc.icon}
             </ListItemIcon>
-            <ListItemText
-              primary="Calculators"
-              primaryTypographyProps={{ fontWeight: 700 }}
-            />
-            {openCalculators ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
+            {calc.label}
+          </MenuItem>
+        ))}
+      </Menu>
 
-          <Collapse in={openCalculators} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              {calculators.map((calc) => (
-                <ListItemButton
-                  key={calc.path}
-                  sx={{ pl: 4, borderRadius: 2 }}
-                  onClick={() => handleNavigation(calc.path)}
-                  selected={location.pathname.startsWith(calc.path)}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>{calc.icon}</ListItemIcon>
-                  <ListItemText
-                    primary={calc.label}
-                    primaryTypographyProps={{ fontSize: '0.9rem' }}
-                  />
-                </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
-
-          <Divider sx={{ my: 1 }} />
-
-          {/* GROUP 2: MY ACCOUNT (Profile) */}
-          <ListItemButton onClick={() => setOpenAccount(!openAccount)}>
-            <ListItemIcon>
-              <ProfileIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="My Account"
-              primaryTypographyProps={{ fontWeight: 700 }}
-            />
-            {openAccount ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-
-          <Collapse in={openAccount} timeout="auto" unmountOnExit>
-            <List component="div" disablePadding>
-              <ListItemButton
-                sx={{ pl: 4, borderRadius: 2 }}
-                onClick={() => handleNavigation('/profile?tab=personal')}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <PersonIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Personal Profile"
-                  primaryTypographyProps={{ fontSize: '0.9rem' }}
-                />
-              </ListItemButton>
-              <ListItemButton
-                sx={{ pl: 4, borderRadius: 2 }}
-                onClick={() => handleNavigation('/profile?tab=goals')}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <GoalsIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Financial Goals"
-                  primaryTypographyProps={{ fontSize: '0.9rem' }}
-                />
-              </ListItemButton>
-              <ListItemButton
-                sx={{ pl: 4, borderRadius: 2 }}
-                onClick={() => handleNavigation('/profile?tab=wealth')}
-              >
-                <ListItemIcon sx={{ minWidth: 40 }}>
-                  <WealthIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText
-                  primary="Wealth Dashboard"
-                  primaryTypographyProps={{ fontSize: '0.9rem' }}
-                />
-              </ListItemButton>
-            </List>
-          </Collapse>
-
-          <Divider sx={{ my: 1 }} />
-
-          {/* STATIC ITEMS */}
-          <ListItemButton onClick={() => handleNavigation('/settings')}>
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Global Settings" />
-          </ListItemButton>
-
-          <ListItemButton onClick={() => handleNavigation('/faq')}>
-            <ListItemIcon>
-              <HelpIcon />
-            </ListItemIcon>
-            <ListItemText primary="Help & FAQ" />
-          </ListItemButton>
-
-          <Box sx={{ mt: 4, p: 1 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              color="error"
-              startIcon={<ResetIcon />}
-              onClick={handleResetData}
-              sx={{ borderRadius: 2, textTransform: 'none', fontWeight: 700 }}
-            >
-              Reset All Data
-            </Button>
-          </Box>
-        </List>
-      </Drawer>
-
-      {/* Keep Desktop Menus for non-mobile use */}
+      {/* --- DESKTOP PROFILE MENU --- */}
       <Menu
         anchorEl={profileAnchorEl}
         open={Boolean(profileAnchorEl)}
         onClose={() => setProfileAnchorEl(null)}
         SlotProps={menuStyle}
+        disableScrollLock // Prevents layout shifting
       >
         <MenuItem onClick={() => handleNavigation('/profile?tab=personal')}>
           <ListItemIcon>
@@ -327,14 +254,139 @@ const Header = () => {
           </ListItemIcon>
           Wealth Dashboard
         </MenuItem>
-        <Divider />
+
+        <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={() => console.log('Exporting...')}>
+          <ListItemIcon>
+            <ExportIcon fontSize="small" />
+          </ListItemIcon>
+          Export Reports
+        </MenuItem>
         <MenuItem onClick={() => handleNavigation('/settings')}>
           <ListItemIcon>
             <SettingsIcon fontSize="small" />
           </ListItemIcon>
           Settings
         </MenuItem>
+        <MenuItem onClick={() => handleNavigation('/faq')}>
+          <ListItemIcon>
+            <HelpIcon fontSize="small" />
+          </ListItemIcon>
+          Help & Support
+        </MenuItem>
+
+        <Divider sx={{ my: 1 }} />
+
+        <MenuItem onClick={handleResetData} sx={{ color: 'error.main' }}>
+          <ListItemIcon>
+            <ResetIcon fontSize="small" color="error" />
+          </ListItemIcon>
+          Reset Application Data
+        </MenuItem>
       </Menu>
+
+      {/* --- MOBILE DRAWER --- */}
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        disableScrollLock // Prevents layout shifting
+        PaperProps={{
+          sx: {
+            width: 300,
+            bgcolor: 'background.default',
+            backgroundImage: 'none',
+          },
+        }}
+      >
+        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <CalculateIcon color="primary" sx={{ fontSize: 32 }} />
+          <Typography variant="h6" sx={{ fontWeight: 900 }}>
+            SmartFund{' '}
+            <span style={{ color: theme.palette.primary.main }}>Manager</span>
+          </Typography>
+        </Box>
+        <Divider />
+
+        <List sx={{ p: 1 }}>
+          <ListItemButton onClick={() => setOpenCalculators(!openCalculators)}>
+            <ListItemIcon>
+              <CalculateIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Calculators"
+              primaryTypographyProps={{ fontWeight: 700 }}
+            />
+            {openCalculators ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={openCalculators} timeout="auto">
+            <List disablePadding>
+              {calculators.map((calc) => (
+                <ListItemButton
+                  key={calc.path}
+                  sx={{ pl: 4, borderRadius: 2 }}
+                  onClick={() => handleNavigation(calc.path)}
+                  selected={location.pathname === calc.path}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>{calc.icon}</ListItemIcon>
+                  <ListItemText primary={calc.label} />
+                </ListItemButton>
+              ))}
+            </List>
+          </Collapse>
+
+          <Divider sx={{ my: 1 }} />
+
+          <ListItemButton onClick={() => setOpenAccount(!openAccount)}>
+            <ListItemIcon>
+              <ProfileIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText
+              primary="My Account"
+              primaryTypographyProps={{ fontWeight: 700 }}
+            />
+            {openAccount ? <ExpandLess /> : <ExpandMore />}
+          </ListItemButton>
+          <Collapse in={openAccount} timeout="auto">
+            <List disablePadding>
+              <ListItemButton
+                sx={{ pl: 4, borderRadius: 2 }}
+                onClick={() => handleNavigation('/profile?tab=personal')}
+              >
+                <ListItemIcon>
+                  <PersonIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Personal Profile" />
+              </ListItemButton>
+              <ListItemButton
+                sx={{ pl: 4, borderRadius: 2 }}
+                onClick={() => console.log('Exporting...')}
+              >
+                <ListItemIcon>
+                  <ExportIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Export Data" />
+              </ListItemButton>
+            </List>
+          </Collapse>
+
+          <Divider sx={{ my: 1 }} />
+
+          <ListItemButton onClick={() => handleNavigation('/settings')}>
+            <ListItemIcon>
+              <SettingsIcon />
+            </ListItemIcon>
+            <ListItemText primary="Global Settings" />
+          </ListItemButton>
+          <ListItemButton onClick={() => handleNavigation('/faq')}>
+            <ListItemIcon>
+              <HelpIcon />
+            </ListItemIcon>
+            <ListItemText primary="Help & FAQ" />
+          </ListItemButton>
+        </List>
+      </Drawer>
     </>
   );
 };
