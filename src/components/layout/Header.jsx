@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -17,9 +17,8 @@ import {
   Collapse,
   Button,
   Stack,
-  useTheme,
-  alpha,
   Tooltip,
+  useTheme,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -27,25 +26,28 @@ import {
   CreditCard as CreditCardIcon,
   TrendingUp as TrendingUpIcon,
   AccountBalanceWallet as TaxIcon,
-  Payments as PersonalLoanIcon,
+  AccountCircle as ProfileIcon,
   Menu as MenuIcon,
   FileDownload as ExportIcon,
-  AccountCircle as ProfileIcon,
+  HelpOutline as HelpIcon,
   Person as PersonIcon,
   EmojiEvents as GoalsIcon,
-  Dashboard as WealthIcon,
   Settings as SettingsIcon,
   RestartAlt as ResetIcon,
   ExpandLess,
   ExpandMore,
-  HelpOutline as HelpIcon,
+  Payments as PersonalLoanIcon,
+  Dashboard as WealthIcon,
 } from '@mui/icons-material';
+
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCalculatedValues } from '../../features/emiCalculator/utils/emiCalculator';
 import { resetEmiState } from '../../store/emiSlice';
+import { useSnackbar } from 'notistack';
 import storage from 'redux-persist/lib/storage';
 
-const calculators = [
+const CALCULATORS = [
   { path: '/calculator', label: 'Home Loan EMI', icon: <CalculateIcon /> },
   {
     path: '/credit-card-emi',
@@ -67,19 +69,43 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const { enqueueSnackbar } = useSnackbar();
+  const calculatedValues = useSelector(selectCalculatedValues);
 
-  // State Management
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openCalculators, setOpenCalculators] = useState(true);
-  const [openAccount, setOpenAccount] = useState(false);
-  const [calcAnchorEl, setCalcAnchorEl] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
+  const [exportAnchorEl, setExportAnchorEl] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openCalculators, setOpenCalculators] = useState(false);
+  const [openProfile, setOpenProfile] = useState(false);
 
-  const handleNavigation = (path) => {
-    navigate(path);
-    setDrawerOpen(false);
-    setCalcAnchorEl(null);
-    setProfileAnchorEl(null);
+  // Set default to Home Loan EMI if no matching path
+  const currentCalc = useMemo(
+    () =>
+      CALCULATORS.find((c) => location.pathname.startsWith(c.path)) ||
+      CALCULATORS[0],
+    [location.pathname],
+  );
+
+  // Export visible only on specific pages
+  const showExport = useMemo(() => {
+    const allowed = ['/calculator', '/profile', '/tax-calculator'];
+    return allowed.some((path) => location.pathname.startsWith(path));
+  }, [location.pathname]);
+
+  const handleExport = async (format) => {
+    setExportAnchorEl(null);
+    if (format === 'pdf') {
+      window.print();
+    } else if (format === 'excel') {
+      if (!calculatedValues?.schedule)
+        return enqueueSnackbar('No data to export', { variant: 'info' });
+      const XLSX = await import('xlsx');
+      const ws = XLSX.utils.json_to_sheet(calculatedValues.schedule);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Schedule');
+      XLSX.writeFile(wb, 'SmartFund_Export.xlsx');
+    }
   };
 
   const handleResetData = async () => {
@@ -91,303 +117,335 @@ const Header = () => {
     }
   };
 
-  const currentCalc =
-    calculators.find((c) => location.pathname.startsWith(c.path)) ||
-    calculators[0];
-
-  // Consistent Menu Styling
-  const menuStyle = {
-    paper: {
-      elevation: 0,
-      sx: {
-        mt: 1.5,
-        minWidth: 240,
-        borderRadius: 2,
-        bgcolor: 'background.paper',
-        border: `1px solid ${theme.palette.divider}`,
-        boxShadow: theme.shadows[8],
-        '& .MuiMenuItem-root': {
-          typography: 'body2',
-          py: 1.2,
-          borderRadius: 1,
-          mx: 0.5,
-        },
-      },
-    },
+  const handleNavigation = (path) => {
+    navigate(path);
+    setDrawerOpen(false);
+    setAnchorEl(null);
+    setProfileAnchorEl(null);
   };
 
   return (
-    <>
-      <AppBar
-        position="fixed"
-        elevation={0}
-        sx={{
-          bgcolor: 'primary.main',
-          color: 'primary.contrastText',
-          zIndex: theme.zIndex.drawer + 1,
-          borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-        }}
-      >
-        <Toolbar>
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center' }}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              {isMobile && (
-                <IconButton onClick={() => setDrawerOpen(true)} color="inherit">
-                  <MenuIcon />
-                </IconButton>
-              )}
+    <AppBar
+      position="fixed"
+      elevation={0}
+      sx={{
+        bgcolor: 'primary.main',
+        color: 'primary.contrastText',
+        zIndex: theme.zIndex.drawer + 1,
+        borderBottom: 1,
+        borderColor: 'divider',
+      }}
+    >
+      <Toolbar>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          sx={{ flexGrow: 1 }}
+        >
+          {isMobile && (
+            <IconButton onClick={() => setDrawerOpen(true)} color="inherit">
+              <MenuIcon />
+            </IconButton>
+          )}
 
-              <Box
-                onClick={() => handleNavigation('/')}
+          <Box
+            onClick={() => handleNavigation('/')}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              gap: theme.spacing(1),
+            }}
+          >
+            <CalculateIcon sx={{ fontSize: theme.spacing(4) }} />
+            <Typography
+              variant="h6"
+              sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'block' } }}
+            >
+              SmartFund Manager
+            </Typography>
+          </Box>
+
+          {!isMobile && (
+            <>
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{ mx: 2, bgcolor: 'primary.light' }}
+              />
+              <Button
+                onClick={(e) => setAnchorEl(e.currentTarget)}
+                endIcon={<ArrowDownIcon />}
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
-                  gap: 1.5,
+                  color: 'inherit',
+                  textTransform: 'none',
+                  fontWeight: 'medium',
+                  fontSize: '1rem',
+                  borderRadius: theme.shape.borderRadius,
+                  '&:hover': { bgcolor: 'action.hover' },
                 }}
               >
-                <CalculateIcon sx={{ fontSize: 32 }} />
-                <Typography
-                  variant="h6"
-                  sx={{ fontWeight: 900, display: { xs: 'none', sm: 'block' } }}
-                >
-                  SmartFund Manager
-                </Typography>
-              </Box>
+                {currentCalc.label}
+              </Button>
+            </>
+          )}
+        </Stack>
 
-              {!isMobile && (
+        <Stack direction="row" spacing={theme.spacing(1.5)} alignItems="center">
+          {!isMobile && (
+            <>
+              {showExport && (
                 <Button
-                  color="inherit"
-                  endIcon={<ArrowDownIcon />}
-                  onClick={(e) => setCalcAnchorEl(e.currentTarget)}
+                  variant="outlined"
+                  startIcon={<ExportIcon />}
+                  onClick={(e) => setExportAnchorEl(e.currentTarget)}
                   sx={{
-                    ml: 2,
-                    textTransform: 'none',
-                    bgcolor: alpha(theme.palette.common.white, 0.1),
+                    color: 'inherit',
+                    borderColor: 'primary.light',
+                    borderRadius: theme.shape.borderRadius,
                     '&:hover': {
-                      bgcolor: alpha(theme.palette.common.white, 0.2),
+                      borderColor: 'inherit',
+                      bgcolor: 'action.hover',
                     },
                   }}
                 >
-                  {currentCalc.label}
+                  Export
                 </Button>
               )}
-            </Stack>
-          </Box>
 
-          <Stack direction="row" spacing={1} alignItems="center">
-            {!isMobile && (
               <Tooltip title="Help & FAQ">
                 <IconButton
-                  color="inherit"
                   onClick={() => handleNavigation('/faq')}
+                  color="inherit"
                 >
                   <HelpIcon />
                 </IconButton>
               </Tooltip>
-            )}
+            </>
+          )}
 
-            <IconButton
-              onClick={(e) => setProfileAnchorEl(e.currentTarget)}
-              sx={{
-                bgcolor: alpha(theme.palette.common.white, 0.1),
-                color: 'inherit',
-              }}
-            >
-              <ProfileIcon />
-            </IconButton>
-          </Stack>
-        </Toolbar>
-      </AppBar>
-
-      {/* --- DESKTOP CALCULATOR MENU --- */}
-      <Menu
-        anchorEl={calcAnchorEl}
-        open={Boolean(calcAnchorEl)}
-        onClose={() => setCalcAnchorEl(null)}
-        SlotProps={menuStyle}
-        disableScrollLock // Prevents layout shifting
-      >
-        <Typography
-          variant="overline"
-          sx={{ px: 2, fontWeight: 800, color: 'text.secondary' }}
-        >
-          Select Calculator
-        </Typography>
-        {calculators.map((calc) => (
-          <MenuItem
-            key={calc.path}
-            onClick={() => handleNavigation(calc.path)}
-            selected={location.pathname === calc.path}
+          <IconButton
+            onClick={(e) => setProfileAnchorEl(e.currentTarget)}
+            color="inherit"
+            sx={{ borderRadius: theme.shape.borderRadius }}
           >
-            <ListItemIcon sx={{ color: 'primary.main' }}>
-              {calc.icon}
-            </ListItemIcon>
-            {calc.label}
+            <ProfileIcon />
+          </IconButton>
+        </Stack>
+
+        {/* CALCULATORS DROPDOWN - Inherits Glass from theme */}
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={() => setAnchorEl(null)}
+          disableScrollLock
+          PaperProps={{
+            elevation: 0, // Glass themes usually prefer 0 elevation to show blur
+            sx: { mt: 1, minWidth: 220 },
+          }}
+        >
+          {CALCULATORS.map((calc) => (
+            <MenuItem
+              key={calc.path}
+              onClick={() => handleNavigation(calc.path)}
+              selected={location.pathname.startsWith(calc.path)}
+              sx={{ py: theme.spacing(1.5), gap: 2 }}
+            >
+              <ListItemIcon sx={{ color: 'primary.main', minWidth: 'auto' }}>
+                {calc.icon}
+              </ListItemIcon>
+              <ListItemText
+                primary={calc.label}
+                primaryTypographyProps={{ fontWeight: 'bold' }}
+              />
+            </MenuItem>
+          ))}
+        </Menu>
+
+        {/* PROFILE DROPDOWN */}
+        <Menu
+          anchorEl={profileAnchorEl}
+          open={Boolean(profileAnchorEl)}
+          onClose={() => setProfileAnchorEl(null)}
+          disableScrollLock
+          PaperProps={{ elevation: 0, sx: { mt: 1, minWidth: 240 } }}
+        >
+          <MenuItem onClick={() => handleNavigation('/profile?tab=personal')}>
+            <ListItemIcon>
+              <PersonIcon fontSize="small" />
+            </ListItemIcon>{' '}
+            Personal Profile
           </MenuItem>
-        ))}
-      </Menu>
+          <MenuItem onClick={() => handleNavigation('/profile?tab=goals')}>
+            <ListItemIcon>
+              <GoalsIcon fontSize="small" />
+            </ListItemIcon>{' '}
+            Financial Goals
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation('/profile?tab=wealth')}>
+            <ListItemIcon>
+              <WealthIcon fontSize="small" />
+            </ListItemIcon>{' '}
+            Wealth Dashboard
+          </MenuItem>
+          <Divider sx={{ my: 1 }} />
+          <MenuItem onClick={() => handleNavigation('/settings')}>
+            <ListItemIcon>
+              <SettingsIcon fontSize="small" />
+            </ListItemIcon>{' '}
+            Global Settings
+          </MenuItem>
+          <Divider sx={{ my: 1 }} />
+          <MenuItem onClick={handleResetData} sx={{ color: 'error.main' }}>
+            <ListItemIcon>
+              <ResetIcon fontSize="small" color="error" />
+            </ListItemIcon>{' '}
+            Reset All Data
+          </MenuItem>
+        </Menu>
 
-      {/* --- DESKTOP PROFILE MENU --- */}
-      <Menu
-        anchorEl={profileAnchorEl}
-        open={Boolean(profileAnchorEl)}
-        onClose={() => setProfileAnchorEl(null)}
-        SlotProps={menuStyle}
-        disableScrollLock // Prevents layout shifting
-      >
-        <MenuItem onClick={() => handleNavigation('/profile?tab=personal')}>
-          <ListItemIcon>
-            <PersonIcon fontSize="small" />
-          </ListItemIcon>
-          Personal Profile
-        </MenuItem>
-        <MenuItem onClick={() => handleNavigation('/profile?tab=goals')}>
-          <ListItemIcon>
-            <GoalsIcon fontSize="small" />
-          </ListItemIcon>
-          Financial Goals
-        </MenuItem>
-        <MenuItem onClick={() => handleNavigation('/profile?tab=wealth')}>
-          <ListItemIcon>
-            <WealthIcon fontSize="small" />
-          </ListItemIcon>
-          Wealth Dashboard
-        </MenuItem>
+        {/* EXPORT MENU */}
+        <Menu
+          anchorEl={exportAnchorEl}
+          open={Boolean(exportAnchorEl)}
+          onClose={() => setExportAnchorEl(null)}
+        >
+          <MenuItem onClick={() => handleExport('pdf')}>Download PDF</MenuItem>
+          <MenuItem onClick={() => handleExport('excel')}>
+            Download Excel
+          </MenuItem>
+        </Menu>
+      </Toolbar>
 
-        <Divider sx={{ my: 1 }} />
-
-        <MenuItem onClick={() => console.log('Exporting...')}>
-          <ListItemIcon>
-            <ExportIcon fontSize="small" />
-          </ListItemIcon>
-          Export Reports
-        </MenuItem>
-        <MenuItem onClick={() => handleNavigation('/settings')}>
-          <ListItemIcon>
-            <SettingsIcon fontSize="small" />
-          </ListItemIcon>
-          Settings
-        </MenuItem>
-        <MenuItem onClick={() => handleNavigation('/faq')}>
-          <ListItemIcon>
-            <HelpIcon fontSize="small" />
-          </ListItemIcon>
-          Help & Support
-        </MenuItem>
-
-        <Divider sx={{ my: 1 }} />
-
-        <MenuItem onClick={handleResetData} sx={{ color: 'error.main' }}>
-          <ListItemIcon>
-            <ResetIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          Reset Application Data
-        </MenuItem>
-      </Menu>
-
-      {/* --- MOBILE DRAWER --- */}
+      {/* DRAWER - Inherits Glass/Paper feel from theme */}
       <Drawer
         anchor="left"
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        disableScrollLock // Prevents layout shifting
-        PaperProps={{
-          sx: {
-            width: 300,
-            bgcolor: 'background.default',
-            backgroundImage: 'none',
-          },
-        }}
+        PaperProps={{ elevation: 0, sx: { width: theme.spacing(35) } }}
       >
-        <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1.5 }}>
-          <CalculateIcon color="primary" sx={{ fontSize: 32 }} />
-          <Typography variant="h6" sx={{ fontWeight: 900 }}>
-            SmartFund{' '}
-            <span style={{ color: theme.palette.primary.main }}>Manager</span>
-          </Typography>
-        </Box>
-        <Divider />
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+          <Box
+            sx={{
+              p: theme.spacing(3),
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 'black' }}>
+              SmartFund Manager
+            </Typography>
+          </Box>
 
-        <List sx={{ p: 1 }}>
-          <ListItemButton onClick={() => setOpenCalculators(!openCalculators)}>
-            <ListItemIcon>
-              <CalculateIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Calculators"
-              primaryTypographyProps={{ fontWeight: 700 }}
-            />
-            {openCalculators ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={openCalculators} timeout="auto">
-            <List disablePadding>
-              {calculators.map((calc) => (
+          <List sx={{ p: theme.spacing(1.5) }}>
+            <ListItemButton
+              onClick={() => setOpenCalculators(!openCalculators)}
+              sx={{ borderRadius: theme.shape.borderRadius, mb: 0.5 }}
+            >
+              <ListItemIcon>
+                <CalculateIcon color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Calculators"
+                primaryTypographyProps={{ fontWeight: 'bold' }}
+              />
+              {openCalculators ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+
+            <Collapse in={openCalculators} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                {CALCULATORS.map((calc) => (
+                  <ListItemButton
+                    key={calc.path}
+                    sx={{
+                      pl: 4,
+                      borderRadius: theme.shape.borderRadius,
+                      mb: 0.5,
+                    }}
+                    onClick={() => handleNavigation(calc.path)}
+                    selected={location.pathname.startsWith(calc.path)}
+                  >
+                    <ListItemIcon sx={{ minWidth: theme.spacing(5) }}>
+                      {calc.icon}
+                    </ListItemIcon>
+                    <ListItemText primary={calc.label} />
+                  </ListItemButton>
+                ))}
+              </List>
+            </Collapse>
+
+            <Divider sx={{ my: theme.spacing(1) }} />
+
+            <ListItemButton
+              onClick={() => setOpenProfile(!openProfile)}
+              sx={{ borderRadius: theme.shape.borderRadius }}
+            >
+              <ListItemIcon>
+                <PersonIcon />
+              </ListItemIcon>
+              <ListItemText
+                primary="My Account"
+                primaryTypographyProps={{ fontWeight: 'bold' }}
+              />
+              {openProfile ? <ExpandLess /> : <ExpandMore />}
+            </ListItemButton>
+
+            <Collapse in={openProfile} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
                 <ListItemButton
-                  key={calc.path}
-                  sx={{ pl: 4, borderRadius: 2 }}
-                  onClick={() => handleNavigation(calc.path)}
-                  selected={location.pathname === calc.path}
+                  sx={{ pl: 4, borderRadius: theme.shape.borderRadius }}
+                  onClick={() => handleNavigation('/profile?tab=personal')}
                 >
-                  <ListItemIcon sx={{ minWidth: 40 }}>{calc.icon}</ListItemIcon>
-                  <ListItemText primary={calc.label} />
+                  <ListItemText primary="Profile Details" />
                 </ListItemButton>
-              ))}
-            </List>
-          </Collapse>
+                <ListItemButton
+                  sx={{ pl: 4, borderRadius: theme.shape.borderRadius }}
+                  onClick={() => handleNavigation('/profile?tab=wealth')}
+                >
+                  <ListItemText primary="Wealth Dashboard" />
+                </ListItemButton>
+              </List>
+            </Collapse>
 
-          <Divider sx={{ my: 1 }} />
+            <ListItemButton
+              onClick={() => handleNavigation('/settings')}
+              sx={{ borderRadius: theme.shape.borderRadius }}
+            >
+              <ListItemIcon>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Settings" />
+            </ListItemButton>
 
-          <ListItemButton onClick={() => setOpenAccount(!openAccount)}>
-            <ListItemIcon>
-              <ProfileIcon color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="My Account"
-              primaryTypographyProps={{ fontWeight: 700 }}
-            />
-            {openAccount ? <ExpandLess /> : <ExpandMore />}
-          </ListItemButton>
-          <Collapse in={openAccount} timeout="auto">
-            <List disablePadding>
-              <ListItemButton
-                sx={{ pl: 4, borderRadius: 2 }}
-                onClick={() => handleNavigation('/profile?tab=personal')}
-              >
-                <ListItemIcon>
-                  <PersonIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Personal Profile" />
-              </ListItemButton>
-              <ListItemButton
-                sx={{ pl: 4, borderRadius: 2 }}
-                onClick={() => console.log('Exporting...')}
-              >
-                <ListItemIcon>
-                  <ExportIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Export Data" />
-              </ListItemButton>
-            </List>
-          </Collapse>
+            <ListItemButton
+              onClick={() => handleNavigation('/faq')}
+              sx={{ borderRadius: theme.shape.borderRadius }}
+            >
+              <ListItemIcon>
+                <HelpIcon />
+              </ListItemIcon>
+              <ListItemText primary="Help & FAQ" />
+            </ListItemButton>
 
-          <Divider sx={{ my: 1 }} />
+            <Divider sx={{ my: theme.spacing(1) }} />
 
-          <ListItemButton onClick={() => handleNavigation('/settings')}>
-            <ListItemIcon>
-              <SettingsIcon />
-            </ListItemIcon>
-            <ListItemText primary="Global Settings" />
-          </ListItemButton>
-          <ListItemButton onClick={() => handleNavigation('/faq')}>
-            <ListItemIcon>
-              <HelpIcon />
-            </ListItemIcon>
-            <ListItemText primary="Help & FAQ" />
-          </ListItemButton>
-        </List>
+            <ListItemButton
+              onClick={handleResetData}
+              sx={{
+                color: 'error.main',
+                borderRadius: theme.shape.borderRadius,
+              }}
+            >
+              <ListItemIcon>
+                <ResetIcon color="error" />
+              </ListItemIcon>
+              <ListItemText primary="Clear All Data" />
+            </ListItemButton>
+          </List>
+        </Box>
       </Drawer>
-    </>
+    </AppBar>
   );
 };
 
