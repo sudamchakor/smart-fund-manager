@@ -38,7 +38,7 @@ jest.mock('../../../src/components/common/LoanSummaryTerminal', () => ({ monthly
     <span data-testid="total-interest">{currency}{totalInterest}</span>
     <span data-testid="total-payable">{currency}{totalPayable}</span>
     {loading && <span data-testid="loading-indicator">Loading...</span>}
-    {children}
+    <div data-testid="loan-summary-terminal-children">{children}</div> {/* Added to capture children */}
   </div>
 ));
 
@@ -86,6 +86,12 @@ describe('PersonalLoanCalculator Page', () => {
   it('renders LoanSummaryTerminal', () => {
     renderComponent();
     expect(screen.getByTestId('mock-loan-summary-terminal')).toBeInTheDocument();
+  });
+
+  it('renders children inside LoanSummaryTerminal', () => {
+    renderComponent();
+    expect(screen.getByTestId('loan-summary-terminal-children')).toBeInTheDocument();
+    expect(screen.getByText('Chart Visualization Region')).toBeInTheDocument();
   });
 
   // --- InputSlider Interactions and Calculations ---
@@ -163,17 +169,19 @@ describe('PersonalLoanCalculator Page', () => {
   });
 
   it('shows loading indicator in LoanSummaryTerminal during calculation', async () => {
-    // This is hard to test directly with `useEffect` as it's synchronous in tests.
-    // To properly test loading state, you'd need to mock the calculation to be asynchronous.
-    // For now, we'll ensure the `loading` prop is passed.
+    // Due to the synchronous nature of useEffect in tests, the loading state
+    // will be false by the time assertions are made. This test ensures the
+    // loading prop is correctly passed and the indicator is not shown when not loading.
     renderComponent();
-    expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument(); // Should not be loading after initial render
+    expect(screen.queryByTestId('loading-indicator')).not.toBeInTheDocument();
   });
 
   it('uses the currency from Redux state', () => {
     renderComponent('$');
-    expect(screen.getByTestId('monthly-emi')).toHaveTextContent('$9999'); // Default EMI with $
-    expect(screen.getByTestId('total-interest')).toHaveTextContent('$99999'); // Default Interest with $
-    expect(screen.getByTestId('total-payable')).toHaveTextContent('$999999'); // Default Payable with $
+    // Initial values with default loanAmount=500000, interestRate=10.5, tenure=5
+    // EMI: 10747.8, Total Interest: 144868, Total Payable: 644868
+    expect(screen.getByTestId('monthly-emi')).toHaveTextContent('$10748');
+    expect(screen.getByTestId('total-interest')).toHaveTextContent('$144868');
+    expect(screen.getByTestId('total-payable')).toHaveTextContent('$644868');
   });
 });

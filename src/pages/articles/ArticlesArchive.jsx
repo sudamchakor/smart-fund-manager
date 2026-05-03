@@ -8,7 +8,6 @@ import {
   Container,
   InputAdornment,
   Button,
-  CircularProgress,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -22,6 +21,7 @@ import { db } from '../../firebaseConfig';
 import ArticleCard from '../../components/articles/ArticleCard';
 import PageHeader from '../../components/common/PageHeader';
 import { useAuth } from '../../hooks/useAuth';
+import SuspenseFallback from '../../components/common/SuspenseFallback'; // Import SuspenseFallback
 
 const ArticlesArchive = () => {
   const { isAuthenticated } = useAuth();
@@ -29,7 +29,7 @@ const ArticlesArchive = () => {
   // States
   const [allArticles, setAllArticles] = useState([]); // Master list from DB
   const [filteredArticles, setFilteredArticles] = useState([]); // Displayed list
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Reintroduced loading state for data fetching
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
@@ -37,7 +37,7 @@ const ArticlesArchive = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        setLoading(true);
+        setLoading(true); // Set loading to true before fetching
         const articlesCollection = collection(db, 'articles');
         // We order by timestamp so newest articles appear first
         const q = query(articlesCollection, orderBy('createdAt', 'desc'));
@@ -52,8 +52,9 @@ const ArticlesArchive = () => {
         setFilteredArticles(fetchedArticles);
       } catch (error) {
         console.error('Error fetching articles: ', error);
+        // Optionally, you could set an error state here to display an error message
       } finally {
-        setLoading(false);
+        setLoading(false); // Set loading to false after fetching (success or error)
       }
     };
 
@@ -148,7 +149,7 @@ const ArticlesArchive = () => {
 
       {loading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
-          <CircularProgress />
+          <SuspenseFallback message="" /> {/* Show SuspenseFallback without message */}
         </Box>
       ) : (
         <Grid container spacing={4}>

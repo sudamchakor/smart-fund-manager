@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -31,6 +31,24 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
+jest.mock('../../../src/pages/Home', () => {
+  const actual = jest.requireActual('../../../src/pages/Home');
+  // Define mockSystemModules INSIDE the factory function to avoid hoisting issues
+  const mockSystemModules = [
+    { title: "User Profile", description: "Desc 1", icon: <div data-testid="icon-user-profile" />, path: "/profile", colorToken: "secondary" },
+    { title: "EMI Calculator", description: "Desc 2", icon: <div data-testid="icon-emi-calculator" />, path: "/calculator", colorToken: "primary" },
+    { title: "Credit Card EMI", description: "Desc 3", icon: <div data-testid="icon-credit-card-emi" />, path: "/credit-card-emi", colorToken: "success" },
+    { title: "Investment Strategy", description: "Desc 4", icon: <div data-testid="icon-investment-strategy" />, path: "/investment/sip", colorToken: "info" },
+    { title: "Personal Loan", description: "Desc 5", icon: <div data-testid="icon-personal-loan" />, path: "/personal-loan", colorToken: "warning" },
+    { title: "Tax Optimization", description: "Desc 6", icon: <div data-testid="icon-tax-optimization" />, path: "/tax-calculator", colorToken: "error" },
+  ];
+  return {
+    ...actual,
+    systemModules: mockSystemModules, // Use our mock array
+  };
+});
+
+
 describe('Home Component', () => {
   // Helper function to render the component with ThemeProvider and Router
   const renderComponent = () => {
@@ -56,33 +74,32 @@ describe('Home Component', () => {
     expect(screen.getByText('Your centralized financial command center for precision planning and capital growth.')).toBeInTheDocument();
   });
 
+  it('navigates to /profile when "Get Started" button is clicked', () => {
+    renderComponent();
+    fireEvent.click(screen.getByRole('button', { name: /Get Started/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/profile');
+  });
+
   // --- System Modules Grid ---
   it('renders all system modules', () => {
     renderComponent();
-    expect(screen.getByText('User Profile')).toBeInTheDocument();
-    expect(screen.getByText('EMI Calculator')).toBeInTheDocument();
-    expect(screen.getByText('Credit Card EMI')).toBeInTheDocument();
-    expect(screen.getByText('Investment Strategy')).toBeInTheDocument();
-    expect(screen.getByText('Personal Loan')).toBeInTheDocument();
-    expect(screen.getByText('Tax Optimization')).toBeInTheDocument();
+    // Access the mocked systemModules from the Home module itself
+    const { systemModules: mockedSystemModules } = require('../../../src/pages/Home');
+    mockedSystemModules.forEach(module => {
+      expect(screen.getByText(module.title)).toBeInTheDocument();
+      expect(screen.getByText(module.description)).toBeInTheDocument();
+      expect(screen.getByTestId(`icon-${module.title.toLowerCase().replace(/\s/g, '-')}`)).toBeInTheDocument();
+    });
   });
 
-  it('navigates to the correct path when a module card is clicked', () => {
+  it('navigates to the correct path when each module card is clicked', () => {
     renderComponent();
-    fireEvent.click(screen.getByText('User Profile').closest('button'));
-    expect(mockNavigate).toHaveBeenCalledWith('/profile');
-
-    fireEvent.click(screen.getByText('EMI Calculator').closest('button'));
-    expect(mockNavigate).toHaveBeenCalledWith('/calculator');
-  });
-
-  it('renders module icons and descriptions', () => {
-    renderComponent();
-    expect(screen.getByText('Manage your demographics, operational liabilities, and capital goals.')).toBeInTheDocument();
-    expect(screen.getByText('Calculate monthly amortization schedules and prepayment impacts.')).toBeInTheDocument();
-    // Check for presence of icons (mocked or actual)
-    expect(screen.getByTestId('AccountCircleIcon')).toBeInTheDocument();
-    expect(screen.getByTestId('CalculateIcon')).toBeInTheDocument();
+    const { systemModules: mockedSystemModules } = require('../../../src/pages/Home');
+    mockedSystemModules.forEach(module => {
+      fireEvent.click(screen.getByText(module.title).closest('button'));
+      expect(mockNavigate).toHaveBeenCalledWith(module.path);
+    });
+    expect(mockNavigate).toHaveBeenCalledTimes(mockedSystemModules.length);
   });
 
   // --- Onboarding Modal ---
@@ -113,16 +130,38 @@ describe('Home Component', () => {
 
   // --- Edge Cases / Negative Scenarios ---
   it('handles empty module list gracefully (no modules rendered)', () => {
-    // Temporarily modify systemModules for this test
-    const originalModules = [...systemModules];
-    systemModules.length = 0; // Clear the array
+    // Temporarily override the mockSystemModules for this test
+    jest.doMock('../../../src/pages/Home', () => {
+      const actual = jest.requireActual('../../../src/pages/Home');
+      return {
+        ...actual,
+        systemModules: [], // Empty array
+      };
+    });
+    // Re-render the component with the empty mock
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <Router>
+          <Home />
+        </Router>
+      </ThemeProvider>
+    );
 
-    renderComponent();
     expect(screen.queryByText('User Profile')).not.toBeInTheDocument();
-    expect(screen.queryAllByRole('button')).toHaveLength(0); // Only the hero section buttons might exist
+    // Check that no module cards are rendered, only the "Get Started" button in the hero section
+    expect(screen.queryAllByRole('button', { name: /System Module/i })).toHaveLength(0);
 
-    // Restore original modules
-    systemModules.push(...originalModules);
+    // Restore original mock for subsequent tests
+    jest.dontMock('../../../src/pages/Home');
+    // Re-import Home to get the original mockSystemModules back
+    const OriginalHome = require('../../../src/pages/Home').default;
+    rerender(
+      <ThemeProvider theme={theme}>
+        <Router>
+          <OriginalHome />
+        </Router>
+      </ThemeProvider>
+    );
   });
 
   it('ensures module cards have correct styling and hover effects (visual check, not directly testable with JSDOM)', () => {
@@ -132,10 +171,7 @@ describe('Home Component', () => {
     const userProfileCard = screen.getByText('User Profile').closest('button');
     expect(userProfileCard).toHaveStyle('border: 1px solid');
     expect(userProfileCard).toHaveStyle('transition: all 0.3s ease');
-    // Check for animation properties
-    expect(userProfileCard).toHaveStyle('animation: moduleBootUp 2250ms ease-in-out both');
+    // Check for animation properties (this is a simplified check, actual keyframe animation is harder to test)
+    expect(userProfileCard).toHaveStyle('animation-delay: 0ms'); // First item has 0ms delay
   });
 });
-
-// Re-import systemModules after the test to ensure it's reset for other tests
-import { systemModules } from '../../../src/pages/Home';

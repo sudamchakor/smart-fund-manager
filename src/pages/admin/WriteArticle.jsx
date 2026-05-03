@@ -43,7 +43,7 @@ const WriteArticle = () => {
 
   // UI State
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loadingArticle, setLoadingArticle] = useState(true);
+  // Removed loadingArticle state, as Suspense handles initial component loading
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: '',
@@ -81,7 +81,7 @@ const WriteArticle = () => {
     const fetchArticle = async () => {
       if (id) {
         try {
-          setLoadingArticle(true);
+          // Removed setLoadingArticle(true);
           const docRef = doc(db, 'articles', id);
           const docSnap = await getDoc(docRef);
 
@@ -108,20 +108,16 @@ const WriteArticle = () => {
             severity: 'error',
           });
         } finally {
-          setLoadingArticle(false);
+          // Removed setLoadingArticle(false);
         }
-      } else {
-        setLoadingArticle(false);
       }
     };
 
-    // Only fetch if authenticated and is admin, or if it's a new article and user is admin
+    // Only fetch if authenticated and is admin
     if (!authLoading && user && user.uid === ADMIN_UID) {
       fetchArticle();
-    } else if (!authLoading && (!user || user.uid !== ADMIN_UID)) {
-      // If not admin, ensure loading state is false so UI can render unauthorized message/redirect
-      setLoadingArticle(false);
     }
+    // No need for an else if to setLoadingArticle(false) as it's removed
   }, [id, navigate, user, authLoading]);
 
   const handlePublish = async (e, status = 'published') => {
@@ -210,7 +206,7 @@ const WriteArticle = () => {
     }
   };
 
-  if (authLoading || loadingArticle) {
+  if (authLoading) { // Only wait for auth to load, initial component loading handled by Suspense
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <CircularProgress />
@@ -230,7 +226,7 @@ const WriteArticle = () => {
         </Button>
       </Container>
     );
-  }
+    }
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>

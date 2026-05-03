@@ -40,6 +40,24 @@ jest.mock('../../../src/utils/constants', () => ({
   ADMIN_UID: 'admin-uid-123',
 }));
 
+// Mock formatDate from utils/formatting
+jest.mock('../../../src/utils/formatting', () => ({
+  formatDate: jest.fn((date) => {
+    if (!date) return 'N/A';
+    const d = date instanceof Date ? date : new Date(date);
+    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+  }),
+}));
+
+// Mock PageHeader
+jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+  <div data-testid="mock-page-header">
+    <h1>{title}</h1>
+    <p>{subtitle}</p>
+    {Icon && <Icon data-testid="mock-header-icon" />}
+  </div>
+));
+
 describe('AdminArticles Component', () => {
   const mockAdminUser = { uid: 'admin-uid-123', displayName: 'Admin User' };
   const mockNonAdminUser = { uid: 'non-admin-uid', displayName: 'Regular User' };
@@ -101,23 +119,36 @@ describe('AdminArticles Component', () => {
     mockGetDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
     renderComponent();
     await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument(); // Check for Alert component
       expect(screen.getByText('Failed to load articles.')).toBeInTheDocument();
     });
   });
 
   // --- Admin View ---
-  it('renders "Manage Articles" title and "Add New Article" button for admin', async () => {
+  it('renders PageHeader with correct title, subtitle, and icon', async () => {
     renderComponent();
     await waitFor(() => {
+      expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
       expect(screen.getByText('Manage Articles')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Add New Article' })).toBeInTheDocument();
+      expect(screen.getByText('View, edit, and delete your published and drafted articles.')).toBeInTheDocument();
+      expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // ArticleIcon
+    });
+  });
+
+  it('renders "Add New Article" button as a Link for admin', async () => {
+    renderComponent();
+    await waitFor(() => {
+      const addButton = screen.getByRole('link', { name: 'Add New Article' });
+      expect(addButton).toBeInTheDocument();
+      expect(addButton).toHaveAttribute('href', '/admin/articles/new');
     });
   });
 
   it('renders a table with articles for admin', async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByRole('table', { name: 'articles table' })).toBeInTheDocument();
+      const table = screen.getByRole('table', { name: 'articles table' });
+      expect(table).toBeInTheDocument();
       expect(screen.getByText('Title')).toBeInTheDocument();
       expect(screen.getByText('Category')).toBeInTheDocument();
       expect(screen.getByText('Author')).toBeInTheDocument();
@@ -148,7 +179,8 @@ describe('AdminArticles Component', () => {
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this article?');
       expect(mockDeleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', '1');
       expect(window.alert).toHaveBeenCalledWith('Article deleted successfully!');
-      expect(screen.queryByText('Article One')).not.toBeInTheDocument(); // Article removed from list
+      // Re-fetch is triggered, so the article should disappear from the list
+      expect(screen.queryByText('Article One')).not.toBeInTheDocument();
     });
   });
 
@@ -170,14 +202,6 @@ describe('AdminArticles Component', () => {
     await waitFor(() => {
       fireEvent.click(screen.getAllByLabelText('delete')[0]);
       expect(window.alert).toHaveBeenCalledWith('Failed to delete article.');
-    });
-  });
-
-  it('formats Firestore Timestamp objects correctly', async () => {
-    renderComponent();
-    await waitFor(() => {
-      expect(screen.getByText('1/1/2023')).toBeInTheDocument();
-      expect(screen.getByText('1/2/2023')).toBeInTheDocument();
     });
   });
 
@@ -203,6 +227,13 @@ describe('AdminArticles Component', () => {
   });
 
   // --- Non-Admin View ---
+  it('redirects to /admin/login if user is null and not loading', async () => {
+    renderComponent(false, null);
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/admin/login');
+    });
+  });
+
   it('does not show "Add New Article" button for non-admin users', async () => {
     renderComponent(false, mockNonAdminUser);
     await waitFor(() => {

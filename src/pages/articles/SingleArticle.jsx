@@ -9,7 +9,7 @@ import {
   Divider,
   Button,
   useTheme,
-  CircularProgress,
+  // CircularProgress, // Removed CircularProgress import
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ImageIcon from '@mui/icons-material/Image';
@@ -23,16 +23,17 @@ import { db } from '../../firebaseConfig';
 // Centralized category imports
 import { categoryIcons } from '../../utils/articleCategories';
 import { useAuth } from '../../hooks/useAuth'; // Import useAuth
+import SuspenseFallback from '../../components/common/SuspenseFallback'; // Import SuspenseFallback
 
 const SingleArticle = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const theme = useTheme();
-  const { user, loading: authLoading } = useAuth(); // Get user and authLoading from useAuth
+  const { user } = useAuth(); // Get user from useAuth, authLoading is handled higher up
 
   // States
   const [article, setArticle] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // Keep internal loading for data fetching
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -56,9 +57,11 @@ const SingleArticle = () => {
           });
         } else {
           console.log('No such document!');
+          setArticle(null); // Explicitly set to null if not found
         }
       } catch (error) {
         console.error('Error fetching article:', error);
+        setArticle(null); // Set to null on error to show "Article Not Found"
       } finally {
         setLoading(false);
       }
@@ -89,10 +92,10 @@ const SingleArticle = () => {
     return new Date(timestamp).toLocaleDateString();
   };
 
-  if (loading || authLoading) { // Wait for both article and auth to load
+  if (loading) { // Only use internal loading for article data fetching
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
-        <CircularProgress />
+        <SuspenseFallback message="" /> {/* Use SuspenseFallback without message */}
       </Container>
     );
   }

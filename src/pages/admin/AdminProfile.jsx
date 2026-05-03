@@ -6,7 +6,7 @@ import {
   Paper,
   Button,
   TextField,
-  CircularProgress,
+  CircularProgress, // Keep CircularProgress for authLoading
   Snackbar,
   Alert,
   Stack,
@@ -32,6 +32,7 @@ import {
   reauthenticateWithCredential,
   updatePassword, // Import updatePassword
 } from 'firebase/auth'; // Import Firebase Auth functions
+import SuspenseFallback from '../../components/common/SuspenseFallback'; // Import SuspenseFallback
 
 const AdminProfile = () => {
   const { user, loading: authLoading, logout } = useAuth();
@@ -41,7 +42,7 @@ const AdminProfile = () => {
     displayName: '',
     bio: '',
   });
-  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true); // Reintroduced loadingProfile state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -72,7 +73,7 @@ const AdminProfile = () => {
     const fetchProfile = async () => {
       if (user) {
         try {
-          setLoadingProfile(true);
+          setLoadingProfile(true); // Set loading to true before fetching
           const profileRef = doc(db, 'authorProfiles', user.uid);
           const docSnap = await getDoc(profileRef);
 
@@ -93,7 +94,7 @@ const AdminProfile = () => {
             severity: 'error',
           });
         } finally {
-          setLoadingProfile(false);
+          setLoadingProfile(false); // Set loading to false after fetching
         }
       }
     };
@@ -261,7 +262,7 @@ const AdminProfile = () => {
     }
   };
 
-  if (authLoading || loadingProfile) {
+  if (authLoading) { // Still wait for auth to load
     return (
       <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
         <CircularProgress />
@@ -271,6 +272,14 @@ const AdminProfile = () => {
 
   if (!user) {
     return null; // Redirect handled by useEffect
+  }
+
+  if (loadingProfile) { // Show SuspenseFallback while profile data is loading
+    return (
+      <Container maxWidth="md" sx={{ py: 8, textAlign: 'center' }}>
+        <SuspenseFallback message="" />
+      </Container>
+    );
   }
 
   return (

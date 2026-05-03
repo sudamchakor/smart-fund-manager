@@ -10,15 +10,13 @@ import LightbulbIcon from '@mui/icons-material/Lightbulb';
 export const articleCategories = [
   'Finance',
   'Investments',
-  'Banking',
-  'Savings',
-  'Credit Cards',
-  'Education',
-  'Tips',
-  'Tax',
   'SIP',
-  'Real Estate',
   'Economy',
+  'Goal Planning',
+  'Financial Planning',
+  'Financial Security',
+  'Tax Strategy',
+  'Investment & Tax',
   'Other',
 ];
 
