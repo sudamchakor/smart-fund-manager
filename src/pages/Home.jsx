@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import {
   Grid,
   Typography,
@@ -21,7 +21,8 @@ import {
   ChevronRight as ChevronRightIcon,
   Dashboard as DashboardIcon,
 } from "@mui/icons-material";
-import OnboardingModal from "../features/profile/tabs/OnboardingModal";
+
+const OnboardingModal = lazy(() => import("../features/profile/tabs/OnboardingModal"));
 
 const moduleBootUp = keyframes`
   0% { opacity: 0; transform: translateY(20px) scale(0.98); }
@@ -162,7 +163,11 @@ export default function Home() {
           })}
         </Grid>
 
-        <OnboardingModal open={showOnboarding} onClose={handleCloseOnboarding} />
+        {showOnboarding && (
+            <Suspense fallback={null}>
+                <OnboardingModal open={showOnboarding} onClose={handleCloseOnboarding} />
+            </Suspense>
+        )}
       </Container>
   );
 }

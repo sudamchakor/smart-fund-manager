@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -10,27 +10,10 @@ import {
   StepLabel,
   Box,
   Typography,
-  TextField,
-  FormControl,
-  Select,
-  MenuItem,
-  Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemText,
   Divider,
   useTheme,
   alpha,
-  Stack,
 } from "@mui/material";
-import {
-  DeleteOutline as DeleteIcon,
-  FlagCircle as GoalIcon,
-  Speed as SpeedIcon,
-  AccountBalanceWallet as IncomeIcon,
-  ReceiptLong as ExpenseIcon,
-} from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addIncome,
@@ -43,9 +26,11 @@ import {
   setGeneralInflationRate,
   selectEducationInflationRate,
 } from "../../../store/profileSlice";
-import SliderInput from "../../../components/common/SliderInput";
-import GoalForm from "../components/GoalForm";
-import { labelStyle, getWellInputStyle } from "../../../styles/formStyles";
+
+const SystemParameters = lazy(() => import("./OnboardingSteps/SystemParameters"));
+const IncomeStreams = lazy(() => import("./OnboardingSteps/IncomeStreams"));
+const FixedLiabilities = lazy(() => import("./OnboardingSteps/FixedLiabilities"));
+const CapitalGoals = lazy(() => import("./OnboardingSteps/CapitalGoals"));
 
 const steps = [
   "System Parameters",
@@ -111,7 +96,7 @@ export default function OnboardingModal({ open, onClose }) {
         age: basicInfo.age,
         occupation: basicInfo.occupation,
         riskTolerance: basicInfo.riskTolerance,
-      }),
+      })
     );
     dispatch(setCurrentAge(basicInfo.age));
     dispatch(setRetirementAge(basicInfo.retirementAge));
@@ -119,10 +104,10 @@ export default function OnboardingModal({ open, onClose }) {
     dispatch(setGeneralInflationRate(basicInfo.generalInflationRate));
 
     incomesList.forEach((inc) =>
-      dispatch(addIncome({ ...inc, id: Date.now() + Math.random() })),
+      dispatch(addIncome({ ...inc, id: Date.now() + Math.random() }))
     );
     expensesList.forEach((exp) =>
-      dispatch(addExpense({ ...exp, id: Date.now() + Math.random() })),
+      dispatch(addExpense({ ...exp, id: Date.now() + Math.random() }))
     );
     goalsList.forEach((goal) => {
       dispatch(addGoal({ ...goal, id: Date.now() + Math.random() }));
@@ -211,7 +196,7 @@ export default function OnboardingModal({ open, onClose }) {
   const applyEmergencyFundGoal = () => {
     const totalMonthlyOutflow = expensesList.reduce(
       (sum, e) => sum + e.amount,
-      0,
+      0
     );
     const targetAmount = Math.round(totalMonthlyOutflow * 6);
     setGoalsList([
@@ -242,719 +227,45 @@ export default function OnboardingModal({ open, onClose }) {
     switch (step) {
       case 0:
         return (
-          <Box sx={{ mt: 3 }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ mb: 3 }}
-            >
-              <SpeedIcon sx={{ fontSize: "1.2rem", color: "primary.main" }} />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "text.secondary",
-                }}
-              >
-                System & Demographics
-              </Typography>
-            </Stack>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <Typography sx={labelStyle}>User Identity</Typography>
-                <TextField
-                  variant="standard"
-                  fullWidth
-                  size="small"
-                  value={basicInfo.name}
-                  onChange={(e) =>
-                    setBasicInfoState({ ...basicInfo, name: e.target.value })
-                  }
-                  InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <Typography sx={labelStyle}>Professional Sector</Typography>
-                <TextField
-                  variant="standard"
-                  fullWidth
-                  size="small"
-                  value={basicInfo.occupation}
-                  onChange={(e) =>
-                    setBasicInfoState({
-                      ...basicInfo,
-                      occupation: e.target.value,
-                    })
-                  }
-                  InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <SliderInput
-                  label="Current Age"
-                  value={basicInfo.age}
-                  onChange={(val) =>
-                    setBasicInfoState({ ...basicInfo, age: val })
-                  }
-                  min={18}
-                  max={100}
-                  step={1}
-                  isInline={false}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <SliderInput
-                  label="Retirement Target"
-                  value={basicInfo.retirementAge}
-                  onChange={(val) =>
-                    setBasicInfoState({ ...basicInfo, retirementAge: val })
-                  }
-                  min={basicInfo.age}
-                  max={100}
-                  step={1}
-                  color="warning"
-                  isInline={false}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <SliderInput
-                  label="Career Growth (p.a)"
-                  value={(basicInfo.careerGrowthRate * 100).toFixed(1)}
-                  onChange={(val) =>
-                    setBasicInfoState({
-                      ...basicInfo,
-                      careerGrowthRate: val / 100,
-                    })
-                  }
-                  min={0}
-                  max={20}
-                  step={0.1}
-                  color="success"
-                  isInline={false}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <SliderInput
-                  label="General Inflation"
-                  value={(basicInfo.generalInflationRate * 100).toFixed(1)}
-                  onChange={(val) =>
-                    setBasicInfoState({
-                      ...basicInfo,
-                      generalInflationRate: val / 100,
-                    })
-                  }
-                  min={0}
-                  max={20}
-                  step={0.1}
-                  color="error"
-                  isInline={false}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Typography sx={labelStyle}>
-                  Calculated Risk Tolerance
-                </Typography>
-                <FormControl variant="standard" fullWidth>
-                  <Select
-                    value={basicInfo.riskTolerance}
-                    onChange={(e) =>
-                      setBasicInfoState({
-                        ...basicInfo,
-                        riskTolerance: e.target.value,
-                      })
-                    }
-                    disableUnderline
-                    sx={getWellInputStyle(theme)}
-                  >
-                    <MenuItem value="low" sx={{ fontWeight: 700 }}>
-                      Conservative (Capital Preservation)
-                    </MenuItem>
-                    <MenuItem value="medium" sx={{ fontWeight: 700 }}>
-                      Moderate (Balanced Growth)
-                    </MenuItem>
-                    <MenuItem value="high" sx={{ fontWeight: 700 }}>
-                      Aggressive (Maximum Yield)
-                    </MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Box>
+          <SystemParameters
+            basicInfo={basicInfo}
+            setBasicInfoState={setBasicInfoState}
+          />
         );
       case 1:
         return (
-          <Box sx={{ mt: 3 }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ mb: 3 }}
-            >
-              <IncomeIcon sx={{ fontSize: "1.2rem", color: "success.main" }} />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "success.main",
-                }}
-              >
-                Primary Capital Inflows
-              </Typography>
-            </Stack>
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.success.main, 0.03),
-                border: `1px dashed ${alpha(theme.palette.success.main, 0.2)}`,
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography sx={labelStyle}>Source Designation</Typography>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    value={income.name}
-                    onChange={(e) =>
-                      setIncome({ ...income, name: e.target.value })
-                    }
-                    InputProps={{
-                      disableUnderline: true,
-                      sx: getWellInputStyle(theme, 'success'),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <SliderInput
-                    label="Amount"
-                    value={Number(income.amount) || 0}
-                    onChange={(val) => setIncome({ ...income, amount: val })}
-                    min={0}
-                    max={10000000}
-                    step={1000}
-                    color="success"
-                    showInput={true}
-                    isInline={false}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Typography sx={labelStyle}>Frequency</Typography>
-                  <FormControl variant="standard" fullWidth>
-                    <Select
-                      value={income.frequency}
-                      onChange={(e) =>
-                        setIncome({ ...income, frequency: e.target.value })
-                      }
-                      disableUnderline
-                      sx={getWellInputStyle(theme, 'success')}
-                    >
-                      <MenuItem value="monthly" sx={{ fontWeight: 700 }}>
-                        Monthly
-                      </MenuItem>
-                      <MenuItem value="quarterly" sx={{ fontWeight: 700 }}>
-                        Quarterly
-                      </MenuItem>
-                      <MenuItem value="yearly" sx={{ fontWeight: 700 }}>
-                        Yearly
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <SliderInput
-                    label="Start Year"
-                    value={income.startYear}
-                    onChange={(val) => setIncome({ ...income, startYear: val })}
-                    min={currentYear}
-                    max={currentYear + 50}
-                    step={1}
-                    color="success"
-                    isInline={false}
-                    showInput={true}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <SliderInput
-                    label="End Year"
-                    value={income.endYear}
-                    onChange={(val) => setIncome({ ...income, endYear: val })}
-                    min={income.startYear}
-                    max={currentYear + 50}
-                    step={1}
-                    color="success"
-                    isInline={false}
-                    showInput={true}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}
-                >
-                  <Button
-                    variant="contained"
-                    color="success"
-                    onClick={handleAddIncome}
-                    disabled={!income.name || income.amount === 0}
-                    sx={{ fontWeight: 800, px: 4 }}
-                  >
-                    Inject Capital Stream
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
-
-            {incomesList.length > 0 && (
-              <List
-                dense
-                sx={{
-                  mt: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 2,
-                }}
-              >
-                {incomesList.map((inc, index) => (
-                  <ListItem
-                    key={index}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        color="error"
-                        onClick={() =>
-                          setIncomesList(
-                            incomesList.filter((_, i) => i !== index),
-                          )
-                        }
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontWeight: 800 }}>
-                          {inc.name}
-                        </Typography>
-                      }
-                      secondary={`${inc.amount} (${inc.frequency})`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Box>
+          <IncomeStreams
+            income={income}
+            setIncome={setIncome}
+            incomesList={incomesList}
+            setIncomesList={setIncomesList}
+            handleAddIncome={handleAddIncome}
+          />
         );
       case 2:
         return (
-          <Box sx={{ mt: 3 }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ mb: 3 }}
-            >
-              <ExpenseIcon sx={{ fontSize: "1.2rem", color: "warning.main" }} />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "warning.main",
-                }}
-              >
-                Operational Liabilities
-              </Typography>
-            </Stack>
-            <Box
-              sx={{
-                p: 2,
-                borderRadius: 2,
-                bgcolor: alpha(theme.palette.warning.main, 0.03),
-                border: `1px dashed ${alpha(theme.palette.warning.main, 0.2)}`,
-              }}
-            >
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <Typography sx={labelStyle}>Liability Identifier</Typography>
-                  <TextField
-                    variant="standard"
-                    fullWidth
-                    size="small"
-                    value={expense.name}
-                    onChange={(e) =>
-                      setExpense({ ...expense, name: e.target.value })
-                    }
-                    InputProps={{
-                      disableUnderline: true,
-                      sx: getWellInputStyle(theme, 'warning'),
-                    }}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <SliderInput
-                    label="Amount"
-                    value={Number(expense.amount) || 0}
-                    onChange={(val) => setExpense({ ...expense, amount: val })}
-                    min={0}
-                    max={1000000}
-                    step={500}
-                    color="warning"
-                    showInput={true}
-                    isInline={false}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography sx={labelStyle}>Classification</Typography>
-                  <FormControl variant="standard" fullWidth>
-                    <Select
-                      value={expense.category}
-                      onChange={(e) =>
-                        setExpense({ ...expense, category: e.target.value })
-                      }
-                      disableUnderline
-                      sx={getWellInputStyle(theme, 'warning')}
-                    >
-                      <MenuItem value="basic" sx={{ fontWeight: 700 }}>
-                        Mandatory Need
-                      </MenuItem>
-                      <MenuItem value="discretionary" sx={{ fontWeight: 700 }}>
-                        Discretionary Want
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <Typography sx={labelStyle}>Frequency</Typography>
-                  <FormControl variant="standard" fullWidth>
-                    <Select
-                      value={expense.frequency}
-                      onChange={(e) =>
-                        setExpense({ ...expense, frequency: e.target.value })
-                      }
-                      disableUnderline
-                      sx={getWellInputStyle(theme, 'warning')}
-                    >
-                      <MenuItem value="monthly" sx={{ fontWeight: 700 }}>
-                        Monthly
-                      </MenuItem>
-                      <MenuItem value="quarterly" sx={{ fontWeight: 700 }}>
-                        Quarterly
-                      </MenuItem>
-                      <MenuItem value="yearly" sx={{ fontWeight: 700 }}>
-                        Yearly
-                      </MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <SliderInput
-                    label="Start Year"
-                    value={expense.startYear}
-                    onChange={(val) =>
-                      setExpense({ ...expense, startYear: val })
-                    }
-                    min={currentYear}
-                    max={currentYear + 50}
-                    step={1}
-                    color="warning"
-                    isInline={false}
-                    showInput={true}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <SliderInput
-                    label="End Year"
-                    value={expense.endYear}
-                    onChange={(val) => setExpense({ ...expense, endYear: val })}
-                    min={expense.startYear}
-                    max={currentYear + 50}
-                    step={1}
-                    color="warning"
-                    isInline={false}
-                    showInput={true}
-                  />
-                </Grid>
-                <Grid
-                  item
-                  xs={12}
-                  sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}
-                >
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={handleAddExpense}
-                    disabled={!expense.name || expense.amount === 0}
-                    sx={{ fontWeight: 800, px: 4 }}
-                  >
-                    Log Liability
-                  </Button>
-                </Grid>
-              </Grid>
-            </Box>
-
-            {expensesList.length > 0 && (
-              <List
-                dense
-                sx={{
-                  mt: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 2,
-                }}
-              >
-                {expensesList.map((exp, index) => (
-                  <ListItem
-                    key={index}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        color="error"
-                        onClick={() =>
-                          setExpensesList(
-                            expensesList.filter((_, i) => i !== index),
-                          )
-                        }
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontWeight: 800 }}>
-                          {exp.name}
-                        </Typography>
-                      }
-                      secondary={`${exp.amount} (${exp.category})`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Box>
+          <FixedLiabilities
+            expense={expense}
+            setExpense={setExpense}
+            expensesList={expensesList}
+            setExpensesList={setExpensesList}
+            handleAddExpense={handleAddExpense}
+          />
         );
       case 3:
         return (
-          <Box sx={{ mt: 3 }}>
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              sx={{ mb: 3 }}
-            >
-              <GoalIcon sx={{ fontSize: "1.2rem", color: "info.main" }} />
-              <Typography
-                variant="subtitle2"
-                sx={{
-                  fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "info.main",
-                }}
-              >
-                Future Capital Goals
-              </Typography>
-            </Stack>
-
-            {showCustomGoalForm ? (
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: 2,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                }}
-              >
-                <GoalForm
-                  goal={customGoalData}
-                  currentYear={currentYear}
-                  onSave={setCustomGoalData}
-                />
-                <Stack
-                  direction="row"
-                  justifyContent="flex-end"
-                  spacing={2}
-                  sx={{ mt: 3 }}
-                >
-                  <Button
-                    onClick={() => setShowCustomGoalForm(false)}
-                    sx={{ fontWeight: 700 }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={() => handleAddCustomGoal(customGoalData)}
-                    disabled={
-                      !customGoalData.name || !customGoalData.targetAmount
-                    }
-                    sx={{ fontWeight: 800 }}
-                  >
-                    Compile Goal
-                  </Button>
-                </Stack>
-              </Box>
-            ) : (
-              <Grid container spacing={2}>
-                {/* Styled Goal Tiles */}
-                <Grid item xs={12} sm={3}>
-                  <Box
-                    onClick={applyRetirementGoal}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      textAlign: "center",
-                      bgcolor: alpha(theme.palette.primary.main, 0.05),
-                      border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      },
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ mb: 1 }}>
-                      🎯
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 800, display: "block" }}
-                    >
-                      Retirement
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box
-                    onClick={applyEducationGoal}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      textAlign: "center",
-                      bgcolor: alpha(theme.palette.info.main, 0.05),
-                      border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.info.main, 0.1),
-                      },
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ mb: 1 }}>
-                      🎓
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 800, display: "block" }}
-                    >
-                      Education
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box
-                    onClick={applyEmergencyFundGoal}
-                    sx={{
-                      p: 2,
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      textAlign: "center",
-                      bgcolor: alpha(theme.palette.error.main, 0.05),
-                      border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                      },
-                    }}
-                  >
-                    <Typography variant="h5" sx={{ mb: 1 }}>
-                      🛟
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      sx={{ fontWeight: 800, display: "block" }}
-                    >
-                      Safety Net
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={3}>
-                  <Box
-                    onClick={() => setShowCustomGoalForm(true)}
-                    sx={{
-                      p: 2,
-                      height: "100%",
-                      borderRadius: 2,
-                      cursor: "pointer",
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      bgcolor: alpha(theme.palette.secondary.main, 0.1),
-                      border: `1px dashed ${alpha(theme.palette.secondary.main, 0.4)}`,
-                      transition: "all 0.2s",
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.secondary.main, 0.15),
-                      },
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 900,
-                        color: "secondary.main",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      + Custom
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            )}
-
-            {goalsList.length > 0 && (
-              <List
-                dense
-                sx={{
-                  mt: 3,
-                  border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                  borderRadius: 2,
-                }}
-              >
-                {goalsList.map((goal, index) => (
-                  <ListItem
-                    key={index}
-                    secondaryAction={
-                      <IconButton
-                        edge="end"
-                        color="error"
-                        onClick={() =>
-                          setGoalsList(goalsList.filter((_, i) => i !== index))
-                        }
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    }
-                  >
-                    <ListItemText
-                      primary={
-                        <Typography sx={{ fontWeight: 800 }}>
-                          {goal.name}
-                        </Typography>
-                      }
-                      secondary={`Target Corpus: ₹${goal.targetAmount.toLocaleString("en-IN")}`}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            )}
-          </Box>
+          <CapitalGoals
+            goalsList={goalsList}
+            setGoalsList={setGoalsList}
+            showCustomGoalForm={showCustomGoalForm}
+            setShowCustomGoalForm={setShowCustomGoalForm}
+            customGoalData={customGoalData}
+            setCustomGoalData={setCustomGoalData}
+            applyRetirementGoal={applyRetirementGoal}
+            applyEducationGoal={applyEducationGoal}
+            applyEmergencyFundGoal={applyEmergencyFundGoal}
+            handleAddCustomGoal={handleAddCustomGoal}
+          />
         );
       default:
         return null;
@@ -970,13 +281,20 @@ export default function OnboardingModal({ open, onClose }) {
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: `0 24px 64px ${alpha(theme.palette.common.black || "#000", 0.2)}`,
+          boxShadow: `0 24px 64px ${alpha(
+            theme.palette.common.black || "#000",
+            0.2
+          )}`,
           backgroundImage: "none",
         },
       }}
     >
       <DialogTitle sx={{ p: 3 }}>
-        <Typography component="h2" variant="h5" sx={{ fontWeight: 900, letterSpacing: -0.5 }}>
+        <Typography
+          component="h2"
+          variant="h5"
+          sx={{ fontWeight: 900, letterSpacing: -0.5 }}
+        >
           Initialize Profile Protocol
         </Typography>
         <Typography
@@ -1009,7 +327,9 @@ export default function OnboardingModal({ open, onClose }) {
             </Step>
           ))}
         </Stepper>
-        {renderStepContent(activeStep)}
+        <Suspense fallback={<div>Loading...</div>}>
+          {renderStepContent(activeStep)}
+        </Suspense>
       </DialogContent>
 
       {!showCustomGoalForm && (
