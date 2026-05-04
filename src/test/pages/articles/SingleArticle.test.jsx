@@ -1,8 +1,13 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import SingleArticle from '../../../src/pages/articles/SingleArticle';
+import SingleArticle from '../../../../src/pages/articles/SingleArticle';
 import '@testing-library/jest-dom';
+import {
+  doc,
+  getDoc,
+  deleteDoc,
+} from 'firebase/firestore';
 
 // Mock react-router-dom hooks
 const mockUseParams = jest.fn();
@@ -20,23 +25,20 @@ jest.mock('react-router-dom', () => ({
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn();
-jest.mock('../../../src/hooks/useAuth', () => ({
+jest.mock('../../../../src/hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock Firebase Firestore
-const mockDoc = jest.fn();
-const mockGetDoc = jest.fn();
-const mockDeleteDoc = jest.fn();
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  doc: mockDoc,
-  getDoc: mockGetDoc,
-  deleteDoc: mockDeleteDoc,
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  deleteDoc: jest.fn(),
 }));
 
 // Mock categoryIcons and ImageIcon
-jest.mock('../../../src/utils/articleCategories', () => ({
+jest.mock('../../../../src/utils/articleCategories', () => ({
   categoryIcons: {
     Finance: () => <svg data-testid="FinanceIcon" />,
     Tech: () => <svg data-testid="TechIcon" />,
@@ -69,12 +71,12 @@ describe('SingleArticle Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetDoc.mockResolvedValue({
+    getDoc.mockResolvedValue({
       exists: () => true,
       id: mockArticleData.id,
       data: () => mockArticleData,
     });
-    mockDeleteDoc.mockResolvedValue();
+    deleteDoc.mockResolvedValue();
     jest.spyOn(window, 'confirm').mockReturnValue(true); // Default to confirming deletion
     jest.spyOn(window, 'alert').mockImplementation(() => {}); // Mock alert
   });
@@ -86,13 +88,13 @@ describe('SingleArticle Component', () => {
   });
 
   it('shows loading spinner when article is loading', () => {
-    mockGetDoc.mockReturnValueOnce(new Promise(() => {})); // Never resolve
+    getDoc.mockReturnValueOnce(new Promise(() => {})); // Never resolve
     renderComponent();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('displays "Article Not Found" if article does not exist', async () => {
-    mockGetDoc.mockResolvedValueOnce({ exists: () => false });
+    getDoc.mockResolvedValueOnce({ exists: () => false });
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Article Not Found')).toBeInTheDocument();
@@ -101,7 +103,7 @@ describe('SingleArticle Component', () => {
   });
 
   it('displays error message if fetching article fails', async () => {
-    mockGetDoc.mockRejectedValueOnce(new Error('Fetch error'));
+    getDoc.mockRejectedValueOnce(new Error('Fetch error'));
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Article Not Found')).toBeInTheDocument(); // Fallback to not found
@@ -144,7 +146,7 @@ describe('SingleArticle Component', () => {
   });
 
   it('renders category icon when no imageUrl is provided', async () => {
-    mockGetDoc.mockResolvedValueOnce({
+    getDoc.mockResolvedValueOnce({
       exists: () => true,
       id: mockArticleData.id,
       data: () => ({ ...mockArticleData, imageUrl: '' }),
@@ -157,7 +159,7 @@ describe('SingleArticle Component', () => {
   });
 
   it('renders fallback ImageIcon when no imageUrl and unknown category', async () => {
-    mockGetDoc.mockResolvedValueOnce({
+    getDoc.mockResolvedValueOnce({
       exists: () => true,
       id: mockArticleData.id,
       data: () => ({ ...mockArticleData, imageUrl: '', category: 'Unknown' }),
@@ -207,7 +209,7 @@ describe('SingleArticle Component', () => {
     await waitFor(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this article? This action cannot be undone.');
-      expect(mockDeleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', 'test-article-id');
+      expect(deleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', 'test-article-id');
       expect(window.alert).toHaveBeenCalledWith('Article deleted successfully!');
       expect(mockNavigate).toHaveBeenCalledWith('/articles');
     });
@@ -219,14 +221,14 @@ describe('SingleArticle Component', () => {
     await waitFor(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
       expect(window.confirm).toHaveBeenCalledTimes(1);
-      expect(mockDeleteDoc).not.toHaveBeenCalled();
+      expect(deleteDoc).not.toHaveBeenCalled();
       expect(window.alert).not.toHaveBeenCalled();
       expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
 
   it('shows alert if article deletion fails', async () => {
-    mockDeleteDoc.mockRejectedValueOnce(new Error('Delete failed'));
+    deleteDoc.mockRejectedValueOnce(new Error('Delete failed'));
     renderComponent(false, { uid: 'some-user-id' });
     await waitFor(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));

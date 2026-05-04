@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import TaxDashboard from '../../../src/pages/TaxDashboard';
+import TaxDashboard from '../../pages/TaxDashboard';
 import '@testing-library/jest-dom';
 import {
   updateMonthData,
@@ -14,7 +14,8 @@ import {
   deleteDynamicRow,
   updateHouseProperty,
   updateAge,
-} from '../../../src/store/taxSlice';
+} from '../../store/taxSlice';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock Redux hooks
 const mockUseSelector = jest.fn();
@@ -25,21 +26,20 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock Material-UI useMediaQuery
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
-const mockUseMediaQuery = require('@mui/material/useMediaQuery').default;
+jest.mock('@mui/material/useMediaQuery');
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon, action }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon, action }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     {Icon && <Icon data-testid="mock-header-icon" />}
     {action && <div data-testid="mock-page-header-action">{action}</div>}
   </div>
 ));
-jest.mock('../../../src/components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
+jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
 
 // Enhanced Mock for SalaryTable to allow interaction with renderRow/renderCell
-jest.mock('../../../src/components/tax/SalaryTable', () => {
+jest.mock('../../components/tax/SalaryTable', () => {
   // This mock will actually render a simplified table structure
   // and use the renderRow prop passed to it.
   return ({
@@ -64,7 +64,7 @@ jest.mock('../../../src/components/tax/SalaryTable', () => {
   );
 });
 
-jest.mock('../../../src/components/tax/TaxSummary', () => ({
+jest.mock('../../components/tax/TaxSummary', () => ({
   taxComparison, declarations, onQuickFill, breakEven, calculatedSalary, hraBreakdown
 }) => (
   <div data-testid="mock-tax-summary">
@@ -76,7 +76,7 @@ jest.mock('../../../src/components/tax/TaxSummary', () => ({
     <div data-testid="tax-summary-break-even-section">{breakEven.section}</div>
   </div>
 ));
-jest.mock('../../../src/components/tax/Declarations', () => ({
+jest.mock('../../components/tax/Declarations', () => ({
   declarations, houseProperty, handleDeclarationChange, updateHouseProperty
 }) => (
   <div data-testid="mock-declarations">
@@ -85,12 +85,12 @@ jest.mock('../../../src/components/tax/Declarations', () => ({
     <button onClick={() => updateHouseProperty({ interest: 200000 })} data-testid="declarations-update-house-property">Update House Property</button>
   </div>
 ));
-jest.mock('../../../src/components/tax/TaxBreakdownChart', () => ({ taxComparison, calculatedSalary }) => (
+jest.mock('../../components/tax/TaxBreakdownChart', () => ({ taxComparison, calculatedSalary }) => (
   <div data-testid="mock-tax-breakdown-chart">TaxBreakdownChart</div>
 ));
 
 // Enhanced Mock for ActionModals (DynamicRowModal and SettingsModal)
-jest.mock('../../../src/components/tax/ActionModals', () => ({
+jest.mock('../../components/tax/ActionModals', () => ({
   DynamicRowModal: ({ open, onClose, onSave, mode, label, onLabelChange }) => (
     open ? (
       <div data-testid="mock-dynamic-row-modal">
@@ -115,10 +115,10 @@ jest.mock('../../../src/components/tax/ActionModals', () => ({
 }));
 
 // Mock calculateTax from taxEngine
-jest.mock('../../../src/utils/taxEngine', () => ({
+jest.mock('../../utils/taxEngine', () => ({
   calculateTax: jest.fn((income, declarations, houseProperty, meta) => {
     // Default mock implementation for calculateTax
-    const oldTax = declarations.sec80C.standard80C < 150000 ? 100000 : 10000; // Simulate old regime tax reduction with 80C
+    const oldTax = declarations.sec80C.standard80C < 150000 ? 100000 : 10000;
     const newTax = 50000;
     return {
       oldRegime: { tax: oldTax, grossIncome: income.salary, deductions: 0, taxableIncome: income.salary },
@@ -128,7 +128,7 @@ jest.mock('../../../src/utils/taxEngine', () => ({
     };
   }),
 }));
-const mockCalculateTax = require('../../../src/utils/taxEngine').calculateTax;
+const mockCalculateTax = require('../../utils/taxEngine').calculateTax;
 
 const mockStore = configureStore([]);
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -176,7 +176,7 @@ describe('TaxDashboard Page', () => {
       if (selector.name === 'selectProfileExpenses') return initialState.profile.expenses;
       return {};
     });
-    mockUseMediaQuery.mockReturnValue(isMobile);
+    useMediaQuery.mockReturnValue(isMobile);
     mockUseDispatch.mockReturnValue(jest.fn()); // Ensure useDispatch returns a mock function
 
     return render(
@@ -227,9 +227,6 @@ describe('TaxDashboard Page', () => {
     // This is tricky with functional components and internal state.
     // A more robust way would be to mock `useState` or expose `setIsUpdating`.
     // For now, we'll rely on the fact that `setIsUpdating(true)` is called before dispatch.
-    // We can test the presence of the skeleton after an action that would set isUpdating.
-    // Since the timeout immediately sets it back to false, we can't reliably catch it.
-    // Let's assume the `isUpdating` state is correctly managed by the component's logic.
     // The visual aspect of the skeleton is hard to test in JSDOM.
   });
 
@@ -487,7 +484,7 @@ describe('TaxDashboard Page', () => {
   it('breakEven calculates investmentNeeded for 80C if New Regime is optimal and 80C has room', () => {
     // Mock calculateTax to return old regime better if 80C is filled
     mockCalculateTax.mockImplementationOnce((income, declarations) => {
-      const oldTax = declarations.sec80C.standard80C >= 1000 ? 10000 : 100000; // Simulate old regime tax reduction with 80C
+      const oldTax = declarations.sec80C.standard80C >= 1000 ? 10000 : 100000;
       const newTax = 50000;
       return {
         oldRegime: { tax: oldTax, grossIncome: income.salary, deductions: 0, taxableIncome: income.salary },
@@ -514,7 +511,7 @@ describe('TaxDashboard Page', () => {
   it('breakEven calculates investmentNeeded for 80D if 80C is exhausted and 80D has room', () => {
     // Mock calculateTax to return old regime better if 80D is filled
     mockCalculateTax.mockImplementationOnce((income, declarations) => {
-      const oldTax = declarations.deductions.sec80D.produced >= 1000 ? 10000 : 100000; // Simulate old regime tax reduction with 80D
+      const oldTax = declarations.deductions.sec80D.produced >= 1000 ? 10000 : 100000;
       const newTax = 50000;
       return {
         oldRegime: { tax: oldTax, grossIncome: income.salary, deductions: 0, taxableIncome: income.salary },

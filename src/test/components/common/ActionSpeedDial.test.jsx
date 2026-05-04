@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ActionSpeedDial from '../../../src/components/common/ActionSpeedDial';
+import ActionSpeedDial from '../../../components/common/ActionSpeedDial';
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import '@testing-library/jest-dom';
 

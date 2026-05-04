@@ -14,7 +14,7 @@ import PageHeader from '../../components/common/PageHeader';
 import { useAuth } from '../../hooks/useAuth';
 
 // Firebase Imports
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import {
   updateProfile,
@@ -75,7 +75,9 @@ const AdminProfile = () => {
       try {
         setLoadingProfile(true);
         const userId = user.uid || user.id;
-        const docSnap = await getDoc(doc(db, 'authorProfiles', userId));
+        const docSnap = await getDoc(
+          doc(getDataBase(), 'authorProfiles', userId),
+        );
         if (docSnap.exists()) {
           setProfileData(docSnap.data());
         } else {
@@ -95,9 +97,13 @@ const AdminProfile = () => {
     setIsSubmitting(true);
     try {
       await updateProfile(user, { displayName: profileData.displayName });
-      await setDoc(doc(db, 'authorProfiles', user.uid), profileData, {
-        merge: true,
-      });
+      await setDoc(
+        doc(getDataBase(), 'authorProfiles', user.uid),
+        profileData,
+        {
+          merge: true,
+        },
+      );
       setSnackbar({
         open: true,
         message: 'Profile updated successfully!',
@@ -153,7 +159,7 @@ const AdminProfile = () => {
       const userId = user.uid || user.id;
 
       // 1. Always delete the Firestore profile data
-      await deleteDoc(doc(db, 'authorProfiles', userId));
+      await deleteDoc(doc(getDataBase(), 'authorProfiles', userId));
 
       // 2. If 'full' deletion is selected, delete the Auth account
       if (deletionType === 'full') {
@@ -170,7 +176,7 @@ const AdminProfile = () => {
         setDeleteModalOpen(false);
       }
     } catch (e) {
-      if (e.code === 'auth/requires-recent-login') {
+      if (e.code === 'getAuthentication/requires-recent-login') {
         setDeleteModalOpen(false);
         setReauthenticateOpen(true);
       } else {

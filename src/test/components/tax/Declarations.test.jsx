@@ -1,17 +1,17 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Declarations from '../../../src/components/tax/Declarations';
+import Declarations from '../../../components/tax/Declarations';
 import '@testing-library/jest-dom';
 
 // Mock DataCard and ExemptionRow to simplify testing
-jest.mock('../../../src/components/common/DataCard', () => ({ title, children }) => (
+jest.mock('../../../components/common/DataCard', () => ({ title, children }) => (
   <div data-testid={`data-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
     <h3>{title}</h3>
     <div>{children}</div>
   </div>
 ));
-jest.mock('../../../src/components/common/ExemptionRow', () => ({ label, produced, limited, tooltip }) => (
+jest.mock('../../../components/common/ExemptionRow', () => ({ label, produced, limited, tooltip }) => (
   <div data-testid={`exemption-row-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
     <span>{label}</span>
     <div data-testid={`produced-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>{produced}</div>
@@ -21,7 +21,7 @@ jest.mock('../../../src/components/common/ExemptionRow', () => ({ label, produce
 ));
 
 // Mock formStyles to prevent issues with actual style objects
-jest.mock('../../../src/styles/formStyles', () => ({
+jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
   getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
 }));

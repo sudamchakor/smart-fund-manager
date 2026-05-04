@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import PieChartComponent from '../../../src/components/charts/PieChartComponent';
-import * as formatting from '../../../src/utils/formatting'; // Import the actual formatting functions
+import PieChartComponent from '../../../components/charts/PieChartComponent';
+import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
 
 // Mock Recharts components to avoid actual chart rendering in tests
@@ -29,7 +29,7 @@ jest.spyOn(formatting, 'formatCurrency').mockImplementation((value, currency) =>
 });
 
 // Mock DetailRow to simplify testing its calls and output
-jest.mock('../../../src/components/common/DetailRow', () => ({ label, value, indicatorColor }) => (
+jest.mock('../../../components/common/DetailRow', () => ({ label, value, indicatorColor }) => (
   <div data-testid={`detail-row-${label.toLowerCase().replace(/\s/g, '-')}`} style={{ color: indicatorColor }}>
     <span>{label}:</span>
     <span>{value}</span>

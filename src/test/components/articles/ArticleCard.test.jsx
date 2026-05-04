@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ArticleCard from '../../../src/components/articles/ArticleCard';
+import ArticleCard from '../../../components/articles/ArticleCard';
 import '@testing-library/jest-dom';
 
 // Mock react-router-dom's Link component
@@ -14,14 +14,14 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock DataCard to isolate ArticleCard's rendering
-jest.mock('../../../src/components/common/DataCard', () => ({ children, sx }) => (
+jest.mock('../../../components/common/DataCard', () => ({ children, sx }) => (
   <div data-testid="mock-data-card" style={sx}>
     {children}
   </div>
 ));
 
 // Mock categoryIcons and ImageIcon
-jest.mock('../../../src/utils/articleCategories', () => ({
+jest.mock('../../../utils/articleCategories', () => ({
   categoryIcons: {
     Finance: () => <svg data-testid="FinanceIcon" />,
     Tech: () => <svg data-testid="TechIcon" />,

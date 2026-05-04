@@ -2,7 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Home from '../../../src/pages/Home';
+import Home from '../../pages/Home';
 import '@testing-library/jest-dom';
 
 // Mock react-router-dom's useNavigate
@@ -13,9 +13,14 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock OnboardingModal (lazy loaded)
-jest.mock('../../../src/features/profile/tabs/OnboardingModal', () => ({ open, onClose }) => (
-  open ? <div data-testid="mock-onboarding-modal"><button onClick={onClose}>Close Onboarding</button></div> : null
-));
+jest.mock('../../features/profile/tabs/OnboardingModal', () => {
+  const React = require('react');
+  return ({ open, onClose }) => (
+    open ? React.createElement('div', { 'data-testid': 'mock-onboarding-modal' },
+      React.createElement('button', { onClick: onClose }, 'Close Onboarding')
+    ) : null
+  );
+});
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -31,16 +36,17 @@ Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
-jest.mock('../../../src/pages/Home', () => {
-  const actual = jest.requireActual('../../../src/pages/Home');
+jest.mock('../../pages/Home', () => {
+  const React = require('react');
+  const actual = jest.requireActual('../../pages/Home');
   // Define mockSystemModules INSIDE the factory function to avoid hoisting issues
   const mockSystemModules = [
-    { title: "User Profile", description: "Desc 1", icon: <div data-testid="icon-user-profile" />, path: "/profile", colorToken: "secondary" },
-    { title: "EMI Calculator", description: "Desc 2", icon: <div data-testid="icon-emi-calculator" />, path: "/calculator", colorToken: "primary" },
-    { title: "Credit Card EMI", description: "Desc 3", icon: <div data-testid="icon-credit-card-emi" />, path: "/credit-card-emi", colorToken: "success" },
-    { title: "Investment Strategy", description: "Desc 4", icon: <div data-testid="icon-investment-strategy" />, path: "/investment/sip", colorToken: "info" },
-    { title: "Personal Loan", description: "Desc 5", icon: <div data-testid="icon-personal-loan" />, path: "/personal-loan", colorToken: "warning" },
-    { title: "Tax Optimization", description: "Desc 6", icon: <div data-testid="icon-tax-optimization" />, path: "/tax-calculator", colorToken: "error" },
+    { title: "User Profile", description: "Desc 1", icon: React.createElement('div', { 'data-testid': 'icon-user-profile' }), path: "/profile", colorToken: "secondary" },
+    { title: "EMI Calculator", description: "Desc 2", icon: React.createElement('div', { 'data-testid': 'icon-emi-calculator' }), path: "/calculator", colorToken: "primary" },
+    { title: "Credit Card EMI", description: "Desc 3", icon: React.createElement('div', { 'data-testid': 'icon-credit-card-emi' }), path: "/credit-card-emi", colorToken: "success" },
+    { title: "Investment Strategy", description: "Desc 4", icon: React.createElement('div', { 'data-testid': 'icon-investment-strategy' }), path: "/investment/sip", colorToken: "info" },
+    { title: "Personal Loan", description: "Desc 5", icon: React.createElement('div', { 'data-testid': 'icon-personal-loan' }), path: "/personal-loan", colorToken: "warning" },
+    { title: "Tax Optimization", description: "Desc 6", icon: React.createElement('div', { 'data-testid': 'icon-tax-optimization' }), path: "/tax-calculator", colorToken: "error" },
   ];
   return {
     ...actual,
@@ -84,7 +90,7 @@ describe('Home Component', () => {
   it('renders all system modules', () => {
     renderComponent();
     // Access the mocked systemModules from the Home module itself
-    const { systemModules: mockedSystemModules } = require('../../../src/pages/Home');
+    const { systemModules: mockedSystemModules } = require('../../pages/Home');
     mockedSystemModules.forEach(module => {
       expect(screen.getByText(module.title)).toBeInTheDocument();
       expect(screen.getByText(module.description)).toBeInTheDocument();
@@ -94,7 +100,7 @@ describe('Home Component', () => {
 
   it('navigates to the correct path when each module card is clicked', () => {
     renderComponent();
-    const { systemModules: mockedSystemModules } = require('../../../src/pages/Home');
+    const { systemModules: mockedSystemModules } = require('../../pages/Home');
     mockedSystemModules.forEach(module => {
       fireEvent.click(screen.getByText(module.title).closest('button'));
       expect(mockNavigate).toHaveBeenCalledWith(module.path);
@@ -131,8 +137,8 @@ describe('Home Component', () => {
   // --- Edge Cases / Negative Scenarios ---
   it('handles empty module list gracefully (no modules rendered)', () => {
     // Temporarily override the mockSystemModules for this test
-    jest.doMock('../../../src/pages/Home', () => {
-      const actual = jest.requireActual('../../../src/pages/Home');
+    jest.doMock('../../pages/Home', () => {
+      const actual = jest.requireActual('../../pages/Home');
       return {
         ...actual,
         systemModules: [], // Empty array
@@ -152,9 +158,9 @@ describe('Home Component', () => {
     expect(screen.queryAllByRole('button', { name: /System Module/i })).toHaveLength(0);
 
     // Restore original mock for subsequent tests
-    jest.dontMock('../../../src/pages/Home');
+    jest.dontMock('../../pages/Home');
     // Re-import Home to get the original mockSystemModules back
-    const OriginalHome = require('../../../src/pages/Home').default;
+    const OriginalHome = require('../../pages/Home').default;
     rerender(
       <ThemeProvider theme={theme}>
         <Router>

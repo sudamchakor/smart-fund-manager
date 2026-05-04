@@ -1,4 +1,4 @@
-import { articleCategories } from '../../src/utils/articleCategories';
+import { articleCategories } from '../../../src/utils/articleCategories';
 
 describe('articleCategories', () => {
   it('should be an array', () => {

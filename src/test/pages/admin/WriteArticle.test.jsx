@@ -1,8 +1,16 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import WriteArticle from '../../../src/pages/admin/WriteArticle';
+import WriteArticle from '../../../../src/pages/admin/WriteArticle';
 import '@testing-library/jest-dom';
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+  updateDoc,
+} from 'firebase/firestore';
 
 // Mock react-router-dom hooks
 const mockNavigate = jest.fn();
@@ -15,25 +23,19 @@ jest.mock('react-router-dom', () => ({
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn();
-jest.mock('../../../src/hooks/useAuth', () => ({
+jest.mock('../../../../src/hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock Firebase Firestore
-const mockCollection = jest.fn();
-const mockAddDoc = jest.fn();
-const mockServerTimestamp = jest.fn(() => 'mock-timestamp');
-const mockDoc = jest.fn();
-const mockGetDoc = jest.fn();
-const mockUpdateDoc = jest.fn();
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  collection: mockCollection,
-  addDoc: mockAddDoc,
-  serverTimestamp: mockServerTimestamp,
-  doc: mockDoc,
-  getDoc: mockGetDoc,
-  updateDoc: mockUpdateDoc,
+  collection: jest.fn(),
+  addDoc: jest.fn(),
+  serverTimestamp: jest.fn(() => 'mock-timestamp'),
+  doc: jest.fn(),
+  getDoc: jest.fn(),
+  updateDoc: jest.fn(),
 }));
 
 // Mock ReactQuill
@@ -45,7 +47,7 @@ jest.mock('react-quill', () => {
 });
 
 // Mock PageHeader
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
@@ -54,12 +56,12 @@ jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle,
 ));
 
 // Mock articleCategories
-jest.mock('../../../src/utils/articleCategories', () => ({
+jest.mock('../../../../src/utils/articleCategories', () => ({
   articleCategories: ['Finance', 'Technology', 'Health'],
 }));
 
 // Mock ADMIN_UID
-jest.mock('../../../src/utils/constants', () => ({
+jest.mock('../../../../src/utils/constants', () => ({
   ADMIN_UID: 'admin-uid-123',
 }));
 
@@ -79,7 +81,7 @@ describe('WriteArticle Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetDoc.mockResolvedValue({
+    getDoc.mockResolvedValue({
       exists: () => true,
       data: () => ({
         title: 'Existing Article',
@@ -88,8 +90,8 @@ describe('WriteArticle Component', () => {
         content: '<p>Existing content</p>',
       }),
     });
-    mockAddDoc.mockResolvedValue({ id: 'new-article-id' });
-    mockUpdateDoc.mockResolvedValue();
+    addDoc.mockResolvedValue({ id: 'new-article-id' });
+    updateDoc.mockResolvedValue();
   });
 
   // --- Authentication and Authorization ---
@@ -167,7 +169,7 @@ describe('WriteArticle Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Publish Now' }));
 
     await waitFor(() => {
-      expect(mockAddDoc).toHaveBeenCalledWith(expect.any(Object), {
+      expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
         title: 'New Article',
         category: 'Finance',
         imageUrl: '',
@@ -195,7 +197,7 @@ describe('WriteArticle Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save Draft' }));
 
     await waitFor(() => {
-      expect(mockAddDoc).toHaveBeenCalledWith(expect.any(Object), {
+      expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
         title: 'Draft Article',
         category: 'Finance',
         imageUrl: '',
@@ -219,7 +221,7 @@ describe('WriteArticle Component', () => {
     await waitFor(() => {
       expect(screen.getByText('Please fill in Title, Category, and Content.')).toBeInTheDocument();
     });
-    expect(mockAddDoc).not.toHaveBeenCalled();
+    expect(addDoc).not.toHaveBeenCalled();
   });
 
   // --- Edit Article Mode ---
@@ -249,7 +251,7 @@ describe('WriteArticle Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Update Article' }));
 
     await waitFor(() => {
-      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+      expect(updateDoc).toHaveBeenCalledWith(expect.any(Object), {
         title: 'Updated Title',
         category: 'Finance',
         imageUrl: 'http://example.com/img.jpg',
@@ -272,7 +274,7 @@ describe('WriteArticle Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
 
     await waitFor(() => {
-      expect(mockUpdateDoc).toHaveBeenCalledWith(expect.any(Object), {
+      expect(updateDoc).toHaveBeenCalledWith(expect.any(Object), {
         title: 'Updated Draft Title',
         category: 'Finance',
         imageUrl: 'http://example.com/img.jpg',
@@ -288,7 +290,7 @@ describe('WriteArticle Component', () => {
   });
 
   it('shows error snackbar if fetching article for edit fails', async () => {
-    mockGetDoc.mockRejectedValueOnce(new Error('Fetch error'));
+    getDoc.mockRejectedValueOnce(new Error('Fetch error'));
     renderComponent(false, mockAdminUser, { id: 'article-id-123' });
     await waitFor(() => {
       expect(screen.getByText('Error loading article for editing.')).toBeInTheDocument();
@@ -296,7 +298,7 @@ describe('WriteArticle Component', () => {
   });
 
   it('redirects if article not found for editing', async () => {
-    mockGetDoc.mockResolvedValueOnce({ exists: () => false });
+    getDoc.mockResolvedValueOnce({ exists: () => false });
     renderComponent(false, mockAdminUser, { id: 'article-id-123' });
     await waitFor(() => {
       expect(screen.getByText('Article not found.')).toBeInTheDocument();
@@ -306,7 +308,7 @@ describe('WriteArticle Component', () => {
 
   // --- General Error Handling ---
   it('shows error snackbar if publish/save fails due to Firestore error', async () => {
-    mockAddDoc.mockRejectedValueOnce(new Error('Firestore write error'));
+    addDoc.mockRejectedValueOnce(new Error('Firestore write error'));
     renderComponent();
     await waitFor(() => expect(screen.getByLabelText('Article Title')).toBeInTheDocument());
 

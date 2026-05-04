@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import TermsOfService from '../../../src/pages/TermsOfService';
+import TermsOfService from '../../pages/TermsOfService';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
@@ -42,7 +42,7 @@ describe('TermsOfService Component', () => {
   it('renders "1. System Introduction" section', () => {
     renderComponent();
     expect(screen.getByText('1. System Introduction')).toBeInTheDocument();
-    expect(screen.getByText(/Welcome to SmartFund Manager./i)).toBeInTheDocument();
+    expect(screen.getByText(/Welcome to SmartFund Manager\./i)).toBeInTheDocument();
   });
 
   // --- Section 2: Permitted System Usage ---
@@ -93,16 +93,20 @@ describe('TermsOfService Component', () => {
   it('renders "8. Contact & Support" section', () => {
     renderComponent();
     expect(screen.getByText('8. Contact & Support')).toBeInTheDocument();
-    expect(screen.getByText(/If you require clarification on any of the terms outlined above/i)).toBeInTheDocument();
+    expect(screen.getByText(/If you have any questions regarding this security protocol/i)).toBeInTheDocument();
+    expect(screen.getByText('By email:')).toBeInTheDocument();
     expect(screen.getByText('support@smartfundmanager.com')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'support@smartfundmanager.com' })).toHaveAttribute('href', 'mailto:support@smartfundmanager.com');
+    expect(screen.getByText('By visiting this page on our website:')).toBeInTheDocument();
+    const contactLink = screen.getByRole('link', { name: 'https://yourwebsite.com/contact' });
+    expect(contactLink).toBeInTheDocument();
+    expect(contactLink).toHaveAttribute('href', '#'); // Mocked to '#'
   });
 
   // --- Styling (indirectly) ---
   it('applies main container styling', () => {
     renderComponent();
     const container = screen.getByText('Terms of Service').closest('.MuiBox-root');
-    expect(container).toHaveStyle('padding: 24px'); // p: { xs: 3, md: 5 }
-    expect(container).toHaveStyle('border-radius: 24px'); // borderRadius: 3
+    expect(container).toHaveStyle(`padding: ${theme.spacing(3)}`); // p: { xs: 3, md: 5 }
+    expect(container).toHaveStyle(`border-radius: ${theme.spacing(3)}`); // borderRadius: 3
   });
 });

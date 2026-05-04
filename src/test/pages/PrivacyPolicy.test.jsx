@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import PrivacyPolicy from '../../../src/pages/PrivacyPolicy';
+import PrivacyPolicy from '../../pages/PrivacyPolicy';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>

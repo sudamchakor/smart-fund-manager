@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import PersonalLoanCalculator from '../../../src/pages/PersonalLoanCalculator';
+import PersonalLoanCalculator from '../../pages/PersonalLoanCalculator';
 import '@testing-library/jest-dom';
 
 // Mock Redux hooks
@@ -13,14 +13,14 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
     {Icon && <Icon data-testid="mock-header-icon" />}
   </div>
 ));
-jest.mock('../../../src/components/common/InputSlider', () => ({ label, value, onChange, ...props }) => (
+jest.mock('../../components/common/InputSlider', () => ({ label, value, onChange, ...props }) => (
   <div data-testid={`mock-input-slider-${label.replace(/\s/g, '-')}`}>
     <label htmlFor={`input-${label}`}>{label}</label>
     <input
@@ -32,7 +32,7 @@ jest.mock('../../../src/components/common/InputSlider', () => ({ label, value, o
     />
   </div>
 ));
-jest.mock('../../../src/components/common/LoanSummaryTerminal', () => ({ monthlyEmi, totalInterest, totalPayable, currency, loading, children }) => (
+jest.mock('../../components/common/LoanSummaryTerminal', () => ({ monthlyEmi, totalInterest, totalPayable, currency, loading, children }) => (
   <div data-testid="mock-loan-summary-terminal">
     <span data-testid="monthly-emi">{currency}{monthlyEmi}</span>
     <span data-testid="total-interest">{currency}{totalInterest}</span>
@@ -144,7 +144,7 @@ describe('PersonalLoanCalculator Page', () => {
     });
   });
 
-  it('handles zero loan amount correctly', async () => {
+  it('handles zero principal amount correctly', async () => {
     renderComponent();
     const loanAmountInput = screen.getByTestId('input-field-Loan-Amount');
     fireEvent.change(loanAmountInput, { target: { value: '0' } });

@@ -3,8 +3,8 @@ import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import TaxBreakdownChart from '../../../src/components/tax/TaxBreakdownChart';
-import * as formatting from '../../../src/utils/formatting'; // Import the actual formatting functions
+import TaxBreakdownChart from '../../../components/tax/TaxBreakdownChart';
+import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
 
 // Mock Recharts components to avoid actual chart rendering in tests

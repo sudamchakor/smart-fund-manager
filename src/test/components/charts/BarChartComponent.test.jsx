@@ -3,19 +3,10 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import BarChartComponent from '../../../src/components/charts/BarChartComponent';
-import * as formatting from '../../../src/utils/formatting'; // Import the actual formatting functions
+import BarChartComponent from '../../../components/charts/BarChartComponent';
+import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
-
-// Mock Material-UI's useMediaQuery hook
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
-const mockUseMediaQuery = require('@mui/material/useMediaQuery').default;
-
-// Mock Redux useSelector
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-}));
-const mockUseSelector = require('react-redux').useSelector;
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock Recharts components to avoid actual chart rendering in tests
 jest.mock('recharts', () => ({
@@ -33,6 +24,12 @@ jest.mock('recharts', () => ({
   ),
   Legend: (props) => <div data-testid="recharts-legend" {...props}></div>,
 }));
+
+// Mock Redux useSelector
+jest.mock('react-redux', () => ({
+  useSelector: jest.fn(),
+}));
+const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing
 jest.spyOn(formatting, 'formatCurrency').mockImplementation((value, currency) => {
@@ -75,7 +72,7 @@ describe('BarChartComponent', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseMediaQuery.mockReturnValue(false); // Default to desktop
+    useMediaQuery.mockReturnValue(false); // Default to desktop
     formatting.formatCurrency.mockClear(); // Clear calls for each test
     formatting.formatCurrency.mockImplementation((value, currency) => {
       if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
@@ -163,7 +160,7 @@ describe('BarChartComponent', () => {
 
   // --- Responsiveness (useMediaQuery) ---
   it('adjusts maxBars for mobile view', () => {
-    mockUseMediaQuery.mockImplementation((query) => query.includes('sm') ? true : false); // Simulate mobile
+    useMediaQuery.mockImplementation((query) => query.includes('sm') ? true : false); // Simulate mobile
     renderComponent();
     const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
     // 24 months, maxBars=6 (mobile), chunkSize = ceil(24/6) = 4
@@ -172,7 +169,7 @@ describe('BarChartComponent', () => {
   });
 
   it('adjusts maxBars for tablet view', () => {
-    mockUseMediaQuery.mockImplementation((query) => query.includes('md') ? true : false); // Simulate tablet
+    useMediaQuery.mockImplementation((query) => query.includes('md') ? true : false); // Simulate tablet
     renderComponent();
     const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
     // 24 months, maxBars=10 (tablet), chunkSize = ceil(24/10) = 3
@@ -191,6 +188,7 @@ describe('BarChartComponent', () => {
   });
 
   it('formats YAxis values correctly for lakhs', () => {
+    renderComponent();
     const yAxis = screen.getByTestId('recharts-yaxis');
     const formatter = yAxis.props.tickFormatter; // Access the function directly
     expect(formatter(100000, '₹')).toBe('₹1L');
@@ -198,6 +196,7 @@ describe('BarChartComponent', () => {
   });
 
   it('formats YAxis values correctly for crores', () => {
+    renderComponent();
     const yAxis = screen.getByTestId('recharts-yaxis');
     const formatter = yAxis.props.tickFormatter;
     expect(formatter(10000000, '₹')).toBe('₹1Cr');
@@ -259,7 +258,7 @@ describe('BarChartComponent', () => {
     const tooltip = screen.getByTestId('recharts-tooltip');
     const CustomTooltipComponent = tooltip.props.content;
 
-    render(
+    const { rerender } = render(
       <ThemeProvider theme={theme}>
         <CustomTooltipComponent active={true} payload={[]} label={label} />
       </ThemeProvider>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import StepUpSipCalculatorForm from '../../../../src/features/investment/tabs/StepUpSipCalculatorForm';
+import StepUpSipCalculatorForm from '../../../../../src/features/investment/tabs/StepUpSipCalculatorForm';
 
 describe('StepUpSipCalculatorForm', () => {
   it('renders without crashing', () => {

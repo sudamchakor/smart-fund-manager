@@ -7,7 +7,7 @@ import {
   onSnapshot,
   orderBy,
 } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 import CommentItem from './CommentItem';
 import CommentForm from './CommentForm';
 
@@ -26,7 +26,7 @@ const CommentsSection = ({ articleId }) => {
     if (!articleId) return;
 
     const q = query(
-      collection(db, 'comments'),
+      collection(getDataBase(), 'comments'),
       where('articleId', '==', articleId),
       orderBy('createdAt', 'desc'),
     );

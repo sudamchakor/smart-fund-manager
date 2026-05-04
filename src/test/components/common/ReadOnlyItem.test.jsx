@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import ReadOnlyItem from '../../../src/components/common/ReadOnlyItem';
-import * as formatting from '../../../src/utils/formatting'; // Import the actual formatting functions
+import ReadOnlyItem from '../../../components/common/ReadOnlyItem';
+import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons

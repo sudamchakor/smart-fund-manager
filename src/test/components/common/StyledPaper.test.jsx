@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import StyledPaper from '../../../src/components/common/StyledPaper';
+import StyledPaper from '../../../components/common/StyledPaper';
 import '@testing-library/jest-dom';
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -25,11 +25,11 @@ describe('StyledPaper Component', () => {
 
   it('applies default Paper styles', () => {
     renderComponent({ children: <div>Content</div> });
-    const paper = screen.getByText('Content').closest('.MuiPaper-root');
+    const paper = screen.getByTestId('styled-paper');
 
     expect(paper).toBeInTheDocument();
-    expect(paper).toHaveStyle('padding: 20px'); // Default p: 2.5 (2.5 * 8 = 20px)
-    expect(paper).toHaveStyle('border-radius: 24px'); // Default borderRadius: 3 (3 * 8 = 24px)
+    expect(paper).toHaveStyle(`padding: ${theme.spacing(2.5)}`);
+    expect(paper).toHaveStyle(`border-radius: 12px`);
     expect(paper).toHaveStyle('border: 1px solid');
     expect(paper).toHaveStyle('box-shadow: 0 2px 12px rgba(0,0,0,0.02)');
     expect(paper).toHaveStyle('background-color: #fff'); // Default light theme background.paper
@@ -46,42 +46,42 @@ describe('StyledPaper Component', () => {
         height: '50%', // Should override default height
       },
     });
-    const paper = screen.getByText('Custom Styled Content').closest('.MuiPaper-root');
+    const paper = screen.getByTestId('styled-paper');
 
     expect(paper).toHaveStyle('background-color: red');
-    expect(paper).toHaveStyle('border-radius: 8px'); // 1 * 8 = 8px
+    expect(paper).toHaveStyle(`border-radius: 4px`);
     expect(paper).toHaveStyle('height: 50%');
     // Ensure other default styles are still applied
-    expect(paper).toHaveStyle('padding: 20px');
+    expect(paper).toHaveStyle(`padding: ${theme.spacing(2.5)}`);
     expect(paper).toHaveStyle('border: 1px solid');
   });
 
   // --- Negative Scenarios / Edge Cases ---
   it('renders without children', () => {
     renderComponent({});
-    const paper = screen.getByRole('presentation'); // Paper's default role
+    const paper = screen.getByTestId('styled-paper');
     expect(paper).toBeInTheDocument();
     expect(paper).toBeEmptyDOMElement(); // Should have no children
   });
 
   it('handles empty sx prop gracefully', () => {
     renderComponent({ children: <div>Content</div>, sx: {} });
-    const paper = screen.getByText('Content').closest('.MuiPaper-root');
+    const paper = screen.getByTestId('styled-paper');
     expect(paper).toBeInTheDocument();
     // Should still have all default styles
-    expect(paper).toHaveStyle('padding: 20px');
+    expect(paper).toHaveStyle(`padding: ${theme.spacing(2.5)}`);
   });
 
   it('renders with null children', () => {
     renderComponent({ children: null });
-    const paper = screen.getByRole('presentation');
+    const paper = screen.getByTestId('styled-paper');
     expect(paper).toBeInTheDocument();
     expect(paper).toBeEmptyDOMElement();
   });
 
   it('renders with undefined children', () => {
     renderComponent({ children: undefined });
-    const paper = screen.getByRole('presentation');
+    const paper = screen.getByTestId('styled-paper');
     expect(paper).toBeInTheDocument();
     expect(paper).toBeEmptyDOMElement();
   });

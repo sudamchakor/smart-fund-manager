@@ -4,8 +4,9 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Header from '../../../src/components/layout/Header';
+import Header from '../../../components/layout/Header';
 import '@testing-library/jest-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock react-router-dom hooks
 const mockNavigate = jest.fn();
@@ -51,8 +52,7 @@ jest.mock('xlsx', () => ({
 }));
 
 // Mock Material-UI useMediaQuery
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
-const mockUseMediaQuery = require('@mui/material/useMediaQuery').default;
+jest.mock('@mui/material/useMediaQuery');
 
 // Mock window.print and window.confirm
 const mockWindowPrint = jest.fn();
@@ -99,7 +99,7 @@ describe('Header Component', () => {
 
   const renderComponent = (initialPath = '/', isMobile = false) => {
     mockUseLocation.mockReturnValue({ pathname: initialPath });
-    mockUseMediaQuery.mockReturnValue(isMobile);
+    useMediaQuery.mockReturnValue(isMobile);
 
     mockUseSelector.mockImplementation((selector) => {
       if (selector.name === 'selectCalculatedValues') {

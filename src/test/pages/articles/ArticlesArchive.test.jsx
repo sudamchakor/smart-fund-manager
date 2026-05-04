@@ -1,8 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import ArticlesArchive from '../../../src/pages/articles/ArticlesArchive';
+import ArticlesArchive from '../../../../src/pages/articles/ArticlesArchive';
 import '@testing-library/jest-dom';
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+} from 'firebase/firestore';
 
 // Mock react-router-dom's Link
 jest.mock('react-router-dom', () => ({
@@ -16,28 +22,24 @@ jest.mock('react-router-dom', () => ({
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn();
-jest.mock('../../../src/hooks/useAuth', () => ({
+jest.mock('../../../../src/hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock Firebase Firestore
-const mockCollection = jest.fn();
-const mockGetDocs = jest.fn();
-const mockQuery = jest.fn();
-const mockOrderBy = jest.fn();
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  collection: mockCollection,
-  getDocs: mockGetDocs,
-  query: mockQuery,
-  orderBy: mockOrderBy,
+  collection: jest.fn(),
+  getDocs: jest.fn(),
+  query: jest.fn(),
+  orderBy: jest.fn(),
 }));
 
 // Mock child components
-jest.mock('../../../src/components/articles/ArticleCard', () => ({ article }) => (
+jest.mock('../../../../src/components/articles/ArticleCard', () => ({ article }) => (
   <div data-testid={`article-card-${article.id}`}>{article.title}</div>
 ));
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
@@ -81,20 +83,20 @@ describe('ArticlesArchive Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetDocs.mockResolvedValue({
+    getDocs.mockResolvedValue({
       docs: mockArticlesData.map((article) => ({
         id: article.id,
         data: () => article,
       })),
     });
-    mockCollection.mockReturnValue('articles-collection-ref');
-    mockQuery.mockImplementation((colRef, ...args) => ({ colRef, args }));
-    mockOrderBy.mockImplementation((field, direction) => ({ field, direction }));
+    collection.mockReturnValue('articles-collection-ref');
+    query.mockImplementation((colRef, ...args) => ({ colRef, args }));
+    orderBy.mockImplementation((field, direction) => ({ field, direction }));
   });
 
   // --- Initial Loading and Error States ---
   it('shows loading spinner initially', () => {
-    mockGetDocs.mockReturnValueOnce(new Promise(() => {})); // Never resolve
+    getDocs.mockReturnValueOnce(new Promise(() => {})); // Never resolve
     renderComponent();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
@@ -109,7 +111,7 @@ describe('ArticlesArchive Component', () => {
   });
 
   it('displays error message if fetching articles fails', async () => {
-    mockGetDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
+    getDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('No articles found matching your criteria.')).toBeInTheDocument();
@@ -209,7 +211,7 @@ describe('ArticlesArchive Component', () => {
 
   // --- Edge Cases ---
   it('handles empty allArticles array gracefully', async () => {
-    mockGetDocs.mockResolvedValueOnce({ docs: [] });
+    getDocs.mockResolvedValueOnce({ docs: [] });
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('No articles found matching your criteria.')).toBeInTheDocument();

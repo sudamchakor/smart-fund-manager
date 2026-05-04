@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import LumpsumCalculatorForm from '../../../../src/features/investment/tabs/LumpsumCalculatorForm';
+import LumpsumCalculatorForm from '../../../../../src/features/investment/tabs/LumpsumCalculatorForm';
 
 describe('LumpsumCalculatorForm', () => {
   it('renders without crashing', () => {

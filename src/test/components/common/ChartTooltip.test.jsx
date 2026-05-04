@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ChartTooltip from '../../../src/components/common/ChartTooltip';
+import ChartTooltip from '../../../components/common/ChartTooltip';
 import '@testing-library/jest-dom';
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -82,7 +82,7 @@ describe('ChartTooltip Component', () => {
     const payload = [{ name: 'Value 1', value: 100, color: 'red' }];
     renderComponent({ active: true, payload, label: null });
 
-    expect(screen.getByText('AGE: ')).toBeInTheDocument(); // Label will be rendered as "AGE: null" or "AGE: "
+    expect(screen.getByText(/AGE:/)).toBeInTheDocument(); // Label will be rendered as "AGE: null" or "AGE: "
     expect(screen.getByText('Value 1')).toBeInTheDocument();
   });
 
@@ -90,7 +90,7 @@ describe('ChartTooltip Component', () => {
     const payload = [{ name: 'Value 1', value: 100, color: 'red' }];
     renderComponent({ active: true, payload, label: undefined });
 
-    expect(screen.getByText('AGE: ')).toBeInTheDocument(); // Label will be rendered as "AGE: undefined" or "AGE: "
+    expect(screen.getByText(/AGE:/)).toBeInTheDocument(); // Label will be rendered as "AGE: undefined" or "AGE: "
     expect(screen.getByText('Value 1')).toBeInTheDocument();
   });
 

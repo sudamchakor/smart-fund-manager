@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CreditCardEMICalculator from '../../../src/pages/CreditCardEmiCalculator';
+import CreditCardEMICalculator from '../../pages/CreditCardEmiCalculator';
 import '@testing-library/jest-dom';
 
 // Mock Redux hooks (useSelector is not used by the component, but kept for consistency if it were to be added)
@@ -13,14 +13,14 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
     {Icon && <Icon data-testid="mock-header-icon" />}
   </div>
 ));
-jest.mock('../../../src/components/common/InputSlider', () => ({ label, value, onChange, adornment, adornmentPosition, min, max, step, ...props }) => (
+jest.mock('../../components/common/InputSlider', () => ({ label, value, onChange, adornment, adornmentPosition, min, max, step, ...props }) => (
   <div data-testid={`mock-input-slider-${label.replace(/\s/g, '-')}`}>
     <label htmlFor={`input-${label}`}>{label}</label>
     <input
@@ -37,7 +37,7 @@ jest.mock('../../../src/components/common/InputSlider', () => ({ label, value, o
     <span data-testid={`step-${label.replace(/\s/g, '-')}`}>{step}</span>
   </div>
 ));
-jest.mock('../../../src/components/common/LoanSummaryTerminal', () => ({ monthlyEmi, totalInterest, totalPayable, interestColor, loading, children }) => (
+jest.mock('../../components/common/LoanSummaryTerminal', () => ({ monthlyEmi, totalInterest, totalPayable, interestColor, loading, children }) => (
   <div data-testid="mock-loan-summary-terminal">
     <span data-testid="monthly-emi">₹{monthlyEmi}</span> {/* Hardcoded currency as per component */}
     <span data-testid="total-interest">₹{totalInterest}</span>

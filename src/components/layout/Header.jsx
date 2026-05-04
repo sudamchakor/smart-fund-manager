@@ -47,7 +47,6 @@ import { selectCalculatedValues } from '../../features/emiCalculator/utils/emiCa
 import { resetEmiState } from '../../store/emiSlice';
 import { useSnackbar } from 'notistack';
 import storage from 'redux-persist/lib/storage';
-// import { useAuth } from '../../hooks/useAuth'; // No longer needed in public header
 
 const CALCULATORS = [
   { path: '/calculator', label: 'Home Loan EMI', icon: <CalculateIcon /> },
@@ -73,7 +72,6 @@ const Header = () => {
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
   const calculatedValues = useSelector(selectCalculatedValues);
-  // const { user, logout } = useAuth(); // No longer needed in public header
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);

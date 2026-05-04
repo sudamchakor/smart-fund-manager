@@ -1,8 +1,7 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApp, getApps } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth'; // Import getAuth
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
   apiKey: 'AIzaSyBTwyWTwZ7lDHM4bQ1L-qgoR2rXWGQlOhE',
   authDomain: 'smartfund-manager.firebaseapp.com',
@@ -12,7 +11,10 @@ const firebaseConfig = {
   appId: '1:169594247602:web:e3ed6548ec3f6615736cab',
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const auth = getAuth(app); // Initialize and export Firebase Auth
+const getFirebaseApp = () => {
+  return getApps().length ? getApp() : initializeApp(firebaseConfig);
+};
+
+// Keeping your naming: getAuthentication and getDataBase are now functions that return the instance
+export const getAuthentication = () => getAuth(getFirebaseApp());
+export const getDataBase = () => getFirestore(getFirebaseApp());

@@ -22,7 +22,7 @@ import { updateGoalPriority } from '../../store/profileSlice';
 import { formatCurrency } from '../../utils/formatting';
 import { getWellInputStyle } from "../../styles/formStyles";
 
-export const EditableGoalItem = ({
+const EditableGoalItem = ({
   goal,
   currency,
   onEdit,

@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import ThemeSelector from '../../../src/components/common/ThemeSelector';
+import ThemeSelector from '../../../components/common/ThemeSelector';
 import '@testing-library/jest-dom';
 
 // Mock the themeColors import
-jest.mock('../../../src/theme/ThemeConfig', () => ({
+jest.mock('../../../theme/ThemeConfig', () => ({
   themeColors: [
     { name: 'Default', value: 'default', colors: ['#1976d2', '#90caf9', '#e3f2fd'] },
     { name: 'Dark', value: 'dark', colors: ['#212121', '#424242', '#616161'] },
@@ -81,15 +81,15 @@ describe('ThemeSelector Component', () => {
   });
 
   it('handles an empty themeColors array gracefully', () => {
-    jest.resetModules(); // Clear module cache for re-mocking
-    jest.mock('../../../src/theme/ThemeConfig', () => ({
+    jest.doMock('../../../theme/ThemeConfig', () => ({
       themeColors: [],
     }));
-    renderComponent();
-    expect(screen.queryByText('Default')).not.toBeInTheDocument();
-    expect(screen.queryByText('Dark')).not.toBeInTheDocument();
-    expect(screen.queryByText('Custom')).not.toBeInTheDocument();
-    expect(screen.queryAllByRole('button')).toHaveLength(0); // No theme selection buttons
+    const { container } = render(
+      <ThemeProvider theme={theme}>
+        <ThemeSelector {...defaultProps} />
+      </ThemeProvider>
+    );
+    expect(container).toBeEmptyDOMElement();
   });
 
   it('handles selectedTheme not matching any option', () => {

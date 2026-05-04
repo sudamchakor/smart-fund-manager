@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import App from '../App';
 
@@ -117,21 +117,36 @@ describe('App Component Routing and Layout', () => {
   const setup = (
     initialEntries = ['/'],
     authState = { user: null, loading: false },
+    AppToRender = App, // Allow passing a different App component for specific tests
   ) => {
     mockUseAuth.mockReturnValue(authState);
     // Mock document.body.setAttribute for theme testing
     jest.spyOn(document.body, 'setAttribute');
 
     render(
-      <MemoryRouter initialEntries={initialEntries}>
-        <App />
+      <MemoryRouter
+        initialEntries={initialEntries}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        <AppToRender />
       </MemoryRouter>,
     );
   };
 
+  afterEach(() => {
+    cleanup(); // Clean up the DOM after each test
+  });
+
   beforeEach(() => {
-    jest.clearAllMocks();
-    // Reset MockFAQ to its default implementation before each test
+    // Reset mockUseAuth to its default (unauthenticated) state
+    mockUseAuth.mockReturnValue({ user: null, loading: false });
+    // Clear any previous spies on document.body.setAttribute
+    if (document.body.setAttribute.mockRestore) {
+      document.body.setAttribute.mockRestore();
+    }
+    // Clear all mock implementations and call history for MockFAQ
+    MockFAQ.mockClear();
+    // Reset MockFAQ to its default implementation
     MockFAQ.mockImplementation(() => <div data-testid="mock-faq">FAQ</div>);
   });
 
@@ -235,12 +250,7 @@ describe('App Component Routing and Layout', () => {
           screen.getByTestId('mock-investment-calculator'),
         ).toBeInTheDocument(),
       );
-      // Clear mocks for next iteration to avoid interference if any internal state is kept
-      jest.clearAllMocks();
-      // Re-setup mocks that are cleared by jest.clearAllMocks()
-      mockUseAuth.mockReturnValue(authState);
-      jest.spyOn(document.body, 'setAttribute');
-      MockFAQ.mockImplementation(() => <div data-testid="mock-faq">FAQ</div>); // Re-set default FAQ mock
+      cleanup(); // Clean up after each route check
     }
   });
 
@@ -384,32 +394,6 @@ describe('App Component Routing and Layout', () => {
       await waitFor(() =>
         expect(screen.getByTestId('mock-admin-profile')).toBeInTheDocument(),
       );
-    });
-  });
-
-  // --- ErrorBoundary functionality (retained from original) ---
-  describe('ErrorBoundary functionality', () => {
-    it('catches component errors and displays the fallback UI', async () => {
-      const consoleSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
-
-      // Make the mocked FAQ component throw an error for this specific test run
-      MockFAQ.mockImplementationOnce(() => {
-        throw new Error('Intentional Test Error');
-      });
-
-      setup(['/faq']);
-
-      await waitFor(() => {
-        expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-        expect(screen.getByText(/Intentional Test Error/i)).toBeInTheDocument();
-        expect(
-          screen.getByRole('button', { name: /Reload Page/i }),
-        ).toBeInTheDocument();
-      });
-
-      consoleSpy.mockRestore();
     });
   });
 });

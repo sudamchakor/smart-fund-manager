@@ -1,37 +1,40 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AmountInput, AmountWithUnitInput, DatePickerInput } from '../../../src/components/common/CommonComponents';
+import { AmountInput, AmountWithUnitInput, DatePickerInput } from '../../../components/common/CommonComponents';
 import '@testing-library/jest-dom';
 import dayjs from 'dayjs';
 
 // Mock formStyles to prevent issues with actual style objects
-jest.mock('../../../src/styles/formStyles', () => ({
+jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
   getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
 }));
 
 // Mock @mui/x-date-pickers/DatePicker to control its behavior
-jest.mock('@mui/x-date-pickers/DatePicker', () => ({
-  DatePicker: ({ label, value, onChange, open, onOpen, onClose, slotProps, ...props }) => (
-    <div data-testid={`mock-datepicker-${label}`}>
-      <label htmlFor={`mock-datepicker-input-${label}`}>{label}</label>
-      <input
-        id={`mock-datepicker-input-${label}`}
-        data-testid={`mock-datepicker-input-${label}`}
-        value={value ? dayjs(value).format('YYYY-MM-DD') : ''}
-        readOnly
-        onClick={onOpen}
-      />
-      {open && (
-        <div data-testid={`mock-datepicker-popup-${label}`}>
-          <button onClick={() => { onChange(dayjs('2023-01-15')); onClose(); }}>Select 2023-01-15</button>
-          <button onClick={() => { onChange(null); onClose(); }}>Clear</button>
-        </div>
-      )}
-    </div>
-  ),
-}));
+jest.mock('@mui/x-date-pickers/DatePicker', () => {
+  const dayjs = require('dayjs');
+  return {
+    DatePicker: ({ label, value, onChange, open, onOpen, onClose, slotProps, ...props }) => (
+      <div data-testid={`mock-datepicker-${label}`}>
+        <label htmlFor={`mock-datepicker-input-${label}`}>{label}</label>
+        <input
+          id={`mock-datepicker-input-${label}`}
+          data-testid={`mock-datepicker-input-${label}`}
+          value={value ? dayjs(value).format('YYYY-MM-DD') : ''}
+          readOnly
+          onClick={onOpen}
+        />
+        {open && (
+          <div data-testid={`mock-datepicker-popup-${label}`}>
+            <button onClick={() => { onChange(dayjs('2023-01-15')); onClose(); }}>Select 2023-01-15</button>
+            <button onClick={() => { onChange(null); onClose(); }}>Clear</button>
+          </div>
+        )}
+      </div>
+    ),
+  };
+});
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -72,16 +75,28 @@ describe('AmountInput Component', () => {
   });
 
   it('calls onChange with numeric value when input changes', () => {
-    renderComponent();
+    const { rerender } = renderComponent();
     fireEvent.change(screen.getByDisplayValue('100'), { target: { value: '150' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(expect.any(Object)); // Event object
+    
+    rerender(
+        <ThemeProvider theme={theme}>
+            <AmountInput {...defaultProps} value={150} />
+        </ThemeProvider>
+    );
     expect(screen.getByDisplayValue('150')).toBeInTheDocument();
   });
 
   it('calls onChange with empty string when input is cleared', () => {
-    renderComponent();
+    const { rerender } = renderComponent();
     fireEvent.change(screen.getByDisplayValue('100'), { target: { value: '' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(expect.any(Object));
+    
+    rerender(
+        <ThemeProvider theme={theme}>
+            <AmountInput {...defaultProps} value="" />
+        </ThemeProvider>
+    );
     expect(screen.getByDisplayValue('')).toBeInTheDocument();
   });
 
@@ -153,7 +168,7 @@ describe('AmountWithUnitInput Component', () => {
   // --- Positive Scenarios ---
   it('renders with label, amount input, and unit toggle buttons', () => {
     renderComponent();
-    expect(screen.getByLabelText('Time Period')).toBeInTheDocument();
+    expect(screen.getByText('Time Period')).toBeInTheDocument();
     expect(screen.getByDisplayValue('12')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Months' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Years' })).toBeInTheDocument();
@@ -166,9 +181,15 @@ describe('AmountWithUnitInput Component', () => {
   });
 
   it('calls onAmountChange when amount input changes', () => {
-    renderComponent();
+    const { rerender } = renderComponent();
     fireEvent.change(screen.getByDisplayValue('12'), { target: { value: '24' } });
     expect(defaultProps.onAmountChange).toHaveBeenCalledWith(expect.any(Object));
+    
+    rerender(
+        <ThemeProvider theme={theme}>
+            <AmountWithUnitInput {...defaultProps} value={24} />
+        </ThemeProvider>
+    );
     expect(screen.getByDisplayValue('24')).toBeInTheDocument();
   });
 
@@ -195,7 +216,7 @@ describe('AmountWithUnitInput Component', () => {
   // --- Negative Scenarios / Edge Cases ---
   it('renders without label when label prop is empty', () => {
     renderComponent({ label: '' });
-    expect(screen.queryByLabelText('Time Period')).not.toBeInTheDocument();
+    expect(screen.queryByText('Time Period')).not.toBeInTheDocument();
     expect(screen.getByDisplayValue('12')).toBeInTheDocument();
   });
 

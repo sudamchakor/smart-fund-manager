@@ -1,4 +1,4 @@
-import store from "../../src/store/index";
+import store from "../../../src/store/index";
 
 describe("Redux Store Configuration", () => {
   it("should configure the store with correct reducers and persistence", () => {

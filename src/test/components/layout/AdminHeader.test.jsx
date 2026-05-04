@@ -2,8 +2,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import AdminHeader from '../../../src/components/layout/AdminHeader';
+import AdminHeader from '../../../components/layout/AdminHeader';
 import '@testing-library/jest-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock react-router-dom hooks
 const mockNavigate = jest.fn();
@@ -16,16 +17,19 @@ jest.mock('react-router-dom', () => ({
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn();
-jest.mock('../../../src/hooks/useAuth', () => ({
+jest.mock('../../../hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
+
+// Mock Material-UI useMediaQuery
+jest.mock('@mui/material/useMediaQuery');
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
 describe('AdminHeader Component', () => {
   const renderComponent = (initialPath = '/admin/articles', isMobile = false, authState = { user: null, logout: jest.fn() }) => {
     mockUseLocation.mockReturnValue({ pathname: initialPath });
-    mockUseMediaQuery.mockReturnValue(isMobile);
+    useMediaQuery.mockReturnValue(isMobile);
     mockUseAuth.mockReturnValue(authState);
 
     return render(
@@ -138,7 +142,7 @@ describe('AdminHeader Component', () => {
       expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument(); // Drawer should close
     });
 
-    it('navigates to /admin/articles/new from drawer when "Create Article" is clicked', () => {
+    it('navigates to /admin/articles/new when "Create Article" is clicked', () => {
       renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Create Article' }));

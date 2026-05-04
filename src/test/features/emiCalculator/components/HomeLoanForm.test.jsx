@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import HomeLoanForm from '../../../../src/features/emiCalculator/components/HomeLoanForm';
+import HomeLoanForm from '../../../../../src/features/emiCalculator/components/HomeLoanForm';
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
@@ -18,7 +18,7 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock SliderInput
-jest.mock('../../../../src/components/common/SliderInput', () => (props) => (
+jest.mock('../../../../../src/components/common/SliderInput', () => (props) => (
   <div data-testid={`slider-${props.label}`}>{props.label}</div>
 ));
 

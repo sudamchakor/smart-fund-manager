@@ -1,8 +1,8 @@
 import { createTheme, alpha } from '@mui/material/styles';
-import { getAppTheme, themePresets, themeColors } from '../../src/theme/ThemeConfig';
+import { getAppTheme, themePresets, themeColors } from '../../../src/theme/ThemeConfig';
 
 // Mock getMotionProfile as it's an external dependency
-jest.mock('../../src/theme/motionProfiles', () => ({
+jest.mock('../../../src/theme/motionProfiles', () => ({
   getMotionProfile: jest.fn(() => ({
     easing: { easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)', sharp: 'cubic-bezier(0.4, 0, 0.6, 1)' },
     duration: { short: 200, standard: 300 },

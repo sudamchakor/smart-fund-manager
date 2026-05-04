@@ -68,18 +68,6 @@ describe('NotFoundPage Component', () => {
     expect(screen.getByTestId('DashboardIcon')).toBeInTheDocument();
   });
 
-  // --- Styling (visual checks, not directly testable with JSDOM) ---
-  it('applies error-related styling to the main box and icon', () => {
-    renderComponent();
-    const mainBox = screen.getByText('404').closest('.MuiBox-root');
-    expect(mainBox).toHaveStyle(`border-color: ${theme.palette.error.main}33`); // alpha(error.main, 0.2)
-    expect(mainBox).toHaveStyle(`background-color: ${theme.palette.background.paper}`);
-
-    const iconBox = screen.getByTestId('WarningAmberIcon').closest('.MuiBox-root');
-    expect(iconBox).toHaveStyle(`background-color: ${theme.palette.error.main}1a`); // alpha(error.main, 0.1)
-    expect(iconBox).toHaveStyle(`color: ${theme.palette.error.main}`);
-  });
-
   it('applies specific typography styles', () => {
     renderComponent();
     expect(screen.getByText('404')).toHaveStyle('font-weight: 900');

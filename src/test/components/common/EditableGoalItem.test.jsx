@@ -3,9 +3,9 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import EditableGoalItem from '../../../src/components/common/EditableGoalItem';
-import * as profileSlice from '../../../src/store/profileSlice';
-import * as formatting from '../../../src/utils/formatting';
+import EditableGoalItem from '../../../components/common/EditableGoalItem';
+import * as profileSlice from '../../../store/profileSlice';
+import * as formatting from '../../../utils/formatting';
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons
@@ -22,7 +22,7 @@ jest.mock('react-redux', () => ({
 const mockUseDispatch = require('react-redux').useDispatch;
 
 // Mock profileSlice actions
-jest.mock('../../../src/store/profileSlice', () => ({
+jest.mock('../../../store/profileSlice', () => ({
   updateGoalPriority: jest.fn((payload) => ({ type: 'profile/updateGoalPriority', payload })),
 }));
 
@@ -33,7 +33,7 @@ jest.spyOn(formatting, 'formatCurrency').mockImplementation((value, currency) =>
 });
 
 // Mock formStyles to prevent issues with actual style objects
-jest.mock('../../../src/styles/formStyles', () => ({
+jest.mock('../../../styles/formStyles', () => ({
   getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
 }));
 

@@ -1,8 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import AdminArticles from '../../../src/pages/admin/AdminArticles';
+import AdminArticles from '../../../../src/pages/admin/AdminArticles';
 import '@testing-library/jest-dom';
+import {
+  collection,
+  getDocs,
+  doc,
+  deleteDoc,
+} from 'firebase/firestore';
 
 // Mock react-router-dom's Link and useNavigate
 const mockNavigate = jest.fn();
@@ -18,30 +24,26 @@ jest.mock('react-router-dom', () => ({
 
 // Mock useAuth hook
 const mockUseAuth = jest.fn();
-jest.mock('../../../src/hooks/useAuth', () => ({
+jest.mock('../../../../src/hooks/useAuth', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
 // Mock Firebase Firestore
-const mockCollection = jest.fn();
-const mockGetDocs = jest.fn();
-const mockDoc = jest.fn();
-const mockDeleteDoc = jest.fn();
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  collection: mockCollection,
-  getDocs: mockGetDocs,
-  doc: mockDoc,
-  deleteDoc: mockDeleteDoc,
+  collection: jest.fn(),
+  getDocs: jest.fn(),
+  doc: jest.fn(),
+  deleteDoc: jest.fn(),
 }));
 
 // Mock ADMIN_UID
-jest.mock('../../../src/utils/constants', () => ({
+jest.mock('../../../../src/utils/constants', () => ({
   ADMIN_UID: 'admin-uid-123',
 }));
 
 // Mock formatDate from utils/formatting
-jest.mock('../../../src/utils/formatting', () => ({
+jest.mock('../../../../src/utils/formatting', () => ({
   formatDate: jest.fn((date) => {
     if (!date) return 'N/A';
     const d = date instanceof Date ? date : new Date(date);
@@ -50,7 +52,7 @@ jest.mock('../../../src/utils/formatting', () => ({
 }));
 
 // Mock PageHeader
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
@@ -92,13 +94,13 @@ describe('AdminArticles Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGetDocs.mockResolvedValue({
+    getDocs.mockResolvedValue({
       docs: mockArticlesData.map((article) => ({
         id: article.id,
         data: () => article,
       })),
     });
-    mockDeleteDoc.mockResolvedValue();
+    deleteDoc.mockResolvedValue();
     jest.spyOn(window, 'confirm').mockReturnValue(true); // Default to confirming deletion
     jest.spyOn(window, 'alert').mockImplementation(() => {}); // Mock alert
   });
@@ -110,13 +112,13 @@ describe('AdminArticles Component', () => {
   });
 
   it('shows loading spinner when articles are loading', () => {
-    mockGetDocs.mockReturnValueOnce(new Promise(() => {})); // Never resolve
+    getDocs.mockReturnValueOnce(new Promise(() => {})); // Never resolve
     renderComponent();
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
   });
 
   it('displays error message if fetching articles fails', async () => {
-    mockGetDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
+    getDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
     renderComponent();
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument(); // Check for Alert component
@@ -177,7 +179,7 @@ describe('AdminArticles Component', () => {
     await waitFor(() => {
       fireEvent.click(screen.getAllByLabelText('delete')[0]);
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this article?');
-      expect(mockDeleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', '1');
+      expect(deleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', '1');
       expect(window.alert).toHaveBeenCalledWith('Article deleted successfully!');
       // Re-fetch is triggered, so the article should disappear from the list
       expect(screen.queryByText('Article One')).not.toBeInTheDocument();
@@ -190,14 +192,14 @@ describe('AdminArticles Component', () => {
     await waitFor(() => {
       fireEvent.click(screen.getAllByLabelText('delete')[0]);
       expect(window.confirm).toHaveBeenCalledTimes(1);
-      expect(mockDeleteDoc).not.toHaveBeenCalled();
+      expect(deleteDoc).not.toHaveBeenCalled();
       expect(window.alert).not.toHaveBeenCalled();
       expect(screen.getByText('Article One')).toBeInTheDocument(); // Article still in list
     });
   });
 
   it('shows alert if article deletion fails', async () => {
-    mockDeleteDoc.mockRejectedValueOnce(new Error('Delete failed'));
+    deleteDoc.mockRejectedValueOnce(new Error('Delete failed'));
     renderComponent();
     await waitFor(() => {
       fireEvent.click(screen.getAllByLabelText('delete')[0]);
@@ -206,7 +208,7 @@ describe('AdminArticles Component', () => {
   });
 
   it('formats string dates correctly', async () => {
-    mockGetDocs.mockResolvedValueOnce({
+    getDocs.mockResolvedValueOnce({
       docs: [{
         id: '3',
         data: () => ({
@@ -252,7 +254,7 @@ describe('AdminArticles Component', () => {
 
   // --- Empty State ---
   it('displays "No articles found." when there are no articles', async () => {
-    mockGetDocs.mockResolvedValueOnce({ docs: [] }); // No articles
+    getDocs.mockResolvedValueOnce({ docs: [] }); // No articles
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('No articles found.')).toBeInTheDocument();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import ExemptionRow from '../../../src/components/common/ExemptionRow';
+import ExemptionRow from '../../../components/common/ExemptionRow';
 import '@testing-library/jest-dom';
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider

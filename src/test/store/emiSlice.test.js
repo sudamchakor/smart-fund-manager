@@ -20,21 +20,21 @@ import emiReducer, {
   selectVisualStyle,
   selectAutoSave,
   selectIsLoanActive,
-} from '../../src/store/emiSlice';
+} from '../../../src/store/emiSlice';
 
 // Define the default initial state as it is in emiSlice.js for comparison
 const defaultInitialState = {
   loanDetails: {
     homeValue: 5000000,
     marginAmount: 1000000,
-    marginUnit: "Rs",
+    marginUnit: "Rs", // 'Rs' or '%'
     loanInsurance: 0,
     interestRate: 8.5,
     loanTenure: 20,
-    tenureUnit: "years",
+    tenureUnit: "years", // 'years' or 'months'
     loanFees: 10000,
-    feesUnit: "Rs",
-    startDate: expect.any(String), // Date will be different on each run
+    feesUnit: "Rs", // 'Rs' or '%'
+    startDate: expect.any(String),
     yearlyPaymentIncreaseAmount: 0,
     yearlyPaymentIncreaseUnit: "%",
   },
@@ -55,8 +55,12 @@ const defaultInitialState = {
   },
   isLoanActive: true,
   currency: "₹",
-  designSystem: "material",
-  visualStyle: "flat",
+  themeMode: "dodgerblue",
+
+  // --- ARCHITECTURAL STATE ---
+  designSystem: "material", // 'material' | 'apple' | 'fluent'
+  visualStyle: "flat",      // 'flat' | 'minimalist' | 'glass' | 'neumorphic'
+
   autoSave: true,
 };
 

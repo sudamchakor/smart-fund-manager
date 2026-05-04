@@ -3,21 +3,21 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import TaxSummary from '../../../src/components/tax/TaxSummary';
-import * as taxReportGenerator from '../../../src/utils/taxReportGenerator';
+import TaxSummary from '../../../components/tax/TaxSummary';
+import * as taxReportGenerator from '../../../utils/taxReportGenerator';
 import '@testing-library/jest-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock Material-UI's useMediaQuery hook
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
-const mockUseMediaQuery = require('@mui/material/useMediaQuery').default;
+jest.mock('@mui/material/useMediaQuery');
 
 // Mock generateTaxReportPDF
-jest.mock('../../../src/utils/taxReportGenerator', () => ({
+jest.mock('../../../utils/taxReportGenerator', () => ({
   generateTaxReportPDF: jest.fn(),
 }));
 
 // Mock DetailRow to simplify testing
-jest.mock('../../../src/components/common/DetailRow', () => ({ label, value }) => (
+jest.mock('../../../components/common/DetailRow', () => ({ label, value }) => (
   <div data-testid={`detail-row-${label.toLowerCase().replace(/\s/g, '-')}`}>
     <span>{label}:</span>
     <span>{value}</span>
@@ -72,7 +72,7 @@ describe('TaxSummary Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseMediaQuery.mockReturnValue(false); // Default to desktop
+    useMediaQuery.mockReturnValue(false); // Default to desktop
   });
 
   // --- Basic Rendering ---
@@ -299,7 +299,7 @@ describe('TaxSummary Component', () => {
 
   // --- Mobile Responsiveness ---
   it('applies sticky positioning on desktop', () => {
-    mockUseMediaQuery.mockReturnValue(false); // Desktop
+    useMediaQuery.mockReturnValue(false); // Desktop
     renderComponent({
       taxComparison: defaultTaxComparison,
       declarations: defaultDeclarations,
@@ -312,7 +312,7 @@ describe('TaxSummary Component', () => {
   });
 
   it('applies static positioning on mobile', () => {
-    mockUseMediaQuery.mockReturnValue(true); // Mobile
+    useMediaQuery.mockReturnValue(true); // Mobile
     renderComponent({
       taxComparison: defaultTaxComparison,
       declarations: defaultDeclarations,

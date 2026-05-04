@@ -1,4 +1,4 @@
-import { ADMIN_UID } from '../../src/utils/constants';
+import { ADMIN_UID } from '../../utils/constants';
 
 describe('Constants', () => {
   it('ADMIN_UID should have the correct value', () => {

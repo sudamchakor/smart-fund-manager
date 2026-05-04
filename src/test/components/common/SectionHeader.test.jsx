@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import SectionHeader from '../../../src/components/common/SectionHeader';
+import SectionHeader from '../../../components/common/SectionHeader';
 import { Settings as SettingsIcon } from '@mui/icons-material'; // Example icon
 import '@testing-library/jest-dom';
 
@@ -82,7 +82,7 @@ describe('SectionHeader Component', () => {
   // --- Negative Scenarios / Edge Cases ---
   it('renders with an empty title string', () => {
     renderComponent({ title: '' });
-    expect(screen.getByText('')).toBeInTheDocument(); // Empty typography element
+    expect(screen.getByRole('heading', { level: 6 })).toBeInTheDocument(); // Empty typography element
   });
 
   it('renders with an empty subtitle string', () => {

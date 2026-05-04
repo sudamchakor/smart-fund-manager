@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import FAQ from '../../../src/pages/FAQ';
+import FAQ from '../../pages/FAQ';
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons
@@ -51,7 +51,7 @@ describe('FAQ Component', () => {
   it('renders all FAQ questions initially collapsed', () => {
     renderComponent();
     expect(screen.getByText('How is my data stored if there is no backend server?')).toBeInTheDocument();
-    expect(screen.queryByText(/We utilize 'Local-First' architecture./i)).not.toBeInTheDocument(); // Answer should be collapsed
+    expect(screen.queryByText(/We utilize 'Local-First' architecture\./i)).not.toBeInTheDocument(); // Answer should be collapsed
   });
 
   it('expands and collapses accordion on click', () => {
@@ -61,12 +61,12 @@ describe('FAQ Component', () => {
 
     // Expand
     fireEvent.click(summary);
-    expect(screen.getByText(/We utilize 'Local-First' architecture./i)).toBeInTheDocument();
+    expect(screen.getByText(/We utilize 'Local-First' architecture\./i)).toBeInTheDocument();
     expect(summary).toHaveAttribute('aria-expanded', 'true');
 
     // Collapse
     fireEvent.click(summary);
-    expect(screen.queryByText(/We utilize 'Local-First' architecture./i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/We utilize 'Local-First' architecture\./i)).not.toBeInTheDocument();
     expect(summary).toHaveAttribute('aria-expanded', 'false');
   });
 
@@ -74,7 +74,7 @@ describe('FAQ Component', () => {
     renderComponent();
     const question = screen.getByText('What is the \'Reducing Balance\' method?');
     fireEvent.click(question.closest('.MuiAccordionSummary-root'));
-    expect(screen.getByText('PRECISION FORMULA')).toBeInTheDocument();
+    expect(screen.getAllByText('PRECISION FORMULA')[0]).toBeInTheDocument();
     expect(screen.getByText(/E = P \\cdot r \\cdot \\frac{(1 + r)^n}{(1 + r)^n - 1}/i)).toBeInTheDocument();
     expect(screen.getByTestId('FunctionsIcon')).toBeInTheDocument();
   });
@@ -83,7 +83,7 @@ describe('FAQ Component', () => {
     renderComponent();
     const question = screen.getByText('How much can I actually save with prepayments?');
     fireEvent.click(question.closest('.MuiAccordionSummary-root'));
-    expect(screen.getByText('Strategy Insight')).toBeInTheDocument();
+    expect(screen.getAllByText('Strategy Insight')[0]).toBeInTheDocument();
     expect(screen.getByText(/On a \$500k loan at 7% for 20 years/i)).toBeInTheDocument();
     expect(screen.getByTestId('LightbulbOutlinedIcon')).toBeInTheDocument();
   });

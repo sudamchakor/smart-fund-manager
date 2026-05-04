@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import AutoBalancer from '../../../src/features/profile/components/AutoBalancer';
+import AutoBalancer from '../../../../features/profile/components/AutoBalancer';
 
 describe('AutoBalancer', () => {
   it('renders without crashing', () => {

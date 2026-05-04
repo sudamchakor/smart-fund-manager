@@ -3,11 +3,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { BrowserRouter as Router } from 'react-router-dom';
-import UserProfile from '../../../src/pages/UserProfile';
+import UserProfile from '../../pages/UserProfile';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../../src/features/profile/tabs/PersonalProfileTab', () => {
+jest.mock('../../features/profile/tabs/PersonalProfileTab', () => {
   const MockPersonalProfileTab = ({ onEditGoal, onOpenModal }) => (
     <div data-testid="personal-profile-tab">
       Personal Profile Tab
@@ -17,7 +17,7 @@ jest.mock('../../../src/features/profile/tabs/PersonalProfileTab', () => {
   );
   return MockPersonalProfileTab;
 });
-jest.mock('../../../src/features/profile/tabs/FutureGoalsTab', () => {
+jest.mock('../../features/profile/tabs/FutureGoalsTab', () => {
   const MockFutureGoalsTab = ({ goalToEditId }) => (
     <div data-testid="future-goals-tab">
       Future Goals Tab {goalToEditId && `(Editing Goal: ${goalToEditId})`}
@@ -25,8 +25,8 @@ jest.mock('../../../src/features/profile/tabs/FutureGoalsTab', () => {
   );
   return MockFutureGoalsTab;
 });
-jest.mock('../../../src/features/profile/tabs/WealthTab', () => () => <div data-testid="wealth-tab">Wealth Tab</div>);
-jest.mock('../../../src/features/profile/tabs/OnboardingModal', () => {
+jest.mock('../../features/profile/tabs/WealthTab', () => () => <div data-testid="wealth-tab">Wealth Tab</div>);
+jest.mock('../../features/profile/tabs/OnboardingModal', () => {
   const MockOnboardingModal = ({ open, onClose }) => (
     <div data-testid="onboarding-modal" style={{ display: open ? 'block' : 'none' }}>
       Onboarding Modal
@@ -35,7 +35,7 @@ jest.mock('../../../src/features/profile/tabs/OnboardingModal', () => {
   );
   return MockOnboardingModal;
 });
-jest.mock('../../../src/features/profile/components/FinancialModal', () => {
+jest.mock('../../features/profile/components/FinancialModal', () => {
   const MockFinancialModal = ({ open, onClose, type }) => (
     <div data-testid="financial-modal" style={{ display: open ? 'block' : 'none' }}>
       Financial Modal - {type}
@@ -44,21 +44,21 @@ jest.mock('../../../src/features/profile/components/FinancialModal', () => {
   );
   return MockFinancialModal;
 });
-jest.mock('../../../src/components/CustomTabPanel', () => ({ children, value, index }) => (
+jest.mock('../../components/CustomTabPanel', () => ({ children, value, index }) => (
   value === index ? <div data-testid={`custom-tab-panel-${index}`}>{children}</div> : null
 ));
-jest.mock('../../../src/components/PreviewBanner', () => ({ onOpenOnboarding }) => (
+jest.mock('../../components/PreviewBanner', () => ({ onOpenOnboarding }) => (
   <div data-testid="preview-banner">
     Preview Banner
     <button onClick={onOpenOnboarding}>Create Profile</button>
   </div>
 ));
-jest.mock('../../../src/components/FloatingStatusIsland', () => ({ investableSurplus, debtFreeCountdown, currency }) => (
+jest.mock('../../components/FloatingStatusIsland', () => ({ investableSurplus, debtFreeCountdown, currency }) => (
   <div data-testid="floating-status-island">
     Surplus: {currency}{investableSurplus}, Debt: {debtFreeCountdown}
   </div>
 ));
-jest.mock('../../../src/components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
+jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
 
 // Mock react-router-dom hooks
 const mockUseNavigate = jest.fn();

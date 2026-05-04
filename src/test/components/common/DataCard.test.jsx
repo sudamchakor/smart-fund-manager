@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import DataCard from '../../../src/components/common/DataCard';
+import DataCard from '../../../components/common/DataCard';
 import { AcUnit as AcUnitIcon } from '@mui/icons-material'; // Example icon
 import '@testing-library/jest-dom';
 

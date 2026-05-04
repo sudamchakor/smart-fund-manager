@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import 'react-quill/dist/quill.snow.css';
 import {
   Box,
@@ -12,7 +18,7 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 
 // Firebase Imports
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 import {
   collection,
   addDoc,
@@ -64,13 +70,18 @@ const WriteArticle = () => {
         ['bold', 'italic', 'underline', 'strike', 'blockquote'],
         [{ script: 'sub' }, { script: 'super' }],
         [{ color: [] }, { background: [] }],
-        [{ list: 'ordered' }, { list: 'bullet' }, { indent: '-1' }, { indent: '+1' }],
+        [
+          { list: 'ordered' },
+          { list: 'bullet' },
+          { indent: '-1' },
+          { indent: '+1' },
+        ],
         [{ align: [] }],
         ['link', 'image', 'video'],
         ['clean'],
       ],
     }),
-    []
+    [],
   );
 
   // --- Helpers: Word Count & Stats ---
@@ -105,7 +116,7 @@ const WriteArticle = () => {
     const loadData = async () => {
       if (id && isAuthorized) {
         try {
-          const docSnap = await getDoc(doc(db, 'articles', id));
+          const docSnap = await getDoc(doc(getDataBase(), 'articles', id));
           if (docSnap.exists()) {
             const data = docSnap.data();
             setTitle(data.title || '');
@@ -186,9 +197,9 @@ const WriteArticle = () => {
       };
 
       if (id) {
-        await updateDoc(doc(db, 'articles', id), articleData);
+        await updateDoc(doc(getDataBase(), 'articles', id), articleData);
       } else {
-        await addDoc(collection(db, 'articles'), {
+        await addDoc(collection(getDataBase(), 'articles'), {
           ...articleData,
           createdAt: serverTimestamp(),
         });

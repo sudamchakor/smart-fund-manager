@@ -1,15 +1,15 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import SalaryTable from '../../../src/components/tax/SalaryTable';
+import SalaryTable from '../../../components/tax/SalaryTable';
 import '@testing-library/jest-dom';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock Material-UI's useMediaQuery hook
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
-const mockUseMediaQuery = require('@mui/material/useMediaQuery').default;
+jest.mock('@mui/material/useMediaQuery');
 
 // Mock getWellInputStyle if it causes issues, but it's usually just styles
-jest.mock('../../../src/styles/formStyles', () => ({
+jest.mock('../../../styles/formStyles', () => ({
   getWellInputStyle: jest.fn(() => ({ border: '1px solid red' })),
 }));
 
@@ -81,14 +81,14 @@ describe('SalaryTable Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseMediaQuery.mockReturnValue(false); // Default to desktop view
+    useMediaQuery.mockReturnValue(false); // Default to desktop view
     currentViewMode = 'monthly'; // Reset view mode for each test
     MockRenderRow.mockClear(); // Clear mock calls for renderRow
   });
 
   // --- Mobile View Tests ---
   it('renders mobile view with Cards when isMobile is true', () => {
-    mockUseMediaQuery.mockReturnValue(true);
+    useMediaQuery.mockReturnValue(true);
     renderComponent();
 
     expect(screen.getByText('Salary Components')).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe('SalaryTable Component', () => {
   });
 
   it('calls onAnnualChange with correct annual value when input changes in mobile view', () => {
-    mockUseMediaQuery.mockReturnValue(true);
+    useMediaQuery.mockReturnValue(true);
     renderComponent();
 
     const basicInput = screen.getByLabelText('Basic');

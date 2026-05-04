@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import SettingsPage from '../../../src/pages/SettingsPage';
+import SettingsPage from '../../pages/SettingsPage';
 import '@testing-library/jest-dom';
 import {
   setThemeMode,
@@ -11,7 +11,7 @@ import {
   setVisualStyle,
   setCurrency,
   setAutoSave,
-} from '../../../src/store/emiSlice'; // Import Redux actions
+} from '../../store/emiSlice'; // Import Redux actions
 
 // Mock Redux hooks
 const mockUseSelector = jest.fn();
@@ -22,14 +22,14 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
+jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
   <div data-testid="mock-page-header">
     <h1>{title}</h1>
     <p>{subtitle}</p>
     {Icon && <Icon data-testid="mock-header-icon" />}
   </div>
 ));
-jest.mock('../../../src/components/common/ThemeSelector', () => ({ selectedTheme, onThemeChange }) => (
+jest.mock('../../components/common/ThemeSelector', () => ({ selectedTheme, onThemeChange }) => (
   <div data-testid="mock-theme-selector">
     <span data-testid="selected-theme">{selectedTheme}</span>
     <button onClick={() => onThemeChange(selectedTheme === 'light' ? 'dark' : 'light')}>Change Theme</button>
@@ -37,7 +37,7 @@ jest.mock('../../../src/components/common/ThemeSelector', () => ({ selectedTheme
 ));
 
 // Mock themePresets globally for consistent testing
-jest.mock('../../../src/theme/ThemeConfig', () => ({
+jest.mock('../../theme/ThemeConfig', () => ({
   themePresets: {
     modern: { name: 'Modern', arch: 'material', style: 'flat' },
     classic: { name: 'Classic', arch: 'classic', style: 'glass' },
@@ -48,7 +48,7 @@ jest.mock('../../../src/theme/ThemeConfig', () => ({
     { value: '€', label: 'Euro (€)' },
   ],
 }));
-const { themePresets, currencyOptions } = require('../../../src/theme/ThemeConfig');
+const { themePresets, currencyOptions } = require('../../theme/ThemeConfig');
 
 
 // Mock Material-UI Slide component to render children directly
@@ -302,12 +302,12 @@ describe('SettingsPage Component', () => {
   // --- Edge Cases ---
   it('handles empty themePresets gracefully', () => {
     // Temporarily mock themePresets to be empty for this specific test
-    jest.doMock('../../../src/theme/ThemeConfig', () => ({
+    jest.doMock('../../theme/ThemeConfig', () => ({
       themePresets: {},
       currencyOptions: [], // Also mock currencyOptions to be empty
     }));
     // Re-import the component to get the updated mock
-    const MockedSettingsPage = require('../../../src/pages/SettingsPage').default;
+    const MockedSettingsPage = require('../../pages/SettingsPage').default;
     render(
       <Provider store={mockStore({ emi: initialGlobalSettings })}>
         <ThemeProvider theme={theme}>
@@ -318,7 +318,7 @@ describe('SettingsPage Component', () => {
     expect(screen.queryByRole('option')).not.toBeInTheDocument(); // No options in Layout Style select
     expect(screen.queryByRole('button', { name: 'Modern' })).not.toBeInTheDocument(); // No default selected
     expect(screen.queryByRole('button', { name: 'Rupee (₹)' })).not.toBeInTheDocument(); // No default selected
-    jest.dontMock('../../../src/theme/ThemeConfig'); // Clean up mock
+    jest.dontMock('../../theme/ThemeConfig'); // Clean up mock
   });
 
   it('handles globalSettings with null/undefined values gracefully', () => {

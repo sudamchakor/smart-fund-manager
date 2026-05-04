@@ -19,7 +19,7 @@ import {
   GithubAuthProvider,
   signInWithPopup,
 } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
+import { getAuthentication } from '../../firebaseConfig';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +36,7 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(getAuthentication, email, password);
       setSnackbar({
         open: true,
         message: 'Login successful!',
@@ -58,7 +58,7 @@ const LoginPage = () => {
   const handleSocialLogin = async (providerInstance, providerName) => {
     setLoading(true);
     try {
-      await signInWithPopup(auth, providerInstance);
+      await signInWithPopup(getAuthentication, providerInstance);
       setSnackbar({
         open: true,
         message: `${providerName} login successful!`,

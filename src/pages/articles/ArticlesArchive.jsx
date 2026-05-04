@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, Container, useTheme } from '@mui/material';
 import ArticleIcon from '@mui/icons-material/Article';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 
 import PageHeader from '../../components/common/PageHeader';
 import SuspenseFallback from '../../components/common/SuspenseFallback';
@@ -31,7 +31,7 @@ const ArticlesArchive = () => {
       try {
         setLoading(true);
         const q = query(
-          collection(db, 'articles'),
+          collection(getDataBase(), 'articles'),
           orderBy('createdAt', 'desc'),
         );
         const querySnapshot = await getDocs(q);

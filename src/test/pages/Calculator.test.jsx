@@ -3,16 +3,16 @@ import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import Calculator from '../../../src/pages/Calculator';
+import Calculator from '../../pages/Calculator';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../../src/features/emiCalculator/components/HomeLoanForm', () => () => <div data-testid="home-loan-form">HomeLoanForm</div>);
-jest.mock('../../../src/features/emiCalculator/components/PrepaymentsForm', () => () => <div data-testid="prepayments-form">PrepaymentsForm</div>);
-jest.mock('../../../src/features/emiCalculator/components/PaymentScheduleTable', () => () => <div data-testid="payment-schedule-table">PaymentScheduleTable</div>);
-jest.mock('../../../src/features/emiCalculator/components/TotalMonthlyPayment', () => () => <div data-testid="total-monthly-payment">TotalMonthlyPayment</div>);
-jest.mock('../../../src/components/charts/PieChartComponent', () => () => <div data-testid="pie-chart-component">PieChartComponent</div>);
-jest.mock('../../../src/components/charts/BarChartComponent', () => () => <div data-testid="bar-chart-component">BarChartComponent</div>);
+jest.mock('../../features/emiCalculator/components/HomeLoanForm', () => () => <div data-testid="home-loan-form">HomeLoanForm</div>);
+jest.mock('../../features/emiCalculator/components/PrepaymentsForm', () => () => <div data-testid="prepayments-form">PrepaymentsForm</div>);
+jest.mock('../../features/emiCalculator/components/PaymentScheduleTable', () => () => <div data-testid="payment-schedule-table">PaymentScheduleTable</div>);
+jest.mock('../../features/emiCalculator/components/TotalMonthlyPayment', () => () => <div data-testid="total-monthly-payment">TotalMonthlyPayment</div>);
+jest.mock('../../components/charts/PieChartComponent', () => () => <div data-testid="pie-chart-component">PieChartComponent</div>);
+jest.mock('../../components/charts/BarChartComponent', () => () => <div data-testid="bar-chart-component">BarChartComponent</div>);
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({

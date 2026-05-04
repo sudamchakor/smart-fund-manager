@@ -1,8 +1,10 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import TaxCalculator from '../../../src/pages/TaxCalculator';
+import configureStore from 'redux-mock-store';
+import TaxCalculator from '../../pages/TaxCalculator';
 import '@testing-library/jest-dom';
+import { createTheme } from '@mui/material/styles';
 
 // Mock Redux hooks
 const mockUseSelector = jest.fn();
@@ -11,8 +13,8 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock lazy-loaded components
-jest.mock('../../../src/pages/TaxDashboard', () => () => <div data-testid="mock-tax-dashboard">TaxDashboard</div>);
-jest.mock('../../../src/components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
+jest.mock('../../pages/TaxDashboard', () => () => <div data-testid="mock-tax-dashboard">TaxDashboard</div>);
+jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
 
 // Mock themeColors and createTheme
 const mockThemeColors = [
@@ -20,15 +22,18 @@ const mockThemeColors = [
   { value: 'dark', colors: ['#212121', '#424242', '#121212', '#ffffff', '#bbbbbb'] },
   { value: 'custom', colors: ['#ff0000', '#ff5555', '#eeeeee', '#333333', '#888888'] },
 ];
-jest.mock('../../../src/theme/ThemeConfig', () => ({
+jest.mock('../../theme/ThemeConfig', () => ({
   themeColors: mockThemeColors,
 }));
 
 // Mock createTheme from @mui/material/styles
-const mockCreateTheme = jest.fn((options) => options); // Simply return the options passed
-jest.mock('@mui/material/styles', () => ({
-  createTheme: mockCreateTheme,
-}));
+jest.mock('@mui/material/styles', () => {
+  const actual = jest.requireActual('@mui/material/styles');
+  return {
+    ...actual,
+    createTheme: jest.fn((options) => options),
+  };
+});
 
 const mockStore = configureStore([]);
 
@@ -50,7 +55,7 @@ describe('TaxCalculator Page', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockCreateTheme.mockClear(); // Clear mock calls for createTheme
+    createTheme.mockClear(); // Clear mock calls for createTheme
   });
 
   // --- Basic Rendering ---
@@ -71,8 +76,8 @@ describe('TaxCalculator Page', () => {
   it('applies the correct theme for "light" themeMode (maps to dodgerblue)', () => {
     renderComponent('light');
     const expectedColors = mockThemeColors[0].colors; // dodgerblue
-    expect(mockCreateTheme).toHaveBeenCalledTimes(1);
-    expect(mockCreateTheme).toHaveBeenCalledWith(
+    expect(createTheme).toHaveBeenCalledTimes(1);
+    expect(createTheme).toHaveBeenCalledWith(
       expect.objectContaining({
         palette: expect.objectContaining({
           mode: 'light',
@@ -94,8 +99,8 @@ describe('TaxCalculator Page', () => {
   it('applies the correct theme for "dodgerblue" themeMode', () => {
     renderComponent('dodgerblue');
     const expectedColors = mockThemeColors[0].colors; // dodgerblue
-    expect(mockCreateTheme).toHaveBeenCalledTimes(1);
-    expect(mockCreateTheme).toHaveBeenCalledWith(
+    expect(createTheme).toHaveBeenCalledTimes(1);
+    expect(createTheme).toHaveBeenCalledWith(
       expect.objectContaining({
         palette: expect.objectContaining({
           mode: 'light', // dodgerblue is a light theme
@@ -117,8 +122,8 @@ describe('TaxCalculator Page', () => {
   it('applies the correct theme for "dark" themeMode', () => {
     renderComponent('dark');
     const expectedColors = mockThemeColors[1].colors; // dark theme
-    expect(mockCreateTheme).toHaveBeenCalledTimes(1);
-    expect(mockCreateTheme).toHaveBeenCalledWith(
+    expect(createTheme).toHaveBeenCalledTimes(1);
+    expect(createTheme).toHaveBeenCalledWith(
       expect.objectContaining({
         palette: expect.objectContaining({
           mode: 'dark',
@@ -140,8 +145,8 @@ describe('TaxCalculator Page', () => {
   it('defaults to the first themeColors entry if themeMode is unknown', () => {
     renderComponent('unknown');
     const expectedColors = mockThemeColors[0].colors; // dodgerblue (first in mockThemeColors)
-    expect(mockCreateTheme).toHaveBeenCalledTimes(1);
-    expect(mockCreateTheme).toHaveBeenCalledWith(
+    expect(createTheme).toHaveBeenCalledTimes(1);
+    expect(createTheme).toHaveBeenCalledWith(
       expect.objectContaining({
         palette: expect.objectContaining({
           mode: 'light', // Default mode for unknown theme (falls back to first themeColors entry)

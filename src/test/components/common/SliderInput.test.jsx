@@ -1,11 +1,11 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
-import SliderInput from "../../../src/components/common/SliderInput";
+import SliderInput from "../../../components/common/SliderInput";
 import "@testing-library/jest-dom";
 
 // Mock formStyles to prevent issues with actual style objects
-jest.mock("../../../src/styles/formStyles", () => ({
+jest.mock("../../../styles/formStyles", () => ({
   labelStyle: { fontSize: "0.75rem", fontWeight: 700 },
   getWellInputStyle: jest.fn(() => ({ border: "1px solid #ccc", padding: "8px" })),
 }));
@@ -46,58 +46,58 @@ describe("SliderInput Component", () => {
   it("renders the label and current value", () => {
     renderComponent();
     expect(screen.getByText("Loan Amount")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("100000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("100000");
     expect(screen.getByRole("slider")).toBeInTheDocument();
   });
 
   it("syncs internal value with external value prop", () => {
     const { rerender } = renderComponent({ value: 50000 });
-    expect(screen.getByDisplayValue("50000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("50000");
 
     rerender(
       <ThemeProvider theme={theme}>
         <SliderInput {...defaultProps} value={75000} />
       </ThemeProvider>
     );
-    expect(screen.getByDisplayValue("75000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("75000");
   });
 
   // --- TextField Interaction ---
   it("calls onChange with numeric value when text input changes to a valid number", () => {
     renderComponent();
-    const input = screen.getByDisplayValue("100000");
+    const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "150000" } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(150000);
-    expect(screen.getByDisplayValue("150000")).toBeInTheDocument(); // Internal state update
+    expect(screen.getByRole("textbox")).toHaveValue("150000"); // Internal state update
   });
 
   it("calls onChange with empty string when text input is cleared", () => {
     renderComponent();
-    const input = screen.getByDisplayValue("100000");
+    const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "" } });
     expect(defaultProps.onChange).toHaveBeenCalledWith("");
-    expect(screen.getByDisplayValue("")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("");
   });
 
   it("sanitizes leading zeros from text input", () => {
     renderComponent({ value: 500 });
-    const input = screen.getByDisplayValue("500");
+    const input = screen.getByRole("textbox");
     fireEvent.change(input, { target: { value: "00700" } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(700);
-    expect(screen.getByDisplayValue("700")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("700");
   });
 
   it("caps text input value at max prop", () => {
     renderComponent({ value: 500000, max: 200000 });
-    const input = screen.getByDisplayValue("200000"); // Initial value is capped
+    const input = screen.getByRole("textbox"); // Initial value is capped
     fireEvent.change(input, { target: { value: "300000" } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(200000); // Should be capped at max
-    expect(screen.getByDisplayValue("200000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("200000");
   });
 
   it("prevents 'e', 'E', '+', '-' keys in text input", () => {
     renderComponent();
-    const input = screen.getByDisplayValue("100000");
+    const input = screen.getByRole("textbox");
     const preventDefault = jest.fn();
 
     fireEvent.keyDown(input, { key: "e", preventDefault });
@@ -119,13 +119,13 @@ describe("SliderInput Component", () => {
     // Simulate onChangeCommitted by directly calling the prop or using fireEvent.change on the input element
     fireEvent.change(slider, { target: { value: 200000 } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(200000);
-    expect(screen.getByDisplayValue("200000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("200000");
   });
 
   // --- Conditional Rendering: showInput ---
   it("hides the text input when showInput is false", () => {
     renderComponent({ showInput: false });
-    expect(screen.queryByDisplayValue("100000")).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(screen.getByRole("slider")).toBeInTheDocument();
   });
 
@@ -142,7 +142,7 @@ describe("SliderInput Component", () => {
     expect(container).toHaveStyle("flex-direction: row"); // This is the outer Stack
     // The internal structure changes, so we need to check for elements' presence
     expect(screen.getByText("Loan Amount")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("100000")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("100000");
     expect(screen.getByRole("slider")).toBeInTheDocument();
   });
 
@@ -192,7 +192,7 @@ describe("SliderInput Component", () => {
     const slider = screen.getByRole("slider");
     expect(slider).toHaveClass("MuiSlider-colorError"); // MUI adds class for color
 
-    const inputWell = screen.getByDisplayValue("150000").closest("div");
+    const inputWell = screen.getByRole("textbox").closest("div");
     expect(inputWell).toHaveStyle(`border-color: ${theme.palette.error.main}`);
   });
 
@@ -201,7 +201,7 @@ describe("SliderInput Component", () => {
     const slider = screen.getByRole("slider");
     expect(slider).toHaveClass("MuiSlider-colorPrimary");
 
-    const inputWell = screen.getByDisplayValue("50000").closest("div");
+    const inputWell = screen.getByRole("textbox").closest("div");
     expect(inputWell).toHaveStyle(`border-color: ${theme.palette.primary.main}`);
   });
 });

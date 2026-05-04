@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import InvestmentCalculator from '../../../src/pages/InvestmentCalculator';
+import InvestmentCalculator from '../../pages/InvestmentCalculator';
 import '@testing-library/jest-dom';
 
 // Mock react-router-dom hooks
@@ -15,44 +15,44 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock lazy-loaded child components
-jest.mock('../../../src/features/investment/tabs/SipCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
+jest.mock('../../features/investment/tabs/SipCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
   <div data-testid="sip-calculator-form">
     SIP Form
     <button onClick={() => onCalculate({ investedAmount: 100, estimatedReturns: 10, totalValue: 110, chartData: [{ month: 1, value: 10 }] })}>Calculate SIP</button>
     <button onClick={() => onSharedStateChange('monthlyInvestment', 1000)}>Change Monthly Investment</button>
   </div>
 ));
-jest.mock('../../../src/features/investment/tabs/LumpsumCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
+jest.mock('../../features/investment/tabs/LumpsumCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
   <div data-testid="lumpsum-calculator-form">
     Lumpsum Form
     <button onClick={() => onCalculate({ investedAmount: 200, estimatedReturns: 20, totalValue: 220, chartData: [{ month: 1, value: 20 }] })}>Calculate Lumpsum</button>
   </div>
 ));
-jest.mock('../../../src/features/investment/tabs/StepUpSipCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
+jest.mock('../../features/investment/tabs/StepUpSipCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
   <div data-testid="step-up-sip-calculator-form">
     Step-Up SIP Form
     <button onClick={() => onCalculate({ investedAmount: 300, estimatedReturns: 30, totalValue: 330, chartData: [{ month: 1, value: 30 }] })}>Calculate Step-Up SIP</button>
   </div>
 ));
-jest.mock('../../../src/features/investment/tabs/SwpCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
+jest.mock('../../features/investment/tabs/SwpCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
   <div data-testid="swp-calculator-form">
     SWP Form
     <button onClick={() => onCalculate({ investedAmount: 400, totalWithdrawn: 40, totalValue: 360, chartData: [{ month: 1, value: 40 }] })}>Calculate SWP</button>
   </div>
 ));
-jest.mock('../../../src/features/investment/tabs/FdCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
+jest.mock('../../features/investment/tabs/FdCalculatorForm', () => ({ onCalculate, sharedState, onSharedStateChange }) => (
   <div data-testid="fd-calculator-form">
     FD Form
     <button onClick={() => onCalculate({ investedAmount: 500, estimatedReturns: 50, totalValue: 550, chartData: [{ month: 1, value: 50 }] })}>Calculate FD</button>
   </div>
 ));
-jest.mock('../../../src/features/investment/components/InvestmentChart', () => ({ data }) => (
+jest.mock('../../features/investment/components/InvestmentChart', () => ({ data }) => (
   <div data-testid="investment-chart">
     Investment Chart
     <span data-testid="chart-data">{JSON.stringify(data)}</span>
   </div>
 ));
-jest.mock('../../../src/components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
+jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 

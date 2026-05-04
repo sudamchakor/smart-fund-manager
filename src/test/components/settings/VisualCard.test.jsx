@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import VisualCard from '../../../src/components/settings/VisualCard';
+import { ThemeProvider, createTheme, alpha } from '@mui/material/styles'; // Import alpha
+import VisualCard from '../../../components/settings/VisualCard';
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons

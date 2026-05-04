@@ -1,11 +1,11 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { DynamicRowModal, SettingsModal } from '../../../src/components/tax/ActionModals';
+import { DynamicRowModal, SettingsModal } from '../../../components/tax/ActionModals';
 import '@testing-library/jest-dom';
 
 // Mock formStyles to prevent issues with actual style objects
-jest.mock('../../../src/styles/formStyles', () => ({
+jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
   getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
 }));

@@ -22,7 +22,7 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 import { useAuth } from '../../hooks/useAuth';
 import { ADMIN_UID } from '../../utils/constants';
 import SuspenseFallback from '../../components/common/SuspenseFallback';
@@ -64,7 +64,10 @@ const AdminArticles = () => {
     try {
       // 1. Fetch Articles
       const artSnap = await getDocs(
-        query(collection(db, 'articles'), orderBy('createdAt', 'desc')),
+        query(
+          collection(getDataBase(), 'articles'),
+          orderBy('createdAt', 'desc'),
+        ),
       );
       const artData = artSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setArticles(artData);
@@ -72,7 +75,7 @@ const AdminArticles = () => {
       // 2. Fetch Comments (Sorted: Unapproved/Pending First, then Newest)
       const comSnap = await getDocs(
         query(
-          collection(db, 'comments'),
+          collection(getDataBase(), 'comments'),
           orderBy('isApproved', 'asc'),
           orderBy('createdAt', 'desc'),
         ),
@@ -102,7 +105,9 @@ const AdminArticles = () => {
 
   const handleApproveComment = async (commentId) => {
     try {
-      await updateDoc(doc(db, 'comments', commentId), { isApproved: true });
+      await updateDoc(doc(getDataBase(), 'comments', commentId), {
+        isApproved: true,
+      });
       setComments(
         comments.map((c) =>
           c.id === commentId ? { ...c, isApproved: true } : c,
@@ -130,7 +135,7 @@ const AdminArticles = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await deleteDoc(doc(db, deleteType, itemToDelete));
+      await deleteDoc(doc(getDataBase(), deleteType, itemToDelete));
       if (deleteType === 'articles') {
         setArticles(articles.filter((a) => a.id !== itemToDelete));
       } else {

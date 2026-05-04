@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Container,
-  LinearProgress,
-  Paper,
-} from '@mui/material';
+import { Box, Container, LinearProgress, Paper } from '@mui/material';
 
 // Firestore
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../firebaseConfig';
+import { getDataBase } from '../../firebaseConfig';
 import SuspenseFallback from '../../components/common/SuspenseFallback';
 
 // New Components
@@ -41,7 +36,7 @@ const SingleArticle = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const docRef = doc(db, 'articles', id);
+        const docRef = doc(getDataBase(), 'articles', id);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
           setArticle({ id: docSnap.id, ...docSnap.data() });
