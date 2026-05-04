@@ -1,25 +1,59 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/fab-logo.ico" />
-    <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/calculator-logo.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/calculator-logo.png" />
-    <meta name="google-site-verification" content="haJPwQnPLD6PUo7msV_LMrLqTYhCA4PAQbegTNNk96U" />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="%PUBLIC_URL%/calculator-logo.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="%PUBLIC_URL%/calculator-logo.png"
+    />
+    <meta
+      name="google-site-verification"
+      content="haJPwQnPLD6PUo7msV_LMrLqTYhCA4PAQbegTNNk96U"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="author" content="Sudam Chakor" />
     <meta name="robots" content="index, follow" />
-    <title>SmartFund Manager - EMI, Tax & Investment Calculator</title>
-    <meta name="description" content="A comprehensive and free financial calculator to quickly calculate your monthly loan installments, plan your taxes, and project investment returns. Plan your finances with ease." />
-    <meta name="keywords" content="EMI Calculator, Loan Calculator, Investment Calculator, Tax Calculator, Financial Planning, Financial Planner, Goal Tracking, Wealth Dashboard, SIP, Lumpsum, SWP, FD, Step-Up SIP, Home Loan, Personal Loan, Credit Card EMI, Loan Repayment, Interest Calculation, React App" />
+    <title>
+      EMI Calculator, Income Tax Planner & SIP Projector | SmartFund Manager
+    </title>
 
+    <meta
+      name="description"
+      content="Free financial tools for India: Calculate Home Loan EMIs, plan Income Tax (New vs Old Regime), and project SIP investment growth. Simple, fast, and accurate."
+    />
+
+    <meta
+      name="keywords"
+      content="EMI Calculator, Income Tax Calculator 2025-26, SIP Calculator India, Loan Repayment Schedule, Financial Planner"
+    />
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://sudamchakor.github.io/smart-fund-manager/" />
-    <meta property="og:title" content="SmartFund Manager - EMI, Tax & Investment Calculator" />
-    <meta property="og:description" content="A comprehensive and free financial calculator to quickly calculate your monthly loan installments, plan your taxes, and project investment returns. Plan your finances with ease." />
-    <meta property="og:image" content="https://sudamchakor.github.io/smart-fund-manager/og-image.png" />
+    <meta
+      property="og:url"
+      content="https://sudamchakor.github.io/smart-fund-manager/"
+    />
+    <meta
+      property="og:title"
+      content="SmartFund Manager - EMI, Tax & Investment Calculator"
+    />
+    <meta
+      property="og:description"
+      content="A comprehensive and free financial calculator to quickly calculate your monthly loan installments, plan your taxes, and project investment returns. Plan your finances with ease."
+    />
+    <meta
+      property="og:image"
+      content="https://sudamchakor.github.io/smart-fund-manager/og-image.png"
+    />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="SmartFund Manager" />
@@ -27,30 +61,63 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:url" content="https://sudamchakor.github.io/smart-fund-manager/" />
-    <meta name="twitter:title" content="SmartFund Manager - EMI, Tax & Investment Calculator" />
-    <meta name="twitter:description" content="A comprehensive and free financial calculator to quickly calculate your monthly loan installments, plan your taxes, and project investment returns. Plan your finances with ease." />
-    <meta name="twitter:image" content="https://sudamchakor.github.io/smart-fund-manager/og-image.png" />
+    <meta
+      name="twitter:url"
+      content="https://sudamchakor.github.io/smart-fund-manager/"
+    />
+    <meta
+      name="twitter:title"
+      content="SmartFund Manager - EMI, Tax & Investment Calculator"
+    />
+    <meta
+      name="twitter:description"
+      content="A comprehensive and free financial calculator to quickly calculate your monthly loan installments, plan your taxes, and project investment returns. Plan your finances with ease."
+    />
+    <meta
+      name="twitter:image"
+      content="https://sudamchakor.github.io/smart-fund-manager/og-image.png"
+    />
 
     <script type="text/javascript">
-      (function(l) {
+      (function (l) {
         if (l.search) {
           var q = {};
-          l.search.slice(1).split('&').forEach(function(v) {
-            var a = v.split('=');
-            q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
-          });
+          l.search
+            .slice(1)
+            .split('&')
+            .forEach(function (v) {
+              var a = v.split('=');
+              q[a[0]] = a.slice(1).join('=').replace(/~and~/g, '&');
+            });
           if (q.p !== undefined) {
-            window.history.replaceState(null, null,
-              l.pathname.slice(0, -1) + (q.p || '') +
-              (q.q ? ('?' + q.q) : '') +
-              l.hash
+            window.history.replaceState(
+              null,
+              null,
+              l.pathname.slice(0, -1) +
+                (q.p || '') +
+                (q.q ? '?' + q.q : '') +
+                l.hash,
             );
           }
         }
-      }(window.location))
+      })(window.location);
     </script>
-    <link rel="preload" href="%PUBLIC_URL%/static/css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="preload"
+      href="%PUBLIC_URL%/static/css/main.css"
+      as="style"
+      onload="
+        this.onload = null;
+        this.rel = 'stylesheet';
+      "
+    />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
