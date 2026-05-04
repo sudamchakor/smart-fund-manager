@@ -7,16 +7,14 @@ import {
   Button,
   Stack,
   IconButton,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  useTheme,
-  useMediaQuery,
   Drawer,
   List,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Divider,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Article as ArticleIcon,
@@ -25,7 +23,7 @@ import {
   Menu as MenuIcon,
   Dashboard as DashboardIcon,
   Add as AddIcon,
-  Home as HomeIcon, // Import HomeIcon
+  Home as HomeIcon,
 } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -37,20 +35,17 @@ const AdminHeader = () => {
   const location = useLocation();
   const { user, logout } = useAuth();
 
-  const [anchorEl, setAnchorEl] = useState(null); // For desktop profile menu
-  const [drawerOpen, setDrawerOpen] = useState(false); // For mobile drawer
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   const handleNavigation = (path) => {
     navigate(path);
-    setAnchorEl(null);
     setDrawerOpen(false);
   };
 
   const handleLogout = () => {
     logout();
-    setAnchorEl(null);
     setDrawerOpen(false);
-    navigate('/'); // Redirect to home page after logout
+    navigate('/admin/login');
   };
 
   return (
@@ -58,7 +53,7 @@ const AdminHeader = () => {
       position="fixed"
       elevation={0}
       sx={{
-        bgcolor: 'primary.dark', // A distinct color for admin header
+        bgcolor: 'primary.dark',
         color: 'primary.contrastText',
         zIndex: theme.zIndex.drawer + 1,
         borderBottom: 1,
@@ -72,14 +67,15 @@ const AdminHeader = () => {
           alignItems="center"
           sx={{ flexGrow: 1 }}
         >
-          {isMobile && (
+          {/* HIDE MOBILE HAMBURGER IF NOT LOGGED IN */}
+          {isMobile && user && (
             <IconButton onClick={() => setDrawerOpen(true)} color="inherit">
               <MenuIcon />
             </IconButton>
           )}
 
           <Box
-            onClick={() => handleNavigation('/admin/articles')}
+            onClick={() => handleNavigation(user ? '/admin/articles' : '/')}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -96,60 +92,32 @@ const AdminHeader = () => {
             </Typography>
           </Box>
 
-          {!isMobile && (
+          {/* HIDE DESKTOP NAV LINKS IF NOT LOGGED IN */}
+          {!isMobile && user && (
             <>
               <Button
                 onClick={() => handleNavigation('/admin/articles')}
-                sx={{
-                  color: 'inherit',
-                  textTransform: 'none',
-                  fontWeight: 'medium',
-                  fontSize: '1rem',
-                  borderRadius: theme.shape.borderRadius,
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
+                sx={{ color: 'inherit', textTransform: 'none' }}
               >
                 Manage Articles
               </Button>
               <Button
                 onClick={() => handleNavigation('/admin/articles/new')}
                 startIcon={<AddIcon />}
-                sx={{
-                  color: 'inherit',
-                  textTransform: 'none',
-                  fontWeight: 'medium',
-                  fontSize: '1rem',
-                  borderRadius: theme.shape.borderRadius,
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
+                sx={{ color: 'inherit', textTransform: 'none' }}
               >
                 Create Article
               </Button>
               <Button
                 onClick={() => handleNavigation('/admin/profile')}
-                sx={{
-                  color: 'inherit',
-                  textTransform: 'none',
-                  fontWeight: 'medium',
-                  fontSize: '1rem',
-                  borderRadius: theme.shape.borderRadius,
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
+                sx={{ color: 'inherit', textTransform: 'none' }}
               >
                 My Author Profile
               </Button>
-              {/* New "Go to App" button for desktop */}
               <Button
                 onClick={() => handleNavigation('/')}
                 startIcon={<HomeIcon />}
-                sx={{
-                  color: 'inherit',
-                  textTransform: 'none',
-                  fontWeight: 'medium',
-                  fontSize: '1rem',
-                  borderRadius: theme.shape.borderRadius,
-                  '&:hover': { bgcolor: 'action.hover' },
-                }}
+                sx={{ color: 'inherit', textTransform: 'none' }}
               >
                 Go to App
               </Button>
@@ -157,117 +125,57 @@ const AdminHeader = () => {
           )}
         </Stack>
 
-        {/* Desktop Logout/Profile Menu */}
+        {/* LOGOUT SECTION */}
         {!isMobile && user && (
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Typography variant="body2" color="inherit">
-              Welcome, {user.displayName || user.email}!
+              {user.displayName || user.email}
             </Typography>
             <Button
               variant="outlined"
               color="inherit"
+              size="small"
               startIcon={<LogoutIcon />}
               onClick={handleLogout}
-              sx={{
-                borderColor: 'primary.light',
-                '&:hover': {
-                  borderColor: 'inherit',
-                  bgcolor: 'action.hover',
-                },
-              }}
             >
               Logout
             </Button>
           </Stack>
         )}
 
-        {/* Mobile Drawer */}
+        {/* DRAWER (Only logic for when user is logged in) */}
         <Drawer
           anchor="left"
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          PaperProps={{ elevation: 0, sx: { width: theme.spacing(35) } }}
+          PaperProps={{ sx: { width: 280 } }}
         >
-          <Box
-            sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-          >
-            <Box
-              sx={{
-                p: theme.spacing(3),
-                bgcolor: 'primary.dark',
-                color: 'primary.contrastText',
-              }}
-            >
-              <Typography variant="h6" sx={{ fontWeight: 'black' }}>
-                Admin Menu
-              </Typography>
-            </Box>
-
-            <List sx={{ p: theme.spacing(1.5) }}>
-              <ListItemButton
-                onClick={() => handleNavigation('/admin/articles')}
-                selected={location.pathname === '/admin/articles'}
-                sx={{ borderRadius: theme.shape.borderRadius, mb: 0.5 }}
-              >
-                <ListItemIcon>
-                  <ArticleIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Manage Articles" />
-              </ListItemButton>
-
-              <ListItemButton
-                onClick={() => handleNavigation('/admin/articles/new')}
-                selected={location.pathname === '/admin/articles/new'}
-                sx={{ borderRadius: theme.shape.borderRadius, mb: 0.5 }}
-              >
-                <ListItemIcon>
-                  <AddIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Create Article" />
-              </ListItemButton>
-
-              <ListItemButton
-                onClick={() => handleNavigation('/admin/profile')}
-                selected={location.pathname === '/admin/profile'}
-                sx={{ borderRadius: theme.shape.borderRadius, mb: 0.5 }}
-              >
-                <ListItemIcon>
-                  <PersonIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Author Profile" />
-              </ListItemButton>
-
-              <Divider sx={{ my: theme.spacing(1) }} />
-
-              {/* New "Go to App" button for mobile drawer */}
-              <ListItemButton
-                onClick={() => handleNavigation('/')}
-                sx={{ borderRadius: theme.shape.borderRadius, mb: 0.5 }}
-              >
-                <ListItemIcon>
-                  <HomeIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary="Go to App" />
-              </ListItemButton>
-
-              <Divider sx={{ my: theme.spacing(1) }} />
-
-              {user && (
-                <ListItemButton
-                  onClick={handleLogout}
-                  sx={{
-                    color: 'primary.main',
-                    borderRadius: theme.shape.borderRadius,
-                  }}
-                >
-                  <ListItemIcon>
-                    <LogoutIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText primary="Logout" />
-                </ListItemButton>
-              )}
-            </List>
+          <Box sx={{ p: 2, bgcolor: 'primary.dark', color: 'white' }}>
+            <Typography variant="h6">Admin Menu</Typography>
           </Box>
+          <List>
+            <ListItemButton onClick={() => handleNavigation('/admin/articles')}>
+              <ListItemIcon>
+                <ArticleIcon />
+              </ListItemIcon>
+              <ListItemText primary="Manage Articles" />
+            </ListItemButton>
+            <ListItemButton
+              onClick={() => handleNavigation('/admin/articles/new')}
+            >
+              <ListItemIcon>
+                <AddIcon />
+              </ListItemIcon>
+              <ListItemText primary="Create Article" />
+            </ListItemButton>
+            <Divider />
+            <ListItemButton onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItemButton>
+          </List>
         </Drawer>
       </Toolbar>
     </AppBar>

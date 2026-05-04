@@ -1,5 +1,5 @@
 import React, { useMemo, useEffect, Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, Box } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -19,8 +19,9 @@ import Header from './components/layout/Header';
 import AdminHeader from './components/layout/AdminHeader';
 import Footer from './components/layout/Footer';
 import SuspenseFallback from './components/common/SuspenseFallback';
-import ErrorBoundary from './components/common/ErrorBoundary'; // Import ErrorBoundary
-import { AuthProvider, useAuth } from './hooks/useAuth';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { useAuth } from './hooks/useAuth';
+import FirebaseWrapper from './components/layout/FirebaseWrapper';
 
 // Lazy Loaded Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -49,7 +50,7 @@ const AdminArticles = lazy(() => import('./pages/admin/AdminArticles'));
 const LoginPage = lazy(() => import('./pages/admin/LoginPage'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 
-// ProtectedRoute component
+// ProtectedRoute component (Now safely inside AuthProvider context)
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
   if (loading) return <SuspenseFallback />;
@@ -65,6 +66,14 @@ const AdminRedirect = () => {
   return <Navigate to="/admin/articles" replace />;
 };
 
+// New Layout Component for Admin that includes the AdminHeader
+const AdminLayout = () => (
+  <>
+    <AdminHeader />
+    <Outlet />
+  </>
+);
+
 const AppContent = () => {
   const themeMode = useSelector(selectThemeMode);
   const designSystem = useSelector(selectDesignSystem);
@@ -72,8 +81,6 @@ const AppContent = () => {
   const location = useLocation();
 
   const isAdminRoute = location.pathname.startsWith('/admin');
-
-  // UX FIX: Check if current route is a Single Article to remove padding/margins
   const isSingleArticle =
     location.pathname.startsWith('/articles/') &&
     location.pathname.split('/').length === 3;
@@ -100,14 +107,14 @@ const AppContent = () => {
           bgcolor: 'background.default',
         }}
       >
-        {isAdminRoute ? <AdminHeader /> : <Header />}
+        {/* We only show the regular Header here. AdminHeader is moved inside the routes below. */}
+        {!isAdminRoute && <Header />}
 
         <Box
           component="main"
           sx={{
             flexGrow: 1,
             width: '100%',
-            // FIX: Zero padding if it's a single article to let image touch header
             pt: isSingleArticle ? 0 : { xs: '100px', md: '120px' },
             pb: { xs: '150px', md: '200px' },
             transition: 'padding 0.3s ease',
@@ -118,7 +125,6 @@ const AppContent = () => {
           <Box
             sx={{
               width: '100%',
-              // FIX: Remove maxWidth and horizontal padding for Single Article edge-to-edge
               maxWidth: isSingleArticle ? '100%' : '1440px',
               mx: 'auto',
               px: isSingleArticle ? 0 : { xs: 2, md: 3 },
@@ -127,10 +133,7 @@ const AppContent = () => {
           >
             <Suspense fallback={<SuspenseFallback />}>
               <Routes>
-                <Route
-                  path="/smart-fund-manager"
-                  element={<Navigate to="/" replace />}
-                />
+                {/* 1. PUBLIC ROUTES (Zero Firebase loaded here) */}
                 <Route path="/" element={<Home />} />
                 <Route path="/calculator" element={<Calculator />} />
                 <Route path="/profile" element={<UserProfile />} />
@@ -143,51 +146,61 @@ const AppContent = () => {
                   path="/personal-loan"
                   element={<PersonalLoanCalculator />}
                 />
-                <Route path="/investment/*" element={<InvestmentCalculator />} />
+                <Route
+                  path="/investment/*"
+                  element={<InvestmentCalculator />}
+                />
                 <Route path="/tax-calculator" element={<TaxCalculator />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-of-service" element={<TermsOfService />} />
                 <Route path="/contact-us" element={<ContactUs />} />
-                <Route path="/admin/login" element={<LoginPage />} />
-                <Route path="/articles" element={<ArticlesArchive />} />
 
-                {/* Single Article Route */}
-                <Route path="/articles/:id" element={<SingleArticle />} />
+                {/* 2. FIREBASE ROUTES (Articles & Admin) */}
+                <Route element={<FirebaseWrapper />}>
+                  {/* Public Article Pages */}
+                  <Route path="/articles" element={<ArticlesArchive />} />
+                  <Route path="/articles/:id" element={<SingleArticle />} />
 
-                <Route path="/admin" element={<AdminRedirect />} />
-                <Route
-                  path="/admin/articles"
-                  element={
-                    <ProtectedRoute>
-                      <AdminArticles />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/articles/new"
-                  element={
-                    <ProtectedRoute>
-                      <WriteArticle />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/articles/edit/:id"
-                  element={
-                    <ProtectedRoute>
-                      <WriteArticle />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/admin/profile"
-                  element={
-                    <ProtectedRoute>
-                      <AdminProfile />
-                    </ProtectedRoute>
-                  }
-                />
+                  {/* Admin Pages (Wrapped in AdminHeader) */}
+                  <Route element={<AdminLayout />}>
+                    <Route path="/admin/login" element={<LoginPage />} />
+                    <Route path="/admin" element={<AdminRedirect />} />
+                    <Route
+                      path="/admin/articles"
+                      element={
+                        <ProtectedRoute>
+                          <AdminArticles />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/articles/new"
+                      element={
+                        <ProtectedRoute>
+                          <WriteArticle />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/articles/edit/:id"
+                      element={
+                        <ProtectedRoute>
+                          <WriteArticle />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/profile"
+                      element={
+                        <ProtectedRoute>
+                          <AdminProfile />
+                        </ProtectedRoute>
+                      }
+                    />
+                  </Route>
+                </Route>
+
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
@@ -205,11 +218,10 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <HelmetProvider>
-            <AuthProvider>
-              <ErrorBoundary>
-                <AppContent />
-              </ErrorBoundary>
-            </AuthProvider>
+            {/* NOTICE: AuthProvider is removed from here and moved to FirebaseWrapper */}
+            <ErrorBoundary>
+              <AppContent />
+            </ErrorBoundary>
           </HelmetProvider>
         </LocalizationProvider>
       </PersistGate>
