@@ -17,8 +17,10 @@ const TaxCalculator = () => {
     currentThemeValue = 'dodgerblue';
   }
 
-  const selectedTheme = themeColors.find((t) => t.value === currentThemeValue) || themeColors[0];
-  const [primary, secondary, background, textPrimary, textSecondary] = selectedTheme.colors;
+  const selectedTheme =
+    themeColors.find((t) => t.value === currentThemeValue) || themeColors[0];
+  const [primary, secondary, background, textPrimary, textSecondary] =
+    selectedTheme.colors;
 
   // Create MUI theme matching the app theme
   const taxTheme = createTheme({

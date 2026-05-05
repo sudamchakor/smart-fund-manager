@@ -27,16 +27,16 @@ const defaultInitialState = {
   loanDetails: {
     homeValue: 5000000,
     marginAmount: 1000000,
-    marginUnit: "Rs", // 'Rs' or '%'
+    marginUnit: 'Rs', // 'Rs' or '%'
     loanInsurance: 0,
     interestRate: 8.5,
     loanTenure: 20,
-    tenureUnit: "years", // 'years' or 'months'
+    tenureUnit: 'years', // 'years' or 'months'
     loanFees: 10000,
-    feesUnit: "Rs", // 'Rs' or '%'
+    feesUnit: 'Rs', // 'Rs' or '%'
     startDate: expect.any(String),
     yearlyPaymentIncreaseAmount: 0,
-    yearlyPaymentIncreaseUnit: "%",
+    yearlyPaymentIncreaseUnit: '%',
   },
   prepayments: {
     monthly: { amount: 0, startDate: expect.any(String) },
@@ -46,20 +46,20 @@ const defaultInitialState = {
   },
   expenses: {
     oneTimeExpenses: 0,
-    oneTimeUnit: "Rs",
+    oneTimeUnit: 'Rs',
     propertyTaxes: 0,
-    taxesUnit: "Rs",
+    taxesUnit: 'Rs',
     homeInsurance: 0,
-    homeInsUnit: "Rs",
+    homeInsUnit: 'Rs',
     maintenance: 0,
   },
   isLoanActive: true,
-  currency: "₹",
-  themeMode: "dodgerblue",
+  currency: '₹',
+  themeMode: 'dodgerblue',
 
   // --- ARCHITECTURAL STATE ---
-  designSystem: "material", // 'material' | 'apple' | 'fluent'
-  visualStyle: "flat",      // 'flat' | 'minimalist' | 'glass' | 'neumorphic'
+  designSystem: 'material', // 'material' | 'apple' | 'fluent'
+  visualStyle: 'flat', // 'flat' | 'minimalist' | 'glass' | 'neumorphic'
 
   autoSave: true,
 };
@@ -73,25 +73,38 @@ describe('emiSlice reducer', () => {
 
   // --- Reducers ---
   it('should handle updateLoanDetails', () => {
-    const actual = emiReducer(undefined, updateLoanDetails({ key: 'homeValue', value: 6000000 }));
+    const actual = emiReducer(
+      undefined,
+      updateLoanDetails({ key: 'homeValue', value: 6000000 }),
+    );
     expect(actual.loanDetails.homeValue).toEqual(6000000);
     expect(actual.isLoanActive).toBe(true); // Should be set to true
   });
 
   it('should handle updateExpenses', () => {
-    const actual = emiReducer(undefined, updateExpenses({ key: 'propertyTaxes', value: 5000 }));
+    const actual = emiReducer(
+      undefined,
+      updateExpenses({ key: 'propertyTaxes', value: 5000 }),
+    );
     expect(actual.expenses.propertyTaxes).toEqual(5000);
   });
 
   it('should handle updatePrepayments', () => {
-    const actual = emiReducer(undefined, updatePrepayments({ type: 'monthly', key: 'amount', value: 1000 }));
+    const actual = emiReducer(
+      undefined,
+      updatePrepayments({ type: 'monthly', key: 'amount', value: 1000 }),
+    );
     expect(actual.prepayments.monthly.amount).toEqual(1000);
   });
 
   it('should handle changeLoanUnit from Rs to %', () => {
     const initialState = {
       ...defaultInitialState,
-      loanDetails: { ...defaultInitialState.loanDetails, marginAmount: 1000000, homeValue: 5000000 },
+      loanDetails: {
+        ...defaultInitialState.loanDetails,
+        marginAmount: 1000000,
+        homeValue: 5000000,
+      },
     };
     const actual = emiReducer(
       initialState,
@@ -109,7 +122,12 @@ describe('emiSlice reducer', () => {
   it('should handle changeLoanUnit from % to Rs', () => {
     const initialState = {
       ...defaultInitialState,
-      loanDetails: { ...defaultInitialState.loanDetails, marginAmount: 20, marginUnit: '%', homeValue: 5000000 },
+      loanDetails: {
+        ...defaultInitialState.loanDetails,
+        marginAmount: 20,
+        marginUnit: '%',
+        homeValue: 5000000,
+      },
     };
     const actual = emiReducer(
       initialState,
@@ -146,7 +164,11 @@ describe('emiSlice reducer', () => {
   it('should handle changeExpenseUnit from % to Rs', () => {
     const initialState = {
       ...defaultInitialState,
-      expenses: { ...defaultInitialState.expenses, propertyTaxes: 1, taxesUnit: '%' },
+      expenses: {
+        ...defaultInitialState.expenses,
+        propertyTaxes: 1,
+        taxesUnit: '%',
+      },
       loanDetails: { ...defaultInitialState.loanDetails, homeValue: 5000000 },
     };
     const actual = emiReducer(
@@ -203,7 +225,10 @@ describe('emiSlice reducer', () => {
       currency: '$', // This should NOT be reset
       themeMode: 'dark', // This should NOT be reset
       loanDetails: { ...defaultInitialState.loanDetails, homeValue: 1000000 },
-      prepayments: { ...defaultInitialState.prepayments, monthly: { amount: 500, startDate: '2023-01-01' } },
+      prepayments: {
+        ...defaultInitialState.prepayments,
+        monthly: { amount: 500, startDate: '2023-01-01' },
+      },
       expenses: { ...defaultInitialState.expenses, oneTimeExpenses: 2000 },
       isLoanActive: false,
     };

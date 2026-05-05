@@ -1,7 +1,12 @@
-import React from "react";
-import { Box, Typography, Stack, useTheme, alpha } from "@mui/material";
+import React from 'react';
+import { Box, Typography, Stack, useTheme, alpha } from '@mui/material';
 
-export default function ChartTooltip({ active, payload, label, valueFormatter }) {
+export default function ChartTooltip({
+  active,
+  payload,
+  label,
+  valueFormatter,
+}) {
   const theme = useTheme();
   if (active && payload && payload.length) {
     return (
@@ -10,16 +15,16 @@ export default function ChartTooltip({ active, payload, label, valueFormatter })
           p: 1.5,
           borderRadius: 2,
           bgcolor: alpha(theme.palette.background.paper, 0.85),
-          backdropFilter: "blur(8px)",
+          backdropFilter: 'blur(8px)',
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || "#000", 0.12)}`,
+          boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || '#000', 0.12)}`,
         }}
       >
         <Typography
           variant="caption"
           sx={{
             fontWeight: 800,
-            display: "block",
+            display: 'block',
             mb: 1,
             borderBottom: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             pb: 0.5,
@@ -29,11 +34,20 @@ export default function ChartTooltip({ active, payload, label, valueFormatter })
         </Typography>
         <Stack spacing={0.5}>
           {payload.map((p) => (
-            <Box key={p.name} sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}>
-              <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary" }}>
+            <Box
+              key={p.name}
+              sx={{ display: 'flex', justifyContent: 'space-between', gap: 3 }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, color: 'text.secondary' }}
+              >
                 {p.name}
               </Typography>
-              <Typography variant="caption" sx={{ fontWeight: 900, color: p.color }}>
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 900, color: p.color }}
+              >
                 {valueFormatter ? valueFormatter(p.value) : p.value}
               </Typography>
             </Box>

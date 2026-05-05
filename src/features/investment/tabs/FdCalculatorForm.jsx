@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -8,11 +8,13 @@ import {
   alpha,
   useTheme,
   Stack,
-} from "@mui/material";
-import { AccountBalance as FdIcon } from "@mui/icons-material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
-import InvestmentSlider, { investmentLabelStyle } from "../../../components/common/InvestmentSlider";
+} from '@mui/material';
+import { AccountBalance as FdIcon } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
+import InvestmentSlider, {
+  investmentLabelStyle,
+} from '../../../components/common/InvestmentSlider';
 
 const FdCalculatorForm = ({
   onCalculate,
@@ -21,14 +23,14 @@ const FdCalculatorForm = ({
 }) => {
   const theme = useTheme();
   // Wire up the global currency setting
-  const currency = useSelector(selectCurrency) || "₹";
+  const currency = useSelector(selectCurrency) || '₹';
 
   // Provide fallbacks in case the plan is newly created
   const {
     principalAmount = 100000,
     interestRate = 7,
     timePeriod = 5,
-    compoundingFrequency = "annually",
+    compoundingFrequency = 'annually',
   } = sharedState || {};
 
   const calculateFd = useCallback(() => {
@@ -39,9 +41,9 @@ const FdCalculatorForm = ({
 
     // Determine compounds per year based on frequency
     let n = 1;
-    if (compoundingFrequency === "quarterly") n = 4;
-    else if (compoundingFrequency === "half-yearly") n = 2;
-    else if (compoundingFrequency === "monthly") n = 12;
+    if (compoundingFrequency === 'quarterly') n = 4;
+    else if (compoundingFrequency === 'half-yearly') n = 2;
+    else if (compoundingFrequency === 'monthly') n = 12;
 
     // Compound Interest Formula: A = P(1 + r/n)^(nt)
     const totalValue = P > 0 && t > 0 ? P * Math.pow(1 + r / n, n * t) : P;
@@ -60,7 +62,7 @@ const FdCalculatorForm = ({
       }
     }
 
-    if (typeof onCalculate === "function") {
+    if (typeof onCalculate === 'function') {
       onCalculate({
         investedAmount: Math.round(P),
         estimatedReturns: Math.round(estimatedReturns),
@@ -86,7 +88,7 @@ const FdCalculatorForm = ({
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
         <FdIcon
           sx={{
-            fontSize: "1rem",
+            fontSize: '1rem',
             color: theme.palette.primary.main,
             opacity: 0.8,
           }}
@@ -95,8 +97,8 @@ const FdCalculatorForm = ({
           variant="caption"
           sx={{
             fontWeight: 900,
-            color: "text.primary",
-            textTransform: "uppercase",
+            color: 'text.primary',
+            textTransform: 'uppercase',
           }}
         >
           Fixed Deposit Parameters
@@ -109,7 +111,7 @@ const FdCalculatorForm = ({
         min={10000}
         max={5000000}
         step={5000}
-        onChange={(val) => onSharedStateChange("principalAmount", val)}
+        onChange={(val) => onSharedStateChange('principalAmount', val)}
         color="primary"
         adornment={currency}
         adornmentPosition="start"
@@ -121,7 +123,7 @@ const FdCalculatorForm = ({
         min={1}
         max={15}
         step={0.1}
-        onChange={(val) => onSharedStateChange("interestRate", val)}
+        onChange={(val) => onSharedStateChange('interestRate', val)}
         color="success"
         adornment="%"
         adornmentPosition="end"
@@ -133,7 +135,7 @@ const FdCalculatorForm = ({
         min={1}
         max={20}
         step={1}
-        onChange={(val) => onSharedStateChange("timePeriod", val)}
+        onChange={(val) => onSharedStateChange('timePeriod', val)}
         color="info"
         adornment="Yr"
         adornmentPosition="end"
@@ -150,19 +152,19 @@ const FdCalculatorForm = ({
               variant="standard"
               value={compoundingFrequency}
               onChange={(e) =>
-                onSharedStateChange("compoundingFrequency", e.target.value)
+                onSharedStateChange('compoundingFrequency', e.target.value)
               }
               disableUnderline
               sx={{
-                width: "100%",
+                width: '100%',
                 fontWeight: 900,
-                fontSize: "0.85rem",
+                fontSize: '0.85rem',
                 bgcolor: alpha(theme.palette.secondary.main, 0.05),
                 color: theme.palette.secondary.main,
                 px: 1.5,
                 py: 0.5,
                 borderRadius: 1,
-                "& .MuiSelect-select": { paddingRight: "24px !important" },
+                '& .MuiSelect-select': { paddingRight: '24px !important' },
               }}
             >
               <MenuItem value="annually">Annually</MenuItem>

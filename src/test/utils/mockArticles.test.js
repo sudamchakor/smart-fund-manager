@@ -10,7 +10,7 @@ describe.skip('mockArticles', () => {
   });
 
   it('each article should have expected properties', () => {
-    mockArticles.forEach(article => {
+    mockArticles.forEach((article) => {
       expect(article).toHaveProperty('id');
       expect(typeof article.id).toBe('string');
       expect(article).toHaveProperty('title');
@@ -29,12 +29,12 @@ describe.skip('mockArticles', () => {
       expect(typeof article.date).toBe('string'); // Assuming date is stored as a string
       expect(article).toHaveProperty('tags');
       expect(Array.isArray(article.tags)).toBe(true);
-      expect(article.tags.every(tag => typeof tag === 'string')).toBe(true);
+      expect(article.tags.every((tag) => typeof tag === 'string')).toBe(true);
     });
   });
 
   it('should have unique article IDs', () => {
-    const ids = mockArticles.map(article => article.id);
+    const ids = mockArticles.map((article) => article.id);
     const uniqueIds = new Set(ids);
     expect(ids.length).toBe(uniqueIds.size);
   });

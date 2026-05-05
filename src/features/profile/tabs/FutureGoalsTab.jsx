@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -17,7 +17,7 @@ import {
   alpha,
   Stack,
   IconButton,
-} from "@mui/material";
+} from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
   Add as AddIcon,
@@ -27,10 +27,10 @@ import {
   AutoGraph as GraphIcon,
   PieChart as PieIcon,
   Close as CloseIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
 // Redux & Selectors
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch } from 'react-redux';
 import {
   selectGoals,
   selectConsiderInflation,
@@ -48,17 +48,17 @@ import {
   selectTotalMonthlyIncome,
   selectTotalMonthlyGoalContributions,
   selectPrioritizedGoalFunding,
-} from "../../../store/profileSlice";
-import { selectCurrency } from "../../../store/emiSlice";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
+} from '../../../store/profileSlice';
+import { selectCurrency } from '../../../store/emiSlice';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
 
 // Components
-import EditableGoalItem from "../../../components/common/EditableGoalItem";
-import GoalForm from "../components/GoalForm";
-import BridgeGapModal from "../components/BridgeGapModal";
-import StyledPaper from "../../../components/common/StyledPaper";
-import SectionHeader from "../../../components/common/SectionHeader";
-import ActionSpeedDial from "../../../components/common/ActionSpeedDial";
+import EditableGoalItem from '../../../components/common/EditableGoalItem';
+import GoalForm from '../components/GoalForm';
+import BridgeGapModal from '../components/BridgeGapModal';
+import StyledPaper from '../../../components/common/StyledPaper';
+import SectionHeader from '../../../components/common/SectionHeader';
+import ActionSpeedDial from '../../../components/common/ActionSpeedDial';
 
 // Charts
 import {
@@ -73,7 +73,7 @@ import {
   BarChart,
   Bar,
   Line,
-} from "recharts";
+} from 'recharts';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -82,7 +82,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export default function FutureGoalsTab({ goalToEditId }) {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const isMediumScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const isMediumScreen = useMediaQuery(theme.breakpoints.down('md'));
   const currency = useSelector(selectCurrency);
 
   // Redux State
@@ -96,11 +96,11 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const educationInflationRate = useSelector(selectEducationInflationRate) || 0;
   const careerGrowthRaw = useSelector(selectCareerGrowthRate);
   const careerGrowthRate =
-    typeof careerGrowthRaw === "object"
+    typeof careerGrowthRaw === 'object'
       ? careerGrowthRaw.value
       : careerGrowthRaw || 0;
   const careerGrowthType =
-    typeof careerGrowthRaw === "object" ? careerGrowthRaw.type : "percentage";
+    typeof careerGrowthRaw === 'object' ? careerGrowthRaw.type : 'percentage';
   const totalMonthlyIncome = useSelector(selectTotalMonthlyIncome) || 0;
   const currentSurplus = useSelector(selectCurrentSurplus) || 0;
   const totalMonthlyGoalContributions =
@@ -111,7 +111,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const [realValueToggle, setRealValueToggle] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
-  const [modalTitle, setModalTitle] = useState("Add New Goal");
+  const [modalTitle, setModalTitle] = useState('Add New Goal');
   const [currentGoalFormData, setCurrentGoalFormData] = useState(null);
   const [bridgeGapModalOpen, setBridgeGapModalOpen] = useState(false);
   const [selectedGoalForGap, setSelectedGoalForGap] = useState(null);
@@ -131,7 +131,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
     if (!currentGoalFormData) return;
     const finalGoal = {
       ...currentGoalFormData,
-      category: currentGoalFormData.category || "general",
+      category: currentGoalFormData.category || 'general',
     };
     if (editingGoal && editingGoal.id) {
       dispatch(updateGoal({ ...finalGoal, id: editingGoal.id }));
@@ -151,14 +151,14 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const handleOpenModalForNew = useCallback(() => {
     setEditingGoal(null);
     setCurrentGoalFormData({
-      name: "",
+      name: '',
       targetAmount: 0,
       startYear: currentYear,
       targetYear: currentYear + 5,
-      category: "general",
+      category: 'general',
       investmentPlans: [],
     });
-    setModalTitle("Add New Goal");
+    setModalTitle('Add New Goal');
     setOpenModal(true);
   }, [currentYear]);
 
@@ -181,21 +181,21 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const applyRetirementGoal = useCallback(() => {
     const yearsToRetirement = retirementAge - currentAge;
     const monthlyBasicExpenses = profileExpenses
-      .filter((e) => e.category === "basic")
+      .filter((e) => e.category === 'basic')
       .reduce((sum, e) => sum + e.amount, 0);
     let targetAmount = Math.round((monthlyBasicExpenses * 12) / 0.04);
     if (considerInflation && yearsToRetirement > 0) {
       targetAmount *= Math.pow(1 + generalInflationRate, yearsToRetirement);
     }
     setCurrentGoalFormData({
-      name: "Retirement",
+      name: 'Retirement',
       targetAmount,
       startYear: currentYear,
       targetYear: currentYear + (yearsToRetirement > 0 ? yearsToRetirement : 1),
-      category: "retirement",
+      category: 'retirement',
       investmentPlans: [],
     });
-    setModalTitle("Add Retirement Goal");
+    setModalTitle('Add Retirement Goal');
     setOpenModal(true);
   }, [
     retirementAge,
@@ -216,10 +216,10 @@ export default function FutureGoalsTab({ goalToEditId }) {
       targetAmount: Math.round(targetAmount),
       startYear: currentYear,
       targetYear: currentYear + yearsToCollege,
-      category: "education",
+      category: 'education',
       investmentPlans: [],
     });
-    setModalTitle("Add Higher Education Goal");
+    setModalTitle('Add Higher Education Goal');
     setOpenModal(true);
   }, [considerInflation, educationInflationRate, currentYear]);
 
@@ -229,21 +229,21 @@ export default function FutureGoalsTab({ goalToEditId }) {
       monthlyEmi +
       totalMonthlyGoalContributions;
     setCurrentGoalFormData({
-      name: "Emergency Fund",
+      name: 'Emergency Fund',
       targetAmount: Math.round(totalOutflow * 6),
       startYear: currentYear,
       targetYear: currentYear + 1,
-      category: "safety",
+      category: 'safety',
       investmentPlans: [],
     });
-    setModalTitle("Add Emergency Fund Goal");
+    setModalTitle('Add Emergency Fund Goal');
     setOpenModal(true);
   }, [profileExpenses, monthlyEmi, totalMonthlyGoalContributions, currentYear]);
 
   const actions = [
     {
       icon: <HealthAndSafetyIcon />,
-      name: "Emergency Fund",
+      name: 'Emergency Fund',
       handler: applyEmergencyFundGoal,
     },
     {
@@ -253,12 +253,12 @@ export default function FutureGoalsTab({ goalToEditId }) {
     },
     {
       icon: <TrendingUpIcon />,
-      name: "Retirement",
+      name: 'Retirement',
       handler: applyRetirementGoal,
     },
     {
       icon: <AddIcon />,
-      name: "New Custom Goal",
+      name: 'New Custom Goal',
       handler: handleOpenModalForNew,
     },
   ];
@@ -284,7 +284,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
       const yearsFromNow = year - currentYear;
       if (yearsFromNow > 0) {
         currentMonthlyIncome *=
-          1 + (careerGrowthType === "percentage" ? careerGrowthRate : 0);
+          1 + (careerGrowthType === 'percentage' ? careerGrowthRate : 0);
       }
       const annualSurplus =
         (currentMonthlyIncome -
@@ -303,7 +303,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
           if (considerInflation)
             target *= Math.pow(
               1 +
-                (g.category === "education"
+                (g.category === 'education'
                   ? educationInflationRate
                   : generalInflationRate),
               yearsFromNow,
@@ -315,8 +315,8 @@ export default function FutureGoalsTab({ goalToEditId }) {
 
       data.push({
         year,
-        "Total Wealth": Math.round(displayWealth),
-        "Goals Target":
+        'Total Wealth': Math.round(displayWealth),
+        'Goals Target':
           totalGoalsThisYear > 0 ? Math.round(totalGoalsThisYear) : null,
       });
     }
@@ -339,7 +339,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
 
   const breakEvenYear = useMemo(() => {
     const point = wealthData.find(
-      (d) => d["Total Wealth"] >= d["Goals Target"],
+      (d) => d['Total Wealth'] >= d['Goals Target'],
     );
     return point ? point.year : null;
   }, [wealthData]);
@@ -517,11 +517,11 @@ export default function FutureGoalsTab({ goalToEditId }) {
                   />
                   <RechartsTooltip
                     contentStyle={{
-                      borderRadius: "12px",
-                      border: "none",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
-                      backdropFilter: "blur(8px)",
-                      backgroundColor: alpha("#fff", 0.8),
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
+                      backdropFilter: 'blur(8px)',
+                      backgroundColor: alpha('#fff', 0.8),
                     }}
                   />
                   <Area
@@ -543,9 +543,9 @@ export default function FutureGoalsTab({ goalToEditId }) {
                       stroke="green"
                       strokeDasharray="3 3"
                       label={{
-                        value: "Breakeven",
-                        position: "top",
-                        fill: "green",
+                        value: 'Breakeven',
+                        position: 'top',
+                        fill: 'green',
                         fontWeight: 800,
                       }}
                     />
@@ -587,9 +587,9 @@ export default function FutureGoalsTab({ goalToEditId }) {
                   />
                   <RechartsTooltip
                     contentStyle={{
-                      borderRadius: "12px",
-                      border: "none",
-                      boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
                     }}
                   />
                   <Bar
@@ -604,7 +604,7 @@ export default function FutureGoalsTab({ goalToEditId }) {
         </Stack>
       </Grid>
 
-      {isMediumScreen && !openModal&& (
+      {isMediumScreen && !openModal && (
         <ActionSpeedDial
           actions={actions}
           sx={{
@@ -619,17 +619,17 @@ export default function FutureGoalsTab({ goalToEditId }) {
         onClose={handleCloseModal}
         fullScreen
         TransitionComponent={Transition}
-        sx={{ mt: "5rem" }}
+        sx={{ mt: '5rem' }}
       >
         <DialogTitle
           sx={{
             fontWeight: 900,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
         >
-          {modalTitle}{" "}
+          {modalTitle}{' '}
           <IconButton onClick={handleCloseModal}>
             <CloseIcon />
           </IconButton>

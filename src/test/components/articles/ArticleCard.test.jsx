@@ -27,7 +27,9 @@ jest.mock('../../../utils/articleCategories', () => ({
     Tech: () => <svg data-testid="TechIcon" />,
   },
 }));
-jest.mock('@mui/icons-material/Image', () => (props) => <svg data-testid="ImageIcon" {...props} />);
+jest.mock('@mui/icons-material/Image', () => (props) => (
+  <svg data-testid="ImageIcon" {...props} />
+));
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -48,7 +50,7 @@ describe('ArticleCard Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <ArticleCard article={articleProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -61,23 +63,36 @@ describe('ArticleCard Component', () => {
     renderComponent();
     expect(screen.getByText('Finance')).toBeInTheDocument();
     expect(screen.getByText('The Future of Finance')).toBeInTheDocument();
-    expect(screen.getByText('A brief summary of the article content.')).toBeInTheDocument();
+    expect(
+      screen.getByText('A brief summary of the article content.'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Created: 1/15/2023')).toBeInTheDocument();
     expect(screen.getByText('Updated: 1/16/2023')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Read More' })).toHaveAttribute('href', '/articles/1');
+    expect(screen.getByRole('link', { name: 'Read More' })).toHaveAttribute(
+      'href',
+      '/articles/1',
+    );
     expect(screen.queryByTestId('ImageIcon')).not.toBeInTheDocument(); // Should use image
     expect(screen.queryByTestId('FinanceIcon')).not.toBeInTheDocument(); // Should use image
   });
 
   it('renders category icon when no imageUrl is provided', () => {
-    const articleWithoutImage = { ...mockArticle, imageUrl: '', category: 'Finance' };
+    const articleWithoutImage = {
+      ...mockArticle,
+      imageUrl: '',
+      category: 'Finance',
+    };
     renderComponent(articleWithoutImage);
     expect(screen.getByTestId('FinanceIcon')).toBeInTheDocument();
     expect(screen.queryByTestId('ImageIcon')).not.toBeInTheDocument(); // Should use category icon
   });
 
   it('renders fallback ImageIcon when no imageUrl and unknown category', () => {
-    const articleWithoutImage = { ...mockArticle, imageUrl: '', category: 'Unknown' };
+    const articleWithoutImage = {
+      ...mockArticle,
+      imageUrl: '',
+      category: 'Unknown',
+    };
     renderComponent(articleWithoutImage);
     expect(screen.getByTestId('ImageIcon')).toBeInTheDocument();
     expect(screen.queryByTestId('FinanceIcon')).not.toBeInTheDocument(); // Should use fallback
@@ -123,21 +138,33 @@ describe('ArticleCard Component', () => {
   });
 
   it('handles missing createdAt and updatedAt gracefully', () => {
-    const articleWithoutDates = { ...mockArticle, createdAt: undefined, updatedAt: undefined };
+    const articleWithoutDates = {
+      ...mockArticle,
+      createdAt: undefined,
+      updatedAt: undefined,
+    };
     renderComponent(articleWithoutDates);
     expect(screen.queryByText('Created:')).not.toBeInTheDocument();
     expect(screen.queryByText('Updated:')).not.toBeInTheDocument();
   });
 
   it('handles null createdAt and updatedAt gracefully', () => {
-    const articleWithNullDates = { ...mockArticle, createdAt: null, updatedAt: null };
+    const articleWithNullDates = {
+      ...mockArticle,
+      createdAt: null,
+      updatedAt: null,
+    };
     renderComponent(articleWithNullDates);
     expect(screen.queryByText('Created:')).not.toBeInTheDocument();
     expect(screen.queryByText('Updated:')).not.toBeInTheDocument();
   });
 
   it('handles invalid date strings for createdAt and updatedAt', () => {
-    const articleWithInvalidDates = { ...mockArticle, createdAt: 'invalid-date', updatedAt: 'another-invalid-date' };
+    const articleWithInvalidDates = {
+      ...mockArticle,
+      createdAt: 'invalid-date',
+      updatedAt: 'another-invalid-date',
+    };
     renderComponent(articleWithInvalidDates);
     expect(screen.getByText('Created: Invalid Date')).toBeInTheDocument();
     expect(screen.getByText('Updated: Invalid Date')).toBeInTheDocument();
@@ -146,6 +173,9 @@ describe('ArticleCard Component', () => {
   it('renders without crashing if article prop is empty (though prop-types should prevent this)', () => {
     const emptyArticle = { id: '3', title: '', excerpt: '' }; // Minimum required to not crash
     renderComponent(emptyArticle);
-    expect(screen.getByRole('link', { name: 'Read More' })).toHaveAttribute('href', '/articles/3');
+    expect(screen.getByRole('link', { name: 'Read More' })).toHaveAttribute(
+      'href',
+      '/articles/3',
+    );
   });
 });

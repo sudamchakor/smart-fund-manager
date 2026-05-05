@@ -3,12 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import AdminArticles from '../../../../src/pages/admin/AdminArticles';
 import '@testing-library/jest-dom';
-import {
-  collection,
-  getDocs,
-  doc,
-  deleteDoc,
-} from 'firebase/firestore';
+import { collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
 
 // Mock react-router-dom's Link and useNavigate
 const mockNavigate = jest.fn();
@@ -52,17 +47,24 @@ jest.mock('../../../../src/utils/formatting', () => ({
 }));
 
 // Mock PageHeader
-jest.mock('../../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
-  <div data-testid="mock-page-header">
-    <h1>{title}</h1>
-    <p>{subtitle}</p>
-    {Icon && <Icon data-testid="mock-header-icon" />}
-  </div>
-));
+jest.mock(
+  '../../../../src/components/common/PageHeader',
+  () =>
+    ({ title, subtitle, icon: Icon }) => (
+      <div data-testid="mock-page-header">
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+        {Icon && <Icon data-testid="mock-header-icon" />}
+      </div>
+    ),
+);
 
 describe('AdminArticles Component', () => {
   const mockAdminUser = { uid: 'admin-uid-123', displayName: 'Admin User' };
-  const mockNonAdminUser = { uid: 'non-admin-uid', displayName: 'Regular User' };
+  const mockNonAdminUser = {
+    uid: 'non-admin-uid',
+    displayName: 'Regular User',
+  };
 
   const mockArticlesData = [
     {
@@ -88,7 +90,7 @@ describe('AdminArticles Component', () => {
     return render(
       <Router>
         <AdminArticles />
-      </Router>
+      </Router>,
     );
   };
 
@@ -132,7 +134,11 @@ describe('AdminArticles Component', () => {
     await waitFor(() => {
       expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
       expect(screen.getByText('Manage Articles')).toBeInTheDocument();
-      expect(screen.getByText('View, edit, and delete your published and drafted articles.')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'View, edit, and delete your published and drafted articles.',
+        ),
+      ).toBeInTheDocument();
       expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // ArticleIcon
     });
   });
@@ -178,9 +184,17 @@ describe('AdminArticles Component', () => {
     renderComponent();
     await waitFor(() => {
       fireEvent.click(screen.getAllByLabelText('delete')[0]);
-      expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this article?');
-      expect(deleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', '1');
-      expect(window.alert).toHaveBeenCalledWith('Article deleted successfully!');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete this article?',
+      );
+      expect(deleteDoc).toHaveBeenCalledWith(
+        expect.any(Object),
+        'articles',
+        '1',
+      );
+      expect(window.alert).toHaveBeenCalledWith(
+        'Article deleted successfully!',
+      );
       // Re-fetch is triggered, so the article should disappear from the list
       expect(screen.queryByText('Article One')).not.toBeInTheDocument();
     });
@@ -209,17 +223,19 @@ describe('AdminArticles Component', () => {
 
   it('formats string dates correctly', async () => {
     getDocs.mockResolvedValueOnce({
-      docs: [{
-        id: '3',
-        data: () => ({
+      docs: [
+        {
           id: '3',
-          title: 'Article Three',
-          category: 'Finance',
-          authorName: 'Admin User',
-          createdAt: '2023-03-01T00:00:00Z',
-          updatedAt: '2023-03-02T00:00:00Z',
-        }),
-      }],
+          data: () => ({
+            id: '3',
+            title: 'Article Three',
+            category: 'Finance',
+            authorName: 'Admin User',
+            createdAt: '2023-03-01T00:00:00Z',
+            updatedAt: '2023-03-02T00:00:00Z',
+          }),
+        },
+      ],
     });
     renderComponent();
     await waitFor(() => {
@@ -239,7 +255,9 @@ describe('AdminArticles Component', () => {
   it('does not show "Add New Article" button for non-admin users', async () => {
     renderComponent(false, mockNonAdminUser);
     await waitFor(() => {
-      expect(screen.queryByRole('link', { name: 'Add New Article' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Add New Article' }),
+      ).not.toBeInTheDocument();
     });
   });
 

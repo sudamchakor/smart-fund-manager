@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -7,17 +7,17 @@ import {
   alpha,
   Stack,
   Divider,
-} from "@mui/material";
-import { Payments as LoanIcon } from "@mui/icons-material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../store/emiSlice"; // Assumes you have this based on previous files
-import PageHeader from "../components/common/PageHeader";
-import InputSlider from "../components/common/InputSlider";
-import LoanSummaryTerminal from "../components/common/LoanSummaryTerminal";
+} from '@mui/material';
+import { Payments as LoanIcon } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../store/emiSlice'; // Assumes you have this based on previous files
+import PageHeader from '../components/common/PageHeader';
+import InputSlider from '../components/common/InputSlider';
+import LoanSummaryTerminal from '../components/common/LoanSummaryTerminal';
 
 const PersonalLoanCalculator = () => {
   const theme = useTheme();
-  const currency = useSelector(selectCurrency) || "₹";
+  const currency = useSelector(selectCurrency) || '₹';
 
   const [loanAmount, setLoanAmount] = useState(500000);
   const [interestRate, setInterestRate] = useState(10.5);
@@ -63,11 +63,11 @@ const PersonalLoanCalculator = () => {
       sx={{
         p: { xs: 2, md: 4 },
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
-        mx: "auto",
+        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
+        mx: 'auto',
       }}
     >
       <PageHeader
@@ -130,9 +130,9 @@ const PersonalLoanCalculator = () => {
               sx={{
                 mt: 4,
                 height: 120,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 borderRadius: 2,
                 border: `1px dashed ${alpha(theme.palette.divider, 0.2)}`,
                 bgcolor: alpha(theme.palette.background.default, 0.5),
@@ -142,8 +142,8 @@ const PersonalLoanCalculator = () => {
                 variant="caption"
                 sx={{
                   fontWeight: 700,
-                  color: "text.disabled",
-                  textTransform: "uppercase",
+                  color: 'text.disabled',
+                  textTransform: 'uppercase',
                   letterSpacing: 1,
                 }}
               >

@@ -20,8 +20,7 @@ import AdminHeader from './components/layout/AdminHeader';
 import Footer from './components/layout/Footer';
 import SuspenseFallback from './components/common/SuspenseFallback';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import { useAuth } from './hooks/useAuth';
-import FirebaseWrapper from './components/layout/FirebaseWrapper';
+import { useAuth } from './hooks/useAuth'; // Keep useAuth for ProtectedRoute and AdminRedirect
 
 // Lazy Loaded Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -49,6 +48,11 @@ const WriteArticle = lazy(() => import('./pages/admin/WriteArticle'));
 const AdminArticles = lazy(() => import('./pages/admin/AdminArticles'));
 const LoginPage = lazy(() => import('./pages/admin/LoginPage'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
+
+// Lazy Load FirebaseWrapper
+const FirebaseWrapper = lazy(
+  () => import('./components/layout/FirebaseWrapper'),
+);
 
 // ProtectedRoute component (Now safely inside AuthProvider context)
 const ProtectedRoute = ({ children }) => {
@@ -157,7 +161,14 @@ const AppContent = () => {
                 <Route path="/contact-us" element={<ContactUs />} />
 
                 {/* 2. FIREBASE ROUTES (Articles & Admin) */}
-                <Route element={<FirebaseWrapper />}>
+                {/* Wrap FirebaseWrapper with Suspense to lazy load it */}
+                <Route
+                  element={
+                    <Suspense fallback={<SuspenseFallback />}>
+                      <FirebaseWrapper />
+                    </Suspense>
+                  }
+                >
                   {/* Public Article Pages */}
                   <Route path="/articles" element={<ArticlesArchive />} />
                   <Route path="/articles/:id" element={<SingleArticle />} />
@@ -218,7 +229,6 @@ export default function App() {
       <PersistGate loading={null} persistor={persistor}>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <HelmetProvider>
-            {/* NOTICE: AuthProvider is removed from here and moved to FirebaseWrapper */}
             <ErrorBoundary>
               <AppContent />
             </ErrorBoundary>

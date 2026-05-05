@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -11,12 +11,12 @@ import {
   Stack,
   useTheme,
   alpha,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DeleteOutline as DeleteIcon,
   FlagCircle as GoalIcon,
-} from "@mui/icons-material";
-import GoalForm from "../../components/GoalForm";
+} from '@mui/icons-material';
+import GoalForm from '../../components/GoalForm';
 
 export default function CapitalGoals({
   goalsList,
@@ -36,13 +36,13 @@ export default function CapitalGoals({
   return (
     <Box sx={{ mt: 3 }}>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <GoalIcon sx={{ fontSize: "1.2rem", color: "info.main" }} />
+        <GoalIcon sx={{ fontSize: '1.2rem', color: 'info.main' }} />
         <Typography
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "info.main",
+            textTransform: 'uppercase',
+            color: 'info.main',
           }}
         >
           Future Capital Goals
@@ -93,15 +93,12 @@ export default function CapitalGoals({
               sx={{
                 p: 2,
                 borderRadius: 2,
-                cursor: "pointer",
-                textAlign: "center",
+                cursor: 'pointer',
+                textAlign: 'center',
                 bgcolor: alpha(theme.palette.primary.main, 0.05),
-                border: `1px solid ${alpha(
-                  theme.palette.primary.main,
-                  0.2
-                )}`,
-                transition: "all 0.2s",
-                "&:hover": {
+                border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
+                transition: 'all 0.2s',
+                '&:hover': {
                   bgcolor: alpha(theme.palette.primary.main, 0.1),
                 },
               }}
@@ -111,7 +108,7 @@ export default function CapitalGoals({
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ fontWeight: 800, display: "block" }}
+                sx={{ fontWeight: 800, display: 'block' }}
               >
                 Retirement
               </Typography>
@@ -123,12 +120,12 @@ export default function CapitalGoals({
               sx={{
                 p: 2,
                 borderRadius: 2,
-                cursor: "pointer",
-                textAlign: "center",
+                cursor: 'pointer',
+                textAlign: 'center',
                 bgcolor: alpha(theme.palette.info.main, 0.05),
                 border: `1px solid ${alpha(theme.palette.info.main, 0.2)}`,
-                transition: "all 0.2s",
-                "&:hover": {
+                transition: 'all 0.2s',
+                '&:hover': {
                   bgcolor: alpha(theme.palette.info.main, 0.1),
                 },
               }}
@@ -138,7 +135,7 @@ export default function CapitalGoals({
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ fontWeight: 800, display: "block" }}
+                sx={{ fontWeight: 800, display: 'block' }}
               >
                 Education
               </Typography>
@@ -150,12 +147,12 @@ export default function CapitalGoals({
               sx={{
                 p: 2,
                 borderRadius: 2,
-                cursor: "pointer",
-                textAlign: "center",
+                cursor: 'pointer',
+                textAlign: 'center',
                 bgcolor: alpha(theme.palette.error.main, 0.05),
                 border: `1px solid ${alpha(theme.palette.error.main, 0.2)}`,
-                transition: "all 0.2s",
-                "&:hover": {
+                transition: 'all 0.2s',
+                '&:hover': {
                   bgcolor: alpha(theme.palette.error.main, 0.1),
                 },
               }}
@@ -165,7 +162,7 @@ export default function CapitalGoals({
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ fontWeight: 800, display: "block" }}
+                sx={{ fontWeight: 800, display: 'block' }}
               >
                 Safety Net
               </Typography>
@@ -176,20 +173,20 @@ export default function CapitalGoals({
               onClick={() => setShowCustomGoalForm(true)}
               sx={{
                 p: 2,
-                height: "100%",
+                height: '100%',
                 borderRadius: 2,
-                cursor: "pointer",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 bgcolor: alpha(theme.palette.secondary.main, 0.1),
                 border: `1px dashed ${alpha(
                   theme.palette.secondary.main,
-                  0.4
+                  0.4,
                 )}`,
-                transition: "all 0.2s",
-                "&:hover": {
+                transition: 'all 0.2s',
+                '&:hover': {
                   bgcolor: alpha(theme.palette.secondary.main, 0.15),
                 },
               }}
@@ -198,8 +195,8 @@ export default function CapitalGoals({
                 variant="caption"
                 sx={{
                   fontWeight: 900,
-                  color: "secondary.main",
-                  textTransform: "uppercase",
+                  color: 'secondary.main',
+                  textTransform: 'uppercase',
                 }}
               >
                 + Custom
@@ -217,7 +214,7 @@ export default function CapitalGoals({
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             borderRadius: 2,
             maxHeight: 200,
-            overflow: "auto",
+            overflow: 'auto',
           }}
         >
           {goalsList.map((goal, index) => (
@@ -240,7 +237,7 @@ export default function CapitalGoals({
                   <Typography sx={{ fontWeight: 800 }}>{goal.name}</Typography>
                 }
                 secondary={`Target Corpus: ₹${goal.targetAmount.toLocaleString(
-                  "en-IN"
+                  'en-IN',
                 )}`}
               />
             </ListItem>

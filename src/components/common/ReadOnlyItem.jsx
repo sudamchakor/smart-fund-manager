@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Box,
   Typography,
@@ -14,11 +14,11 @@ import {
   Button,
   useTheme,
   alpha,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+} from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 export default function ReadOnlyItem({
   item,
@@ -92,9 +92,7 @@ export default function ReadOnlyItem({
   };
 
   const taxSaved =
-    isExpense && item.isTaxDeductible && taxRate
-      ? item.amount * taxRate
-      : 0;
+    isExpense && item.isTaxDeductible && taxRate ? item.amount * taxRate : 0;
   const netCost = isExpense && taxSaved > 0 ? item.amount - taxSaved : null;
 
   return (
@@ -103,29 +101,25 @@ export default function ReadOnlyItem({
         p: 1.5,
         borderRadius: 2,
         bgcolor: theme.palette.background.paper,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         borderLeft: `4px solid ${itemColor}`,
-        transition: "all 0.2s ease-in-out",
-        "&:hover": { 
-          boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || "#000", 0.08)}`,
-          bgcolor: alpha(theme.palette.action.hover, 0.04) 
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || '#000', 0.08)}`,
+          bgcolor: alpha(theme.palette.action.hover, 0.04),
         },
-        cursor: onClick ? "pointer" : "default",
+        cursor: onClick ? 'pointer' : 'default',
       }}
       onClick={onClick}
     >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
+      <Stack direction="row" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography
             variant="subtitle2"
             sx={{
               fontWeight: 800,
-              color: "text.primary",
+              color: 'text.primary',
             }}
           >
             {item.name}
@@ -142,7 +136,7 @@ export default function ReadOnlyItem({
               sx={{
                 bgcolor: alpha(theme.palette.divider, 0.1),
                 fontWeight: 600,
-                fontSize: "0.7rem",
+                fontSize: '0.7rem',
               }}
             />
           )}
@@ -151,9 +145,9 @@ export default function ReadOnlyItem({
               size="small"
               onClick={handleEditClick}
               sx={{
-                color: "primary.main",
+                color: 'primary.main',
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
-                "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
               }}
             >
               <EditIcon fontSize="small" />
@@ -164,9 +158,9 @@ export default function ReadOnlyItem({
               size="small"
               onClick={handleEditGoalClick}
               sx={{
-                color: "primary.main",
+                color: 'primary.main',
                 bgcolor: alpha(theme.palette.primary.main, 0.1),
-                "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
               }}
             >
               <EditIcon fontSize="small" />
@@ -177,9 +171,9 @@ export default function ReadOnlyItem({
               size="small"
               onClick={handleDeleteActionClick}
               sx={{
-                color: "error.main",
+                color: 'error.main',
                 bgcolor: alpha(theme.palette.error.main, 0.1),
-                "&:hover": { bgcolor: alpha(theme.palette.error.main, 0.2) },
+                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.2) },
               }}
             >
               <DeleteIcon fontSize="small" />
@@ -190,9 +184,9 @@ export default function ReadOnlyItem({
               size="small"
               onClick={handleToggleSubItems}
               sx={{
-                color: "text.secondary",
+                color: 'text.secondary',
                 bgcolor: alpha(theme.palette.divider, 0.05),
-                "&:hover": { bgcolor: alpha(theme.palette.divider, 0.1) },
+                '&:hover': { bgcolor: alpha(theme.palette.divider, 0.1) },
               }}
             >
               {showSubItems ? (
@@ -224,16 +218,17 @@ export default function ReadOnlyItem({
       )}
 
       {showSubItems && subItems && subItems.length > 0 && (
-        <Box 
-          sx={{ 
-            mt: 1.5, 
-            pl: 2, 
-            borderLeft: "2px solid", 
+        <Box
+          sx={{
+            mt: 1.5,
+            pl: 2,
+            borderLeft: '2px solid',
             borderColor: alpha(theme.palette.divider, 0.1),
-            display: "flex",
-            flexDirection: "column",
-            gap: 1.5 
-          }}>
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+          }}
+        >
           {subItems.map((sub, index) => (
             <ReadOnlyItem
               key={sub.id || index}
@@ -258,7 +253,7 @@ export default function ReadOnlyItem({
           PaperProps={{
             sx: {
               borderRadius: 3,
-              boxShadow: `0 24px 64px ${alpha(theme.palette.common.black || "#000", 0.2)}`,
+              boxShadow: `0 24px 64px ${alpha(theme.palette.common.black || '#000', 0.2)}`,
             },
           }}
         >
@@ -266,16 +261,28 @@ export default function ReadOnlyItem({
             Confirm Deletion
           </DialogTitle>
           <DialogContent>
-            <DialogContentText id="alert-dialog-description" sx={{ fontWeight: 600, color: "text.secondary" }}>
+            <DialogContentText
+              id="alert-dialog-description"
+              sx={{ fontWeight: 600, color: 'text.secondary' }}
+            >
               {deletionImpactMessage ||
-                "Are you sure you want to delete this item?"}
+                'Are you sure you want to delete this item?'}
             </DialogContentText>
           </DialogContent>
           <DialogActions sx={{ p: 2 }}>
-            <Button onClick={() => handleConfirmClose(false)} sx={{ fontWeight: 700, color: "text.secondary" }}>
+            <Button
+              onClick={() => handleConfirmClose(false)}
+              sx={{ fontWeight: 700, color: 'text.secondary' }}
+            >
               Cancel
             </Button>
-            <Button onClick={() => handleConfirmClose(true)} autoFocus variant="contained" color="error" sx={{ fontWeight: 800, px: 3, borderRadius: 2 }}>
+            <Button
+              onClick={() => handleConfirmClose(true)}
+              autoFocus
+              variant="contained"
+              color="error"
+              sx={{ fontWeight: 800, px: 3, borderRadius: 2 }}
+            >
               Confirm
             </Button>
           </DialogActions>

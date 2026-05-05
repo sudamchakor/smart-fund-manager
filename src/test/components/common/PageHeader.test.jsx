@@ -13,7 +13,7 @@ describe('PageHeader Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <PageHeader {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -33,13 +33,19 @@ describe('PageHeader Component', () => {
   });
 
   it('renders with a title and icon', () => {
-    renderComponent({ title: 'Test Title', icon: <SettingsIcon data-testid="SettingsIcon" /> });
+    renderComponent({
+      title: 'Test Title',
+      icon: <SettingsIcon data-testid="SettingsIcon" />,
+    });
     expect(screen.getByText('Test Title')).toBeInTheDocument();
     expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
   });
 
   it('renders with a title and action element', () => {
-    renderComponent({ title: 'Test Title', action: <button data-testid="action-element">Action</button> });
+    renderComponent({
+      title: 'Test Title',
+      action: <button data-testid="action-element">Action</button>,
+    });
     expect(screen.getByText('Test Title')).toBeInTheDocument();
     expect(screen.getByTestId('action-element')).toBeInTheDocument();
     // Check alignment when action is present

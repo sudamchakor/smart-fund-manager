@@ -12,7 +12,7 @@ describe('ExemptionRow Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <ExemptionRow {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -38,7 +38,9 @@ describe('ExemptionRow Component', () => {
     expect(screen.getByText('Tooltip Exemption')).toBeInTheDocument();
     expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument();
     fireEvent.mouseOver(screen.getByTestId('InfoOutlinedIcon'));
-    expect(screen.getByRole('tooltip')).toHaveTextContent('This is a helpful tooltip.');
+    expect(screen.getByRole('tooltip')).toHaveTextContent(
+      'This is a helpful tooltip.',
+    );
   });
 
   // --- Negative Scenarios / Edge Cases ---

@@ -13,14 +13,27 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock lazy-loaded components
-jest.mock('../../pages/TaxDashboard', () => () => <div data-testid="mock-tax-dashboard">TaxDashboard</div>);
-jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
+jest.mock('../../pages/TaxDashboard', () => () => (
+  <div data-testid="mock-tax-dashboard">TaxDashboard</div>
+));
+jest.mock('../../components/common/SuspenseFallback', () => () => (
+  <div data-testid="suspense-fallback">Loading...</div>
+));
 
 // Mock themeColors and createTheme
 const mockThemeColors = [
-  { value: 'dodgerblue', colors: ['#1976d2', '#90caf9', '#f5f5f5', '#000000', '#555555'] },
-  { value: 'dark', colors: ['#212121', '#424242', '#121212', '#ffffff', '#bbbbbb'] },
-  { value: 'custom', colors: ['#ff0000', '#ff5555', '#eeeeee', '#333333', '#888888'] },
+  {
+    value: 'dodgerblue',
+    colors: ['#1976d2', '#90caf9', '#f5f5f5', '#000000', '#555555'],
+  },
+  {
+    value: 'dark',
+    colors: ['#212121', '#424242', '#121212', '#ffffff', '#bbbbbb'],
+  },
+  {
+    value: 'custom',
+    colors: ['#ff0000', '#ff5555', '#eeeeee', '#333333', '#888888'],
+  },
 ];
 jest.mock('../../theme/ThemeConfig', () => ({
   themeColors: mockThemeColors,
@@ -49,7 +62,7 @@ describe('TaxCalculator Page', () => {
     return render(
       <Provider store={mockStore({})}>
         <TaxCalculator />
-      </Provider>
+      </Provider>,
     );
   };
 

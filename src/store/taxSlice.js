@@ -1,42 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { createSelector } from "reselect";
-import { calculateTax } from "../utils/taxEngine";
-import { taxRules } from "../utils/taxRules";
+import { createSlice } from '@reduxjs/toolkit';
+import { createSelector } from 'reselect';
+import { calculateTax } from '../utils/taxEngine';
+import { taxRules } from '../utils/taxRules';
 
 const months = [
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-  "Jan",
-  "Feb",
-  "Mar",
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
 ];
 
 const initialMonthData = {
-  includePfBasic: "Y",
-  includePfDa: "Y",
-  includePfConvey: "N",
-  includePfHra: "N",
-  includePfChEduc: "N",
-  includePfMedical: "N",
-  includePfLta: "N",
-  includePfUniformAll: "N",
-  includePfCarAllow: "N",
-  includePfMisc1: "N",
-  includePfMisc2: "N",
-  includePfMisc3: "N",
-  includePfMisc4: "N",
-  includePfMisc5: "N",
-  includePfMisc6: "N",
-  includePfMisc7: "N",
-  includePfMisc8: "N",
-  includePfMisc9: "N",
+  includePfBasic: 'Y',
+  includePfDa: 'Y',
+  includePfConvey: 'N',
+  includePfHra: 'N',
+  includePfChEduc: 'N',
+  includePfMedical: 'N',
+  includePfLta: 'N',
+  includePfUniformAll: 'N',
+  includePfCarAllow: 'N',
+  includePfMisc1: 'N',
+  includePfMisc2: 'N',
+  includePfMisc3: 'N',
+  includePfMisc4: 'N',
+  includePfMisc5: 'N',
+  includePfMisc6: 'N',
+  includePfMisc7: 'N',
+  includePfMisc8: 'N',
+  includePfMisc9: 'N',
 
   basic: 0,
   da: 0,
@@ -81,10 +81,10 @@ const initialState = {
   salaryMonths: months.map((m) => ({ month: m, ...initialMonthData })),
   settings: {
     vpfPercent: 0,
-    coCarUsed: "No",
-    coCarDriver: "No",
-    inIndia: "Yes",
-    isMetro: "No",
+    coCarUsed: 'No',
+    coCarDriver: 'No',
+    inIndia: 'Yes',
+    isMetro: 'No',
     pfPercent: 12,
   },
   declarations: {
@@ -121,8 +121,8 @@ const initialState = {
     },
   },
   dynamicRows: {
-    income: [{ id: "misc1", label: "Misc 1" }],
-    deduction: [{ id: "othDed1", label: "Oth Ded 1" }],
+    income: [{ id: 'misc1', label: 'Misc 1' }],
+    deduction: [{ id: 'othDed1', label: 'Oth Ded 1' }],
   },
   houseProperty: {
     interest: 0,
@@ -131,13 +131,13 @@ const initialState = {
 };
 
 const taxSlice = createSlice({
-  name: "tax",
+  name: 'tax',
   initialState,
   reducers: {
     updateMonthData: (state, action) => {
       const { index, field, value, populateRemaining } = action.payload;
 
-      if (field.startsWith("includePf")) {
+      if (field.startsWith('includePf')) {
         state.salaryMonths[index][field] = value;
         for (let i = index + 1; i < 12; i++) {
           state.salaryMonths[i][field] = value;
@@ -165,7 +165,7 @@ const taxSlice = createSlice({
     },
     updateDeclaration: (state, action) => {
       const { section, field, value } = action.payload;
-      if (typeof value === "object" && value !== null) {
+      if (typeof value === 'object' && value !== null) {
         state.declarations[section][field] = {
           ...state.declarations[section][field],
           ...value,
@@ -179,7 +179,7 @@ const taxSlice = createSlice({
       const maxCount = 9;
       const list = state.dynamicRows[type];
       if (list.length >= maxCount) return;
-      const prefix = type === "income" ? "misc" : "othDed";
+      const prefix = type === 'income' ? 'misc' : 'othDed';
       for (let i = 1; i <= maxCount; i++) {
         const id = `${prefix}${i}`;
         if (!list.find((r) => r.id === id)) {
@@ -268,24 +268,24 @@ export const selectCalculatedSalary = createSelector(
         (month.misc9 || 0);
 
       let pfBase = 0;
-      if (month.includePfBasic === "Y") pfBase += month.basic || 0;
-      if (month.includePfDa === "Y") pfBase += month.da || 0;
-      if (month.includePfConvey === "Y") pfBase += month.convey || 0;
-      if (month.includePfHra === "Y") pfBase += month.hra || 0;
-      if (month.includePfChEduc === "Y") pfBase += month.chEduc || 0;
-      if (month.includePfMedical === "Y") pfBase += month.medical || 0;
-      if (month.includePfLta === "Y") pfBase += month.lta || 0;
-      if (month.includePfUniformAll === "Y") pfBase += month.uniformAll || 0;
-      if (month.includePfCarAllow === "Y") pfBase += month.carAllow || 0;
-      if (month.includePfMisc1 === "Y") pfBase += month.misc1 || 0;
-      if (month.includePfMisc2 === "Y") pfBase += month.misc2 || 0;
-      if (month.includePfMisc3 === "Y") pfBase += month.misc3 || 0;
-      if (month.includePfMisc4 === "Y") pfBase += month.misc4 || 0;
-      if (month.includePfMisc5 === "Y") pfBase += month.misc5 || 0;
-      if (month.includePfMisc6 === "Y") pfBase += month.misc6 || 0;
-      if (month.includePfMisc7 === "Y") pfBase += month.misc7 || 0;
-      if (month.includePfMisc8 === "Y") pfBase += month.misc8 || 0;
-      if (month.includePfMisc9 === "Y") pfBase += month.misc9 || 0;
+      if (month.includePfBasic === 'Y') pfBase += month.basic || 0;
+      if (month.includePfDa === 'Y') pfBase += month.da || 0;
+      if (month.includePfConvey === 'Y') pfBase += month.convey || 0;
+      if (month.includePfHra === 'Y') pfBase += month.hra || 0;
+      if (month.includePfChEduc === 'Y') pfBase += month.chEduc || 0;
+      if (month.includePfMedical === 'Y') pfBase += month.medical || 0;
+      if (month.includePfLta === 'Y') pfBase += month.lta || 0;
+      if (month.includePfUniformAll === 'Y') pfBase += month.uniformAll || 0;
+      if (month.includePfCarAllow === 'Y') pfBase += month.carAllow || 0;
+      if (month.includePfMisc1 === 'Y') pfBase += month.misc1 || 0;
+      if (month.includePfMisc2 === 'Y') pfBase += month.misc2 || 0;
+      if (month.includePfMisc3 === 'Y') pfBase += month.misc3 || 0;
+      if (month.includePfMisc4 === 'Y') pfBase += month.misc4 || 0;
+      if (month.includePfMisc5 === 'Y') pfBase += month.misc5 || 0;
+      if (month.includePfMisc6 === 'Y') pfBase += month.misc6 || 0;
+      if (month.includePfMisc7 === 'Y') pfBase += month.misc7 || 0;
+      if (month.includePfMisc8 === 'Y') pfBase += month.misc8 || 0;
+      if (month.includePfMisc9 === 'Y') pfBase += month.misc9 || 0;
 
       const pf = (pfBase * pfPercent) / 100;
       const vpf = (pfBase * vpfPercent) / 100;
@@ -362,7 +362,7 @@ export const selectCalculatedDeclarations = createSelector(
         0.1 * (parseFloat(annual.basic) || 0),
     );
     const HRA_PERCENT_BASIC =
-      settings.isMetro === "Yes"
+      settings.isMetro === 'Yes'
         ? 0.5 * (parseFloat(annual.basic) || 0)
         : 0.4 * (parseFloat(annual.basic) || 0);
     const hraLimited = Math.min(

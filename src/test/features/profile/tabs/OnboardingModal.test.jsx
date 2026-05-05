@@ -5,33 +5,49 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 // Mock child components
-jest.mock('../../profile/tabs/OnboardingSteps/SystemParameters', () => ({ onNext }) => (
-  <div data-testid="system-parameters">
-    System Parameters
-    <button onClick={onNext}>Next</button>
-  </div>
-));
-jest.mock('../../profile/tabs/OnboardingSteps/IncomeStreams', () => ({ onNext, onBack }) => (
-  <div data-testid="income-streams">
-    Income Streams
-    <button onClick={onNext}>Next</button>
-    <button onClick={onBack}>Back</button>
-  </div>
-));
-jest.mock('../../profile/tabs/OnboardingSteps/FixedLiabilities', () => ({ onNext, onBack }) => (
-  <div data-testid="fixed-liabilities">
-    Fixed Liabilities
-    <button onClick={onNext}>Next</button>
-    <button onClick={onBack}>Back</button>
-  </div>
-));
-jest.mock('../../profile/tabs/OnboardingSteps/CapitalGoals', () => ({ onNext, onBack }) => (
-  <div data-testid="capital-goals">
-    Capital Goals
-    <button onClick={onNext}>Next</button>
-    <button onClick={onBack}>Back</button>
-  </div>
-));
+jest.mock(
+  '../../profile/tabs/OnboardingSteps/SystemParameters',
+  () =>
+    ({ onNext }) => (
+      <div data-testid="system-parameters">
+        System Parameters
+        <button onClick={onNext}>Next</button>
+      </div>
+    ),
+);
+jest.mock(
+  '../../profile/tabs/OnboardingSteps/IncomeStreams',
+  () =>
+    ({ onNext, onBack }) => (
+      <div data-testid="income-streams">
+        Income Streams
+        <button onClick={onNext}>Next</button>
+        <button onClick={onBack}>Back</button>
+      </div>
+    ),
+);
+jest.mock(
+  '../../profile/tabs/OnboardingSteps/FixedLiabilities',
+  () =>
+    ({ onNext, onBack }) => (
+      <div data-testid="fixed-liabilities">
+        Fixed Liabilities
+        <button onClick={onNext}>Next</button>
+        <button onClick={onBack}>Back</button>
+      </div>
+    ),
+);
+jest.mock(
+  '../../profile/tabs/OnboardingSteps/CapitalGoals',
+  () =>
+    ({ onNext, onBack }) => (
+      <div data-testid="capital-goals">
+        Capital Goals
+        <button onClick={onNext}>Next</button>
+        <button onClick={onBack}>Back</button>
+      </div>
+    ),
+);
 
 const mockStore = configureStore([]);
 const store = mockStore({});
@@ -47,7 +63,7 @@ describe.skip('OnboardingModal', () => {
     render(
       <Provider store={store}>
         <OnboardingModal open={true} onClose={mockOnClose} />
-      </Provider>
+      </Provider>,
     );
     expect(screen.getByTestId('system-parameters')).toBeInTheDocument();
     expect(screen.queryByTestId('income-streams')).not.toBeInTheDocument();
@@ -57,7 +73,7 @@ describe.skip('OnboardingModal', () => {
     render(
       <Provider store={store}>
         <OnboardingModal open={true} onClose={mockOnClose} />
-      </Provider>
+      </Provider>,
     );
     fireEvent.click(screen.getByText('Next'));
     expect(screen.getByTestId('income-streams')).toBeInTheDocument();
@@ -68,7 +84,7 @@ describe.skip('OnboardingModal', () => {
     render(
       <Provider store={store}>
         <OnboardingModal open={true} onClose={mockOnClose} />
-      </Provider>
+      </Provider>,
     );
     fireEvent.click(screen.getByText('Next')); // Go to IncomeStreams
     fireEvent.click(screen.getByText('Back')); // Go back to SystemParameters
@@ -80,7 +96,7 @@ describe.skip('OnboardingModal', () => {
     render(
       <Provider store={store}>
         <OnboardingModal open={true} onClose={mockOnClose} />
-      </Provider>
+      </Provider>,
     );
     fireEvent.click(screen.getByText('Next')); // SystemParameters -> IncomeStreams
     fireEvent.click(screen.getByText('Next')); // IncomeStreams -> FixedLiabilities

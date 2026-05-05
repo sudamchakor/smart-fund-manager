@@ -1,7 +1,6 @@
 import * as taxRules from '../../../src/utils/taxRules';
 
 describe.skip('Tax Rules Utility Functions', () => {
-
   // Mock constants for consistent testing
   const MOCK_CONSTANTS = {
     STANDARD_DEDUCTION: 50000,
@@ -20,7 +19,7 @@ describe.skip('Tax Rules Utility Functions', () => {
     SECTION_80TTB_CAP: 50000,
     SECTION_24B_CAP: 200000,
     CESS_RATE: 0.04,
-    SURCHARGE_RATE_50L_1CR: 0.10,
+    SURCHARGE_RATE_50L_1CR: 0.1,
     SURCHARGE_RATE_1CR_2CR: 0.15,
     SURCHARGE_RATE_2CR_5CR: 0.25,
     SURCHARGE_RATE_5CR_PLUS: 0.37,
@@ -33,14 +32,18 @@ describe.skip('Tax Rules Utility Functions', () => {
 
   describe('getStandardDeduction', () => {
     it('should return the standard deduction amount', () => {
-      expect(taxRules.getStandardDeduction()).toBe(MOCK_CONSTANTS.STANDARD_DEDUCTION);
+      expect(taxRules.getStandardDeduction()).toBe(
+        MOCK_CONSTANTS.STANDARD_DEDUCTION,
+      );
     });
   });
 
   describe('getProfessionalTaxDeduction', () => {
     it('should return the professional tax paid up to the cap', () => {
       expect(taxRules.getProfessionalTaxDeduction(2000)).toBe(2000);
-      expect(taxRules.getProfessionalTaxDeduction(3000)).toBe(MOCK_CONSTANTS.PROFESSIONAL_TAX_CAP);
+      expect(taxRules.getProfessionalTaxDeduction(3000)).toBe(
+        MOCK_CONSTANTS.PROFESSIONAL_TAX_CAP,
+      );
     });
     it('should return 0 for negative professional tax', () => {
       expect(taxRules.getProfessionalTaxDeduction(-1000)).toBe(0);
@@ -53,7 +56,12 @@ describe.skip('Tax Rules Utility Functions', () => {
     const rentPaid = 150000; // 15k per month
 
     it('should calculate HRA exemption for metro city', () => {
-      const exemption = taxRules.getHraExemption(baseSalary, hraReceived, rentPaid, 'Yes');
+      const exemption = taxRules.getHraExemption(
+        baseSalary,
+        hraReceived,
+        rentPaid,
+        'Yes',
+      );
       // Least of:
       // 1. Actual HRA received: 200000
       // 2. 50% of (Basic + DA): 0.5 * 500000 = 250000
@@ -62,7 +70,12 @@ describe.skip('Tax Rules Utility Functions', () => {
     });
 
     it('should calculate HRA exemption for non-metro city', () => {
-      const exemption = taxRules.getHraExemption(baseSalary, hraReceived, rentPaid, 'No');
+      const exemption = taxRules.getHraExemption(
+        baseSalary,
+        hraReceived,
+        rentPaid,
+        'No',
+      );
       // Least of:
       // 1. Actual HRA received: 200000
       // 2. 40% of (Basic + DA): 0.4 * 500000 = 200000
@@ -75,14 +88,18 @@ describe.skip('Tax Rules Utility Functions', () => {
     });
 
     it('should return 0 if rent paid is 0', () => {
-      expect(taxRules.getHraExemption(baseSalary, hraReceived, 0, 'Yes')).toBe(0);
+      expect(taxRules.getHraExemption(baseSalary, hraReceived, 0, 'Yes')).toBe(
+        0,
+      );
     });
   });
 
   describe('get80CExemption', () => {
     it('should return the 80C amount up to the cap', () => {
       expect(taxRules.get80CExemption(100000)).toBe(100000);
-      expect(taxRules.get80CExemption(200000)).toBe(MOCK_CONSTANTS.SECTION_80C_CAP);
+      expect(taxRules.get80CExemption(200000)).toBe(
+        MOCK_CONSTANTS.SECTION_80C_CAP,
+      );
     });
     it('should return 0 for negative 80C amount', () => {
       expect(taxRules.get80CExemption(-50000)).toBe(0);
@@ -92,27 +109,37 @@ describe.skip('Tax Rules Utility Functions', () => {
   describe('get80DExemption', () => {
     it('should calculate 80D for self/family below 60', () => {
       expect(taxRules.get80DExemption(20000, 0, 0, 0, 0)).toBe(20000);
-      expect(taxRules.get80DExemption(30000, 0, 0, 0, 0)).toBe(MOCK_CONSTANTS.SECTION_80D_CAP_BELOW_60);
+      expect(taxRules.get80DExemption(30000, 0, 0, 0, 0)).toBe(
+        MOCK_CONSTANTS.SECTION_80D_CAP_BELOW_60,
+      );
     });
 
     it('should calculate 80D for self/family above 60', () => {
       expect(taxRules.get80DExemption(0, 30000, 0, 0, 0)).toBe(30000);
-      expect(taxRules.get80DExemption(0, 60000, 0, 0, 0)).toBe(MOCK_CONSTANTS.SECTION_80D_CAP_ABOVE_60);
+      expect(taxRules.get80DExemption(0, 60000, 0, 0, 0)).toBe(
+        MOCK_CONSTANTS.SECTION_80D_CAP_ABOVE_60,
+      );
     });
 
     it('should calculate 80D for parents below 60', () => {
       expect(taxRules.get80DExemption(0, 0, 20000, 0, 0)).toBe(20000);
-      expect(taxRules.get80DExemption(0, 0, 30000, 0, 0)).toBe(MOCK_CONSTANTS.SECTION_80D_CAP_PARENT_BELOW_60);
+      expect(taxRules.get80DExemption(0, 0, 30000, 0, 0)).toBe(
+        MOCK_CONSTANTS.SECTION_80D_CAP_PARENT_BELOW_60,
+      );
     });
 
     it('should calculate 80D for parents above 60', () => {
       expect(taxRules.get80DExemption(0, 0, 0, 30000, 0)).toBe(30000);
-      expect(taxRules.get80DExemption(0, 0, 0, 60000, 0)).toBe(MOCK_CONSTANTS.SECTION_80D_CAP_PARENT_ABOVE_60);
+      expect(taxRules.get80DExemption(0, 0, 0, 60000, 0)).toBe(
+        MOCK_CONSTANTS.SECTION_80D_CAP_PARENT_ABOVE_60,
+      );
     });
 
     it('should include preventive health checkup up to 5000', () => {
       expect(taxRules.get80DExemption(20000, 0, 0, 0, 5000)).toBe(25000);
-      expect(taxRules.get80DExemption(23000, 0, 0, 0, 5000)).toBe(MOCK_CONSTANTS.SECTION_80D_CAP_BELOW_60); // 23k + 5k = 28k, capped at 25k
+      expect(taxRules.get80DExemption(23000, 0, 0, 0, 5000)).toBe(
+        MOCK_CONSTANTS.SECTION_80D_CAP_BELOW_60,
+      ); // 23k + 5k = 28k, capped at 25k
       expect(taxRules.get80DExemption(20000, 0, 0, 0, 6000)).toBe(25000); // 20k + 6k, capped at 25k (5k for checkup)
     });
 
@@ -123,19 +150,39 @@ describe.skip('Tax Rules Utility Functions', () => {
       const parentsAbove60 = 0;
       const preventiveCheckup = 5000;
       // Expected: (20000 + 5000) + 20000 = 25000 + 20000 = 45000
-      expect(taxRules.get80DExemption(selfFamilyBelow60, selfFamilyAbove60, parentsBelow60, parentsAbove60, preventiveCheckup)).toBe(45000);
+      expect(
+        taxRules.get80DExemption(
+          selfFamilyBelow60,
+          selfFamilyAbove60,
+          parentsBelow60,
+          parentsAbove60,
+          preventiveCheckup,
+        ),
+      ).toBe(45000);
 
       const selfFamilyBelow60_cap = 30000; // will be capped at 25k
       const parentsAbove60_cap = 60000; // will be capped at 50k
       // Expected: 25000 + 50000 = 75000
-      expect(taxRules.get80DExemption(selfFamilyBelow60_cap, 0, 0, parentsAbove60_cap, 0)).toBe(75000);
+      expect(
+        taxRules.get80DExemption(
+          selfFamilyBelow60_cap,
+          0,
+          0,
+          parentsAbove60_cap,
+          0,
+        ),
+      ).toBe(75000);
     });
   });
 
   describe('get80EExemption', () => {
     it('should return the full interest paid on education loan', () => {
       expect(taxRules.get80EExemption(50000)).toBe(50000);
-      expect(taxRules.get80EExemption(MOCK_CONSTANTS.SECTION_80E_MAX_INTEREST + 10000)).toBe(MOCK_CONSTANTS.SECTION_80E_MAX_INTEREST);
+      expect(
+        taxRules.get80EExemption(
+          MOCK_CONSTANTS.SECTION_80E_MAX_INTEREST + 10000,
+        ),
+      ).toBe(MOCK_CONSTANTS.SECTION_80E_MAX_INTEREST);
     });
     it('should return 0 for negative interest', () => {
       expect(taxRules.get80EExemption(-10000)).toBe(0);
@@ -161,7 +208,9 @@ describe.skip('Tax Rules Utility Functions', () => {
   describe('get80TTAExemption', () => {
     it('should return interest on savings account up to cap', () => {
       expect(taxRules.get80TTAExemption(5000, 50)).toBe(5000);
-      expect(taxRules.get80TTAExemption(12000, 50)).toBe(MOCK_CONSTANTS.SECTION_80TTA_CAP);
+      expect(taxRules.get80TTAExemption(12000, 50)).toBe(
+        MOCK_CONSTANTS.SECTION_80TTA_CAP,
+      );
     });
     it('should return 0 for senior citizens', () => {
       expect(taxRules.get80TTAExemption(5000, 65)).toBe(0);
@@ -174,7 +223,9 @@ describe.skip('Tax Rules Utility Functions', () => {
   describe('get80TTBExemption', () => {
     it('should return interest on deposits for senior citizens up to cap', () => {
       expect(taxRules.get80TTBExemption(30000, 65)).toBe(30000);
-      expect(taxRules.get80TTBExemption(60000, 65)).toBe(MOCK_CONSTANTS.SECTION_80TTB_CAP);
+      expect(taxRules.get80TTBExemption(60000, 65)).toBe(
+        MOCK_CONSTANTS.SECTION_80TTB_CAP,
+      );
     });
     it('should return 0 for non-senior citizens', () => {
       expect(taxRules.get80TTBExemption(30000, 50)).toBe(0);
@@ -187,7 +238,9 @@ describe.skip('Tax Rules Utility Functions', () => {
   describe('getSection24BExemption', () => {
     it('should return interest on housing loan up to cap', () => {
       expect(taxRules.getSection24BExemption(150000)).toBe(150000);
-      expect(taxRules.getSection24BExemption(250000)).toBe(MOCK_CONSTANTS.SECTION_24B_CAP);
+      expect(taxRules.getSection24BExemption(250000)).toBe(
+        MOCK_CONSTANTS.SECTION_24B_CAP,
+      );
     });
     it('should return 0 for negative interest', () => {
       expect(taxRules.getSection24BExemption(-50000)).toBe(0);
@@ -233,7 +286,7 @@ describe.skip('Tax Rules Utility Functions', () => {
         exemptions,
         deductions,
         age,
-        'old'
+        'old',
       );
       expect(taxableIncome).toBe(377500);
     });
@@ -247,23 +300,41 @@ describe.skip('Tax Rules Utility Functions', () => {
         exemptions, // These should be ignored for new regime
         deductions, // These should be ignored for new regime
         age,
-        'new'
+        'new',
       );
       expect(taxableIncome).toBe(950000);
     });
 
     it('should handle zero gross salary', () => {
-      const taxableIncome = taxRules.calculateTaxableIncome(0, exemptions, deductions, age, 'old');
+      const taxableIncome = taxRules.calculateTaxableIncome(
+        0,
+        exemptions,
+        deductions,
+        age,
+        'old',
+      );
       expect(taxableIncome).toBe(0);
     });
 
     it('should handle all zero deductions and exemptions', () => {
       const zeroExemptions = { hra: 0, lta: 0, otherExemptions: 0 };
       const zeroDeductions = {
-        professionalTax: 0, section80C: 0, section80D: 0, section80E: 0,
-        section80G: 0, section80TTA: 0, section80TTB: 0, section24B: 0,
+        professionalTax: 0,
+        section80C: 0,
+        section80D: 0,
+        section80E: 0,
+        section80G: 0,
+        section80TTA: 0,
+        section80TTB: 0,
+        section24B: 0,
       };
-      const taxableIncome = taxRules.calculateTaxableIncome(grossSalary, zeroExemptions, zeroDeductions, age, 'old');
+      const taxableIncome = taxRules.calculateTaxableIncome(
+        grossSalary,
+        zeroExemptions,
+        zeroDeductions,
+        age,
+        'old',
+      );
       // Gross Salary - Standard Deduction = 1,000,000 - 50,000 = 950,000
       expect(taxableIncome).toBe(950000);
     });
@@ -363,7 +434,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'old';
       // Tax: 12500 + 0.05 * 1 = 12500.05
-      expect(taxRules.calculateTax(taxableIncome, age, regime)).toBeCloseTo(12500.05);
+      expect(taxRules.calculateTax(taxableIncome, age, regime)).toBeCloseTo(
+        12500.05,
+      );
     });
 
     it('should not apply rebate 87A if income is above limit (new regime)', () => {
@@ -371,7 +444,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'new';
       // Tax: 15000 + 30000 + 15000 + 0.15 * 1 = 60000.15
-      expect(taxRules.calculateTax(taxableIncome, age, regime)).toBeCloseTo(60000.15);
+      expect(taxRules.calculateTax(taxableIncome, age, regime)).toBeCloseTo(
+        60000.15,
+      );
     });
   });
 
@@ -383,25 +458,33 @@ describe.skip('Tax Rules Utility Functions', () => {
     it('should apply 10% surcharge for income between 50L and 1Cr', () => {
       const totalIncome = 7500000; // 75L
       const taxAmount = 1000000; // 10L
-      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_50L_1CR);
+      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(
+        taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_50L_1CR,
+      );
     });
 
     it('should apply 15% surcharge for income between 1Cr and 2Cr', () => {
       const totalIncome = 15000000; // 1.5Cr
       const taxAmount = 2000000; // 20L
-      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_1CR_2CR);
+      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(
+        taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_1CR_2CR,
+      );
     });
 
     it('should apply 25% surcharge for income between 2Cr and 5Cr', () => {
       const totalIncome = 30000000; // 3Cr
       const taxAmount = 5000000; // 50L
-      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_2CR_5CR);
+      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(
+        taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_2CR_5CR,
+      );
     });
 
     it('should apply 37% surcharge for income above 5Cr', () => {
       const totalIncome = 60000000; // 6Cr
       const taxAmount = 10000000; // 1Cr
-      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_5CR_PLUS);
+      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBe(
+        taxAmount * MOCK_CONSTANTS.SURCHARGE_RATE_5CR_PLUS,
+      );
     });
 
     it('should handle marginal relief for income just above 50L', () => {
@@ -412,12 +495,17 @@ describe.skip('Tax Rules Utility Functions', () => {
       // Surcharge on 50L + 1: 10% of tax on 50L + 1
       // Marginal relief calculation is complex, this is a basic check
       const taxWithoutSurcharge = taxRules.calculateTax(5000001, 40, 'old'); // Assuming old regime for simplicity
-      const taxWithSurcharge = taxWithoutSurcharge * (1 + MOCK_CONSTANTS.SURCHARGE_RATE_50L_1CR);
+      const taxWithSurcharge =
+        taxWithoutSurcharge * (1 + MOCK_CONSTANTS.SURCHARGE_RATE_50L_1CR);
       const incomeDifference = totalIncome - 5000000;
-      const marginalRelief = taxWithSurcharge - (taxRules.calculateTax(5000000, 40, 'old') + incomeDifference);
+      const marginalRelief =
+        taxWithSurcharge -
+        (taxRules.calculateTax(5000000, 40, 'old') + incomeDifference);
       // This test would need a more precise marginal relief calculation to be accurate.
       // For now, we'll just check if it's not simply 10% of tax.
-      expect(taxRules.calculateSurcharge(totalIncome, taxAmount)).toBeGreaterThan(0);
+      expect(
+        taxRules.calculateSurcharge(totalIncome, taxAmount),
+      ).toBeGreaterThan(0);
     });
   });
 
@@ -425,7 +513,9 @@ describe.skip('Tax Rules Utility Functions', () => {
     it('should calculate cess as 4% of (tax + surcharge)', () => {
       const tax = 100000;
       const surcharge = 10000;
-      expect(taxRules.calculateCess(tax, surcharge)).toBe((tax + surcharge) * MOCK_CONSTANTS.CESS_RATE);
+      expect(taxRules.calculateCess(tax, surcharge)).toBe(
+        (tax + surcharge) * MOCK_CONSTANTS.CESS_RATE,
+      );
     });
 
     it('should return 0 if tax and surcharge are 0', () => {
@@ -443,7 +533,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'old';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime); // Should be 7500
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(taxBeforeRebate);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(taxBeforeRebate);
     });
 
     it('should return full tax amount if taxable income is below limit (new regime)', () => {
@@ -451,7 +543,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'new';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime); // Should be 15000
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(taxBeforeRebate);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(taxBeforeRebate);
     });
 
     it('should return max rebate amount if tax is higher than max rebate (old regime)', () => {
@@ -459,7 +553,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'old';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime);
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(taxBeforeRebate);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(taxBeforeRebate);
     });
 
     it('should return max rebate amount if tax is higher than max rebate (new regime)', () => {
@@ -467,7 +563,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'new';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime);
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(taxBeforeRebate);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(taxBeforeRebate);
     });
 
     it('should return 0 if taxable income is above limit (old regime)', () => {
@@ -475,7 +573,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'old';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime);
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(0);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(0);
     });
 
     it('should return 0 if taxable income is above limit (new regime)', () => {
@@ -483,7 +583,9 @@ describe.skip('Tax Rules Utility Functions', () => {
       const age = 40;
       const regime = 'new';
       const taxBeforeRebate = taxRules.calculateTax(taxableIncome, age, regime);
-      expect(taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime)).toBe(0);
+      expect(
+        taxRules.getRebate87A(taxableIncome, taxBeforeRebate, regime),
+      ).toBe(0);
     });
   });
 
@@ -507,7 +609,13 @@ describe.skip('Tax Rules Utility Functions', () => {
     const age = 40;
 
     it('should calculate benefits for old regime', () => {
-      const benefits = taxRules.getTaxRegimeBenefits(grossSalary, exemptions, deductions, age, 'old');
+      const benefits = taxRules.getTaxRegimeBenefits(
+        grossSalary,
+        exemptions,
+        deductions,
+        age,
+        'old',
+      );
       expect(benefits.totalExemptions).toBe(170000);
       expect(benefits.totalDeductions).toBe(452500);
       expect(benefits.taxableIncome).toBe(377500);
@@ -518,7 +626,13 @@ describe.skip('Tax Rules Utility Functions', () => {
     });
 
     it('should calculate benefits for new regime', () => {
-      const benefits = taxRules.getTaxRegimeBenefits(grossSalary, exemptions, deductions, age, 'new');
+      const benefits = taxRules.getTaxRegimeBenefits(
+        grossSalary,
+        exemptions,
+        deductions,
+        age,
+        'new',
+      );
       expect(benefits.totalExemptions).toBe(0); // New regime ignores most exemptions
       expect(benefits.totalDeductions).toBe(MOCK_CONSTANTS.STANDARD_DEDUCTION); // Only standard deduction
       expect(benefits.taxableIncome).toBe(950000);
@@ -549,7 +663,12 @@ describe.skip('Tax Rules Utility Functions', () => {
     const age = 40;
 
     it('should compare old and new tax regimes and recommend the better one', () => {
-      const comparison = taxRules.getTaxRegimeComparison(grossSalary, exemptions, deductions, age);
+      const comparison = taxRules.getTaxRegimeComparison(
+        grossSalary,
+        exemptions,
+        deductions,
+        age,
+      );
 
       expect(comparison.oldRegimeTax).toBe(0);
       expect(comparison.newRegimeTax).toBe(62400);
@@ -559,12 +678,23 @@ describe.skip('Tax Rules Utility Functions', () => {
 
     it('should recommend new regime if it results in lower tax', () => {
       const lowDeductions = {
-        professionalTax: 0, section80C: 0, section80D: 0, section80E: 0,
-        section80G: 0, section80TTA: 0, section80TTB: 0, section24B: 0,
+        professionalTax: 0,
+        section80C: 0,
+        section80D: 0,
+        section80E: 0,
+        section80G: 0,
+        section80TTA: 0,
+        section80TTB: 0,
+        section24B: 0,
       };
       const lowExemptions = { hra: 0, lta: 0, otherExemptions: 0 };
 
-      const comparison = taxRules.getTaxRegimeComparison(grossSalary, lowExemptions, lowDeductions, age);
+      const comparison = taxRules.getTaxRegimeComparison(
+        grossSalary,
+        lowExemptions,
+        lowDeductions,
+        age,
+      );
 
       // Old regime: 1,000,000 - 50,000 (SD) = 950,000 taxable. Tax on 9.5L = 112500 + cess
       // New regime: 1,000,000 - 50,000 (SD) = 950,000 taxable. Tax on 9.5L = 65000 + cess

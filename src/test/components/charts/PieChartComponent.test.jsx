@@ -9,9 +9,19 @@ import '@testing-library/jest-dom';
 
 // Mock Recharts components to avoid actual chart rendering in tests
 jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }) => <div data-testid="recharts-responsive-container">{children}</div>,
-  PieChart: ({ children }) => <div data-testid="recharts-pie-chart">{children}</div>,
-  Pie: (props) => <div data-testid="recharts-pie" data-pie-data={JSON.stringify(props.data)} {...props}></div>,
+  ResponsiveContainer: ({ children }) => (
+    <div data-testid="recharts-responsive-container">{children}</div>
+  ),
+  PieChart: ({ children }) => (
+    <div data-testid="recharts-pie-chart">{children}</div>
+  ),
+  Pie: (props) => (
+    <div
+      data-testid="recharts-pie"
+      data-pie-data={JSON.stringify(props.data)}
+      {...props}
+    ></div>
+  ),
   Cell: (props) => <div data-testid="recharts-cell" {...props}></div>,
   Tooltip: (props) => <div data-testid="recharts-tooltip" {...props}></div>,
 }));
@@ -23,18 +33,27 @@ jest.mock('react-redux', () => ({
 const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing
-jest.spyOn(formatting, 'formatCurrency').mockImplementation((value, currency) => {
-  if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
-  return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-});
+jest
+  .spyOn(formatting, 'formatCurrency')
+  .mockImplementation((value, currency) => {
+    if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
+    return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  });
 
 // Mock DetailRow to simplify testing its calls and output
-jest.mock('../../../components/common/DetailRow', () => ({ label, value, indicatorColor }) => (
-  <div data-testid={`detail-row-${label.toLowerCase().replace(/\s/g, '-')}`} style={{ color: indicatorColor }}>
-    <span>{label}:</span>
-    <span>{value}</span>
-  </div>
-));
+jest.mock(
+  '../../../components/common/DetailRow',
+  () =>
+    ({ label, value, indicatorColor }) => (
+      <div
+        data-testid={`detail-row-${label.toLowerCase().replace(/\s/g, '-')}`}
+        style={{ color: indicatorColor }}
+      >
+        <span>{label}:</span>
+        <span>{value}</span>
+      </div>
+    ),
+);
 
 const mockStore = configureStore([]);
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -67,7 +86,11 @@ describe('PieChartComponent', () => {
     maintenance: 50, // Monthly maintenance from expenses slice
   };
 
-  const renderComponent = (calculatedValues = defaultCalculatedValues, expenses = defaultExpenses, currency = '₹') => {
+  const renderComponent = (
+    calculatedValues = defaultCalculatedValues,
+    expenses = defaultExpenses,
+    currency = '₹',
+  ) => {
     mockUseSelector.mockImplementation((selector) => {
       if (selector.name === 'selectCalculatedValues') return calculatedValues;
       if (selector.name === 'selectExpenses') return expenses;
@@ -79,16 +102,18 @@ describe('PieChartComponent', () => {
         <ThemeProvider theme={theme}>
           <PieChartComponent />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset mock implementation for useSelector and formatCurrency for each test
-    mockUseSelector.mockImplementation((selector) => selector({
-      emi: { currency: '₹' },
-    }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({
+        emi: { currency: '₹' },
+      }),
+    );
     formatting.formatCurrency.mockImplementation((value, currency) => {
       if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
       return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
@@ -125,7 +150,9 @@ describe('PieChartComponent', () => {
       oneTimeInRs: 500,
     };
     renderComponent(customCalculatedValues);
-    expect(screen.getByTestId('detail-row-down-payment')).toHaveTextContent('Down Payment:₹12,500');
+    expect(screen.getByTestId('detail-row-down-payment')).toHaveTextContent(
+      'Down Payment:₹12,500',
+    );
   });
 
   it('calculates taxesInsMaint correctly', () => {
@@ -133,13 +160,17 @@ describe('PieChartComponent', () => {
       ...defaultCalculatedValues,
       taxesYearlyInRs: 1200, // 100/month
       homeInsYearlyInRs: 600, // 50/month
-      schedule: Array.from({ length: 24 }, (_, i) => ({ ...defaultCalculatedValues.schedule[0] })), // 2 years
+      schedule: Array.from({ length: 24 }, (_, i) => ({
+        ...defaultCalculatedValues.schedule[0],
+      })), // 2 years
     };
     const customExpenses = { maintenance: 25 }; // 25/month
     // Expected: (1200 + 600) * (24/12) + (25 * 24)
     // (1800 * 2) + 600 = 3600 + 600 = 4200
     renderComponent(customCalculatedValues, customExpenses);
-    expect(screen.getByTestId('detail-row-taxes/maint')).toHaveTextContent('Taxes/Maint:₹4,200');
+    expect(screen.getByTestId('detail-row-taxes/maint')).toHaveTextContent(
+      'Taxes/Maint:₹4,200',
+    );
   });
 
   it('passes correct data to Pie component, filtering out zero values', () => {
@@ -155,8 +186,8 @@ describe('PieChartComponent', () => {
     const chartData = JSON.parse(pie.dataset.pieData);
 
     // Initial and Prepay should be filtered out
-    expect(chartData.some(d => d.name === 'Initial')).toBe(false);
-    expect(chartData.some(d => d.name === 'Prepay')).toBe(false);
+    expect(chartData.some((d) => d.name === 'Initial')).toBe(false);
+    expect(chartData.some((d) => d.name === 'Prepay')).toBe(false);
 
     expect(chartData.length).toBe(3); // Principal, Interest, Maint
     expect(chartData[0].name).toBe('Principal');
@@ -198,6 +229,8 @@ describe('PieChartComponent', () => {
     renderComponent(defaultCalculatedValues, defaultExpenses, '$');
     expect(screen.getByText('Total Cost')).toBeInTheDocument();
     expect(screen.getByText('$2,50,000')).toBeInTheDocument();
-    expect(screen.getByTestId('detail-row-down-payment')).toHaveTextContent('Down Payment:$65,000');
+    expect(screen.getByTestId('detail-row-down-payment')).toHaveTextContent(
+      'Down Payment:$65,000',
+    );
   });
 });

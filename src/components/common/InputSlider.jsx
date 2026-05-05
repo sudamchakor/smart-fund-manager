@@ -1,5 +1,14 @@
-import React from "react";
-import { Box, Stack, Typography, TextField, InputAdornment, Slider, useTheme, alpha } from "@mui/material";
+import React from 'react';
+import {
+  Box,
+  Stack,
+  Typography,
+  TextField,
+  InputAdornment,
+  Slider,
+  useTheme,
+  alpha,
+} from '@mui/material';
 
 export default function InputSlider({
   label,
@@ -9,12 +18,12 @@ export default function InputSlider({
   step = 1,
   onChange,
   adornment,
-  adornmentPosition = "start",
+  adornmentPosition = 'start',
 }) {
   const theme = useTheme();
 
   const handleInputChange = (e) => {
-    let val = e.target.value === "" ? "" : Number(e.target.value);
+    let val = e.target.value === '' ? '' : Number(e.target.value);
     onChange(val);
   };
 
@@ -24,17 +33,17 @@ export default function InputSlider({
 
   const labelStyle = {
     fontWeight: 800,
-    textTransform: "uppercase",
-    fontSize: "0.75rem",
-    color: "text.secondary",
+    textTransform: 'uppercase',
+    fontSize: '0.75rem',
+    color: 'text.secondary',
     letterSpacing: 0.5,
   };
 
   const inputWellStyle = {
     fontWeight: 900,
-    fontSize: "0.95rem",
+    fontSize: '0.95rem',
     bgcolor: alpha(theme.palette.primary.main, 0.05),
-    color: "primary.main",
+    color: 'primary.main',
     px: 1.5,
     py: 0.5,
     borderRadius: 2,
@@ -49,7 +58,9 @@ export default function InputSlider({
         alignItems="center"
         mb={1.5}
       >
-        <Typography sx={labelStyle} id={`${label}-slider-label`}>{label}</Typography>
+        <Typography sx={labelStyle} id={`${label}-slider-label`}>
+          {label}
+        </Typography>
         <TextField
           variant="standard"
           size="small"
@@ -57,16 +68,24 @@ export default function InputSlider({
           onChange={handleInputChange}
           aria-labelledby={`${label}-slider-label`}
           InputProps={{
-            startAdornment: adornmentPosition === "start" && adornment ? (
-              <InputAdornment position="start" sx={{ "& p": { fontWeight: 900, color: "primary.main" } }}>
-                {adornment}
-              </InputAdornment>
-            ) : null,
-            endAdornment: adornmentPosition === "end" && adornment ? (
-              <InputAdornment position="end" sx={{ "& p": { fontWeight: 900, color: "primary.main" } }}>
-                {adornment}
-              </InputAdornment>
-            ) : null,
+            startAdornment:
+              adornmentPosition === 'start' && adornment ? (
+                <InputAdornment
+                  position="start"
+                  sx={{ '& p': { fontWeight: 900, color: 'primary.main' } }}
+                >
+                  {adornment}
+                </InputAdornment>
+              ) : null,
+            endAdornment:
+              adornmentPosition === 'end' && adornment ? (
+                <InputAdornment
+                  position="end"
+                  sx={{ '& p': { fontWeight: 900, color: 'primary.main' } }}
+                >
+                  {adornment}
+                </InputAdornment>
+              ) : null,
             disableUnderline: true,
             sx: inputWellStyle,
           }}
@@ -83,9 +102,9 @@ export default function InputSlider({
         aria-labelledby={`${label}-slider-label`}
         sx={{
           py: 1,
-          "& .MuiSlider-thumb": { width: 14, height: 14 },
-          "& .MuiSlider-track": { height: 4 },
-          "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          '& .MuiSlider-thumb': { width: 14, height: 14 },
+          '& .MuiSlider-track': { height: 4 },
+          '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
         }}
       />
     </Box>

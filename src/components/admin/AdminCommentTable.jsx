@@ -16,7 +16,14 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { Link } from 'react-router-dom';
 
-const AdminCommentTable = ({ comments, page, rowsPerPage, handleApproveComment, confirmDelete, formatFullDate }) => {
+const AdminCommentTable = ({
+  comments,
+  page,
+  rowsPerPage,
+  handleApproveComment,
+  confirmDelete,
+  formatFullDate,
+}) => {
   return (
     <Table>
       <TableHead sx={{ bgcolor: '#fcfcfc' }}>

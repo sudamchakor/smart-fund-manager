@@ -1,13 +1,19 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { DynamicRowModal, SettingsModal } from '../../../components/tax/ActionModals';
+import {
+  DynamicRowModal,
+  SettingsModal,
+} from '../../../components/tax/ActionModals';
 import '@testing-library/jest-dom';
 
 // Mock formStyles to prevent issues with actual style objects
 jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
-  getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
+  getWellInputStyle: jest.fn(() => ({
+    border: '1px solid #ccc',
+    padding: '8px',
+  })),
 }));
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -30,19 +36,21 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText('Inject Data Row')).toBeInTheDocument();
     expect(screen.getByLabelText('Row Identifier')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Apply Change' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Apply Change' }),
+    ).toBeInTheDocument();
   });
 
   it('renders correctly in "modify" mode', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} mode="modify" />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText('Modify Data Row')).toBeInTheDocument();
   });
@@ -51,7 +59,7 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} label="Test Label" />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('Test Label')).toBeInTheDocument();
   });
@@ -60,9 +68,11 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Row Identifier'), { target: { value: 'New Label' } });
+    fireEvent.change(screen.getByLabelText('Row Identifier'), {
+      target: { value: 'New Label' },
+    });
     expect(defaultProps.onLabelChange).toHaveBeenCalledWith(expect.any(Object)); // Event object
   });
 
@@ -70,7 +80,7 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Apply Change' }));
     expect(defaultProps.onSave).toHaveBeenCalledTimes(1);
@@ -80,7 +90,7 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
@@ -90,7 +100,7 @@ describe('DynamicRowModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <DynamicRowModal {...defaultProps} open={false} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.queryByText('Inject Data Row')).not.toBeInTheDocument();
   });
@@ -103,11 +113,13 @@ describe('SettingsModal', () => {
     vpfPercent: '0',
   };
   const defaultCalculatedSalary = {
-    months: [{
-      includePfBasic: 'Y',
-      includePfHra: 'N',
-      includePfBonus: 'Y', // For dynamic row
-    }],
+    months: [
+      {
+        includePfBasic: 'Y',
+        includePfHra: 'N',
+        includePfBonus: 'Y', // For dynamic row
+      },
+    ],
   };
   const defaultEarningsFixed = [
     { label: 'Basic', field: 'basic', includeField: 'includePfBasic' },
@@ -138,7 +150,7 @@ describe('SettingsModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText('System Configuration')).toBeInTheDocument();
     expect(screen.getByLabelText('Assessee Age')).toBeInTheDocument();
@@ -146,14 +158,16 @@ describe('SettingsModal', () => {
     expect(screen.getByLabelText('Employee PF Base (%)')).toBeInTheDocument();
     expect(screen.getByLabelText('Voluntary PF Boost (%)')).toBeInTheDocument();
     expect(screen.getByText('PF Inclusion Logic Engine')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Apply Config' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Apply Config' }),
+    ).toBeInTheDocument();
   });
 
   it('displays the provided age value', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} age={45} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('45')).toBeInTheDocument();
   });
@@ -162,17 +176,22 @@ describe('SettingsModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Assessee Age'), { target: { value: '31' } });
+    fireEvent.change(screen.getByLabelText('Assessee Age'), {
+      target: { value: '31' },
+    });
     expect(defaultProps.onAgeChange).toHaveBeenCalledWith(expect.any(Object));
   });
 
   it('displays the provided isMetro setting', () => {
     render(
       <ThemeProvider theme={theme}>
-        <SettingsModal {...defaultProps} settings={{ ...defaultSettings, isMetro: 'Yes' }} />
-      </ThemeProvider>
+        <SettingsModal
+          {...defaultProps}
+          settings={{ ...defaultSettings, isMetro: 'Yes' }}
+        />
+      </ThemeProvider>,
     );
     expect(screen.getByRole('button', { name: 'Yes' })).toBeInTheDocument();
   });
@@ -181,7 +200,7 @@ describe('SettingsModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     fireEvent.mouseDown(screen.getByRole('button', { name: 'No' }));
     fireEvent.click(screen.getByText('Yes'));
@@ -191,8 +210,11 @@ describe('SettingsModal', () => {
   it('displays the provided pfPercent and vpfPercent settings', () => {
     render(
       <ThemeProvider theme={theme}>
-        <SettingsModal {...defaultProps} settings={{ ...defaultSettings, pfPercent: '15', vpfPercent: '5' }} />
-      </ThemeProvider>
+        <SettingsModal
+          {...defaultProps}
+          settings={{ ...defaultSettings, pfPercent: '15', vpfPercent: '5' }}
+        />
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('15')).toBeInTheDocument();
     expect(screen.getByDisplayValue('5')).toBeInTheDocument();
@@ -202,51 +224,65 @@ describe('SettingsModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Employee PF Base (%)'), { target: { value: '13' } });
-    expect(defaultProps.onSettingChange).toHaveBeenCalledWith('pfPercent', '13');
+    fireEvent.change(screen.getByLabelText('Employee PF Base (%)'), {
+      target: { value: '13' },
+    });
+    expect(defaultProps.onSettingChange).toHaveBeenCalledWith(
+      'pfPercent',
+      '13',
+    );
   });
 
   it('renders fixed earnings items in the PF inclusion table', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText('Basic')).toBeInTheDocument();
     expect(screen.getByText('HRA')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Included' })).toBeInTheDocument(); // Basic is 'Y'
-    expect(screen.getByRole('button', { name: 'Excluded' })).toBeInTheDocument(); // HRA is 'N'
+    expect(
+      screen.getByRole('button', { name: 'Included' }),
+    ).toBeInTheDocument(); // Basic is 'Y'
+    expect(
+      screen.getByRole('button', { name: 'Excluded' }),
+    ).toBeInTheDocument(); // HRA is 'N'
   });
 
   it('renders dynamic income items in the PF inclusion table', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.getByText('Bonus')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Included' })).toBeInTheDocument(); // Bonus is 'Y'
+    expect(
+      screen.getByRole('button', { name: 'Included' }),
+    ).toBeInTheDocument(); // Bonus is 'Y'
   });
 
   it('calls onInclusionChange when a Select value changes in the PF inclusion table', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     // Change HRA from 'Excluded' to 'Included'
     fireEvent.mouseDown(screen.getByRole('button', { name: 'Excluded' })); // HRA's current value
     fireEvent.click(screen.getByText('Included'));
-    expect(defaultProps.onInclusionChange).toHaveBeenCalledWith('includePfHra', 'Y');
+    expect(defaultProps.onInclusionChange).toHaveBeenCalledWith(
+      'includePfHra',
+      'Y',
+    );
   });
 
   it('calls onClose when "Apply Config" button is clicked', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Apply Config' }));
     expect(defaultProps.onClose).toHaveBeenCalledTimes(1);
@@ -256,7 +292,7 @@ describe('SettingsModal', () => {
     render(
       <ThemeProvider theme={theme}>
         <SettingsModal {...defaultProps} open={false} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.queryByText('System Configuration')).not.toBeInTheDocument();
   });
@@ -269,7 +305,7 @@ describe('SettingsModal', () => {
           earningsFixed={[]}
           dynamicRows={{ income: [] }}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(screen.queryByText('Basic')).not.toBeInTheDocument();
     expect(screen.queryByText('HRA')).not.toBeInTheDocument();
@@ -285,7 +321,7 @@ describe('SettingsModal', () => {
           {...defaultProps}
           calculatedSalary={customCalculatedSalary}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     // Find the select for Basic and check its value
     const basicRow = screen.getByText('Basic').closest('tr');

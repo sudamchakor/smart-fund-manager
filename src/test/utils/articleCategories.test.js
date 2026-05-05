@@ -10,7 +10,7 @@ describe('articleCategories', () => {
   });
 
   it('each category should be a string', () => {
-    articleCategories.forEach(category => {
+    articleCategories.forEach((category) => {
       expect(typeof category).toBe('string');
     });
   });

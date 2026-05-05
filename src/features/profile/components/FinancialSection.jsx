@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback } from 'react';
 import {
   Box,
   Typography,
@@ -9,15 +9,15 @@ import {
   Button,
   Tooltip,
   useTheme,
-} from "@mui/material";
-import AddIcon from "@mui/icons-material/Add";
-import InfoIcon from "@mui/icons-material/Info";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-import MoneyOffIcon from "@mui/icons-material/MoneyOff"; // Keep this icon
-import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
-import ReadOnlyItem from "../../../components/common/ReadOnlyItem";
-import { useDispatch, useSelector } from "react-redux";
+} from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import InfoIcon from '@mui/icons-material/Info';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import MoneyOffIcon from '@mui/icons-material/MoneyOff'; // Keep this icon
+import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
+import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
+import ReadOnlyItem from '../../../components/common/ReadOnlyItem';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   selectIncomes,
   deleteIncome,
@@ -30,17 +30,17 @@ import {
   selectGoals,
   selectCurrentSurplus,
   deleteGoal,
-} from "../../../store/profileSlice";
+} from '../../../store/profileSlice';
 import {
   resetHomeLoanForm,
   selectCurrency,
   selectIsLoanActive,
-} from "../../../store/emiSlice";
-import { selectTaxComparison } from "../../../store/taxSlice";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
-import { formatCurrency } from "../../../utils/formatting";
-import { useNavigate } from "react-router-dom";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '../../../store/emiSlice';
+import { selectTaxComparison } from '../../../store/taxSlice';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
+import { formatCurrency } from '../../../utils/formatting';
+import { useNavigate } from 'react-router-dom';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 export default function FinancialSection({
   isIncome,
@@ -82,16 +82,16 @@ export default function FinancialSection({
         const goal = goals.find((g) => g.id === inv.goalId);
         acc[inv.goalId] = {
           id: inv.goalId,
-          name: goal?.name || "Goal",
+          name: goal?.name || 'Goal',
           amount: 0,
-          frequency: "monthly",
+          frequency: 'monthly',
           investments: [],
         };
       }
       let monthly = inv.amount || 0;
-      if (inv.frequency === "yearly") monthly /= 12;
-      else if (inv.frequency === "quarterly") monthly /= 3;
-  
+      if (inv.frequency === 'yearly') monthly /= 12;
+      else if (inv.frequency === 'quarterly') monthly /= 3;
+
       acc[inv.goalId].amount += monthly;
       acc[inv.goalId].investments.push(inv);
       return acc;
@@ -101,17 +101,17 @@ export default function FinancialSection({
   // Helper function to determine expense item color for text
   const getExpenseItemColor = useCallback(
     (category) => {
-      if (category === "basic") return theme.palette.info.main;
-      if (category === "discretionary") return theme.palette.warning.main;
+      if (category === 'basic') return theme.palette.info.main;
+      if (category === 'discretionary') return theme.palette.warning.main;
       return theme.palette.primary.main; // Default if no category match
     },
-    [theme.palette]
+    [theme.palette],
   );
 
   const taxRate = useMemo(() => {
     if (!taxComparison) return 0;
     const taxableIncome =
-      taxComparison.optimal === "Old Regime"
+      taxComparison.optimal === 'Old Regime'
         ? taxComparison.oldRegime.taxableIncome
         : taxComparison.newRegime.taxableIncome;
 
@@ -124,33 +124,35 @@ export default function FinancialSection({
   return (
     <Card
       sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         borderRadius: 3,
         boxShadow: 1,
-        overflow: "hidden",
+        overflow: 'hidden',
       }}
     >
       <Box
         sx={{
           pt: 2.5,
           px: 2.5,
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
         }}
       >
         <SectionHeader
-          title={isIncome ? "Income Details" : "Expense Details"}
+          title={isIncome ? 'Income Details' : 'Expense Details'}
           icon={isIncome ? <AttachMoneyIcon /> : <MoneyOffIcon />}
-          color={isIncome ? theme.palette.success.main : theme.palette.error.main}
+          color={
+            isIncome ? theme.palette.success.main : theme.palette.error.main
+          }
         />
         <Button
           variant="contained"
           size="small"
           startIcon={<AddIcon />}
-          onClick={() => onOpenModal(isIncome ? "income" : "expense")}
+          onClick={() => onOpenModal(isIncome ? 'income' : 'expense')}
           sx={{ borderRadius: 1.5, mt: 0.5 }}
         >
           Add
@@ -162,22 +164,22 @@ export default function FinancialSection({
         sx={{
           flexGrow: 1,
           p: 0,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "hidden",
-          "&:last-child": { pb: 0 },
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          '&:last-child': { pb: 0 },
         }}
       >
         <Box
           sx={{
             p: 2,
             flexGrow: 1,
-            overflowY: "auto",
-            maxHeight: "340px",
-            "&::-webkit-scrollbar": { width: "6px" },
-            "&::-webkit-scrollbar-thumb": {
-              backgroundColor: "#ccc",
-              borderRadius: "10px",
+            overflowY: 'auto',
+            maxHeight: '340px',
+            '&::-webkit-scrollbar': { width: '6px' },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: '#ccc',
+              borderRadius: '10px',
             },
           }}
         >
@@ -186,24 +188,24 @@ export default function FinancialSection({
               <Box
                 sx={{
                   minHeight: 200,
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                   opacity: 0.6,
-                  textAlign: "center",
+                  textAlign: 'center',
                 }}
               >
                 <SavingsOutlinedIcon
-                  sx={{ fontSize: 64, mb: 2, color: "text.secondary" }}
+                  sx={{ fontSize: 64, mb: 2, color: 'text.secondary' }}
                 />
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: 700, color: "text.secondary" }}
+                  sx={{ fontWeight: 700, color: 'text.secondary' }}
                 >
                   No income streams added.
                 </Typography>
-                <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   Add your salary, rental income, or other inflows.
                 </Typography>
               </Box>
@@ -219,9 +221,9 @@ export default function FinancialSection({
                     onDelete={(id) => dispatch(deleteIncome(id))}
                     onEdit={(itemId) =>
                       onOpenModal(
-                        "income",
+                        'income',
                         incomes.find((inc) => inc.id === itemId),
-                        "edit",
+                        'edit',
                       )
                     }
                     formatCurrency={formatCurrency}
@@ -236,24 +238,24 @@ export default function FinancialSection({
             <Box
               sx={{
                 minHeight: 200,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
                 opacity: 0.6,
-                textAlign: "center",
+                textAlign: 'center',
               }}
             >
               <ReceiptLongOutlinedIcon
-                sx={{ fontSize: 64, mb: 2, color: "text.secondary" }}
+                sx={{ fontSize: 64, mb: 2, color: 'text.secondary' }}
               />
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, color: "text.secondary" }}
+                sx={{ fontWeight: 700, color: 'text.secondary' }}
               >
                 No expenses recorded.
               </Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                 Add your monthly liabilities and basic needs.
               </Typography>
             </Box>
@@ -262,8 +264,8 @@ export default function FinancialSection({
               {isLoanActive && monthlyEmi > 0 && (
                 <ReadOnlyItem
                   item={{
-                    id: "home-loan-emi",
-                    name: "Home Loan EMI",
+                    id: 'home-loan-emi',
+                    name: 'Home Loan EMI',
                     amount: monthlyEmi,
                   }}
                   currency={currency}
@@ -273,7 +275,7 @@ export default function FinancialSection({
                   formatCurrency={formatCurrency}
                   onConfirmDelete={() => dispatch(resetHomeLoanForm())}
                   isReadOnly={false}
-                  onEdit={() => navigate("/calculator")}
+                  onEdit={() => navigate('/calculator')}
                   deletionImpactMessage="This will permanently clear your EMI calculator data, including your full loan schedule, property details, and prepayments. This action cannot be undone."
                 />
               )}
@@ -304,9 +306,9 @@ export default function FinancialSection({
                   onDelete={(id) => dispatch(deleteExpense(id))}
                   onEdit={(itemId) =>
                     onOpenModal(
-                      "expense",
+                      'expense',
                       expenses.find((exp) => exp.id === itemId),
-                      "edit",
+                      'edit',
                     )
                   }
                   formatCurrency={formatCurrency}
@@ -332,15 +334,15 @@ export default function FinancialSection({
                   ? theme.palette.error.dark
                   : theme.palette.primary.dark
               } 100%)`,
-            color: "white",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            mt: "auto",
+            color: 'white',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mt: 'auto',
           }}
         >
           <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-            {isIncome ? "Total Income" : "Total Expenses"}
+            {isIncome ? 'Total Income' : 'Total Expenses'}
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
             <Typography variant="h6" sx={{ fontWeight: 900 }}>
@@ -348,7 +350,7 @@ export default function FinancialSection({
             </Typography>
             {isBudgetExceeded && (
               <Tooltip title="Spending exceeds income">
-                <InfoIcon fontSize="small" sx={{ color: "white" }} />
+                <InfoIcon fontSize="small" sx={{ color: 'white' }} />
               </Tooltip>
             )}
           </Stack>

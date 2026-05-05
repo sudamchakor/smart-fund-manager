@@ -1,21 +1,21 @@
-import React from "react";
-import { Box, Typography, Grid, Stack, useTheme, alpha } from "@mui/material";
+import React from 'react';
+import { Box, Typography, Grid, Stack, useTheme, alpha } from '@mui/material';
 import {
   EventRepeat as RepeatIcon,
   CalendarMonth as MonthlyIcon,
   EventAvailable as OneTimeIcon,
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   updatePrepayments,
   selectPrepayments,
   selectCurrency,
-} from "../../../store/emiSlice";
+} from '../../../store/emiSlice';
 import {
   AmountInput,
   DatePickerInput,
-} from "../../../components/common/CommonComponents";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '../../../components/common/CommonComponents';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const PrepaymentSection = ({
   title,
@@ -29,7 +29,7 @@ const PrepaymentSection = ({
   currency,
 }) => (
   <Grid item xs={12} sm={6} md={3}>
-    <Box sx={{ height: "100%" }}>
+    <Box sx={{ height: '100%' }}>
       <SectionHeader title={title} icon={icon} color={iconColor} />
       <Stack spacing={2}>
         <AmountInput
@@ -57,14 +57,14 @@ const PrepaymentsForm = () => {
   const handleAmountChange = (type, event) => {
     let value = parseFloat(event.target.value);
     if (isNaN(value)) value = 0;
-    dispatch(updatePrepayments({ type, key: "amount", value }));
+    dispatch(updatePrepayments({ type, key: 'amount', value }));
   };
 
   const handleDateChange = (type, newValue) => {
     dispatch(
       updatePrepayments({
         type,
-        key: type === "oneTime" ? "date" : "startDate",
+        key: type === 'oneTime' ? 'date' : 'startDate',
         value: newValue,
       }),
     );
@@ -78,10 +78,10 @@ const PrepaymentsForm = () => {
           icon={<MonthlyIcon />}
           iconColor={theme.palette.primary.main}
           amountValue={prepayments.monthly.amount}
-          onAmountChange={(e) => handleAmountChange("monthly", e)}
+          onAmountChange={(e) => handleAmountChange('monthly', e)}
           dateLabel="Starting from"
           dateValue={prepayments.monthly.startDate}
-          onDateChange={(newValue) => handleDateChange("monthly", newValue)}
+          onDateChange={(newValue) => handleDateChange('monthly', newValue)}
           currency={currency}
         />
 
@@ -90,10 +90,10 @@ const PrepaymentsForm = () => {
           icon={<RepeatIcon />}
           iconColor={theme.palette.success.main}
           amountValue={prepayments.yearly.amount}
-          onAmountChange={(e) => handleAmountChange("yearly", e)}
+          onAmountChange={(e) => handleAmountChange('yearly', e)}
           dateLabel="Starting from"
           dateValue={prepayments.yearly.startDate}
-          onDateChange={(newValue) => handleDateChange("yearly", newValue)}
+          onDateChange={(newValue) => handleDateChange('yearly', newValue)}
           currency={currency}
         />
 
@@ -102,10 +102,10 @@ const PrepaymentsForm = () => {
           icon={<RepeatIcon />}
           iconColor={theme.palette.info.main}
           amountValue={prepayments.quarterly.amount}
-          onAmountChange={(e) => handleAmountChange("quarterly", e)}
+          onAmountChange={(e) => handleAmountChange('quarterly', e)}
           dateLabel="Starting from"
           dateValue={prepayments.quarterly.startDate}
-          onDateChange={(newValue) => handleDateChange("quarterly", newValue)}
+          onDateChange={(newValue) => handleDateChange('quarterly', newValue)}
           currency={currency}
         />
 
@@ -114,10 +114,10 @@ const PrepaymentsForm = () => {
           icon={<OneTimeIcon />}
           iconColor={theme.palette.warning.main}
           amountValue={prepayments.oneTime.amount}
-          onAmountChange={(e) => handleAmountChange("oneTime", e)}
+          onAmountChange={(e) => handleAmountChange('oneTime', e)}
           dateLabel="Payment month"
           dateValue={prepayments.oneTime.date}
-          onDateChange={(newValue) => handleDateChange("oneTime", newValue)}
+          onDateChange={(newValue) => handleDateChange('oneTime', newValue)}
           currency={currency}
         />
       </Grid>
@@ -134,7 +134,7 @@ const PrepaymentsForm = () => {
       >
         <Typography
           variant="caption"
-          sx={{ color: "success.dark", fontWeight: 600, display: "block" }}
+          sx={{ color: 'success.dark', fontWeight: 600, display: 'block' }}
         >
           💡 Strategy Tip: Even small regular prepayments significantly reduce
           your total interest and loan tenure.

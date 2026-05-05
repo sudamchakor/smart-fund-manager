@@ -113,7 +113,7 @@ describe('Header Component', () => {
         <ThemeProvider theme={theme}>
           <Header />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -127,10 +127,18 @@ describe('Header Component', () => {
     it('renders app title and main navigation buttons', () => {
       renderComponent('/');
       expect(screen.getByText('SmartFund Manager')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Home Loan EMI' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Articles' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Export' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Help & FAQ' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Home Loan EMI' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Articles' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Export' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Help & FAQ' }),
+      ).toBeInTheDocument();
       expect(screen.getByLabelText('Account Circle')).toBeInTheDocument(); // Profile icon
       expect(screen.queryByLabelText('Menu')).not.toBeInTheDocument(); // No mobile menu icon
     });
@@ -158,7 +166,9 @@ describe('Header Component', () => {
     it('highlights the current calculator in the dropdown', () => {
       renderComponent('/investment/sip');
       fireEvent.click(screen.getByRole('button', { name: 'Investment' }));
-      const investmentMenuItem = screen.getByText('Investment').closest('.MuiMenuItem-root');
+      const investmentMenuItem = screen
+        .getByText('Investment')
+        .closest('.MuiMenuItem-root');
       expect(investmentMenuItem).toHaveAttribute('aria-selected', 'true');
     });
 
@@ -188,10 +198,15 @@ describe('Header Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Export' }));
       fireEvent.click(screen.getByText('Download Excel'));
       await waitFor(() => {
-        expect(mockJsonToSheet).toHaveBeenCalledWith(defaultStoreState.emiCalculator.schedule);
+        expect(mockJsonToSheet).toHaveBeenCalledWith(
+          defaultStoreState.emiCalculator.schedule,
+        );
         expect(mockBookNew).toHaveBeenCalledTimes(1);
         expect(mockBookAppendSheet).toHaveBeenCalledTimes(1);
-        expect(mockWriteFile).toHaveBeenCalledWith(expect.any(Object), 'SmartFund_Export.xlsx');
+        expect(mockWriteFile).toHaveBeenCalledWith(
+          expect.any(Object),
+          'SmartFund_Export.xlsx',
+        );
       });
     });
 
@@ -206,7 +221,9 @@ describe('Header Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Export' }));
       fireEvent.click(screen.getByText('Download Excel'));
       await waitFor(() => {
-        expect(mockEnqueueSnackbar).toHaveBeenCalledWith('No data to export', { variant: 'info' });
+        expect(mockEnqueueSnackbar).toHaveBeenCalledWith('No data to export', {
+          variant: 'info',
+        });
         expect(mockWriteFile).not.toHaveBeenCalled();
       });
     });
@@ -257,7 +274,9 @@ describe('Header Component', () => {
 
     it('does not show Export button on non-allowed paths', () => {
       renderComponent('/faq'); // FAQ is not in allowed paths
-      expect(screen.queryByRole('button', { name: 'Export' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Export' }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -267,9 +286,15 @@ describe('Header Component', () => {
       renderComponent('/', true); // isMobile = true
       expect(screen.getByLabelText('Menu')).toBeInTheDocument();
       expect(screen.getByText('SmartFund Manager')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Home Loan EMI' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Articles' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Export' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Home Loan EMI' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Articles' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Export' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByLabelText('Help & FAQ')).not.toBeInTheDocument();
     });
 
@@ -277,11 +302,15 @@ describe('Header Component', () => {
       renderComponent('/', true);
       const menuButton = screen.getByLabelText('Menu');
       fireEvent.click(menuButton);
-      expect(screen.getByRole('presentation', { name: 'Floating Action Menu' })).toBeInTheDocument(); // Drawer is a presentation role
+      expect(
+        screen.getByRole('presentation', { name: 'Floating Action Menu' }),
+      ).toBeInTheDocument(); // Drawer is a presentation role
       expect(screen.getByText('SmartFund Manager')).toBeInTheDocument(); // Drawer header
 
       fireEvent.click(menuButton); // Click again to close
-      expect(screen.queryByRole('presentation', { name: 'Floating Action Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Floating Action Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to home from drawer when app title is clicked', () => {
@@ -289,13 +318,17 @@ describe('Header Component', () => {
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByText('SmartFund Manager'));
       expect(mockNavigate).toHaveBeenCalledWith('/');
-      expect(screen.queryByRole('presentation', { name: 'Floating Action Menu' })).not.toBeInTheDocument(); // Drawer should close
+      expect(
+        screen.queryByRole('presentation', { name: 'Floating Action Menu' }),
+      ).not.toBeInTheDocument(); // Drawer should close
     });
 
     it('toggles Calculators collapse in drawer', () => {
       renderComponent('/', true);
       fireEvent.click(screen.getByLabelText('Menu'));
-      const calculatorsButton = screen.getByRole('button', { name: 'Calculators' });
+      const calculatorsButton = screen.getByRole('button', {
+        name: 'Calculators',
+      });
       fireEvent.click(calculatorsButton); // Open
       expect(screen.getByText('Credit Card EMI')).toBeInTheDocument();
       fireEvent.click(calculatorsButton); // Close
@@ -308,7 +341,9 @@ describe('Header Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'Calculators' })); // Open collapse
       fireEvent.click(screen.getByText('Investment'));
       expect(mockNavigate).toHaveBeenCalledWith('/investment');
-      expect(screen.queryByRole('presentation', { name: 'Floating Action Menu' })).not.toBeInTheDocument(); // Drawer should close
+      expect(
+        screen.queryByRole('presentation', { name: 'Floating Action Menu' }),
+      ).not.toBeInTheDocument(); // Drawer should close
     });
 
     it('navigates to Articles from drawer', () => {
@@ -321,7 +356,9 @@ describe('Header Component', () => {
     it('toggles My Account collapse in drawer', () => {
       renderComponent('/', true);
       fireEvent.click(screen.getByLabelText('Menu'));
-      const myAccountButton = screen.getByRole('button', { name: 'My Account' });
+      const myAccountButton = screen.getByRole('button', {
+        name: 'My Account',
+      });
       fireEvent.click(myAccountButton); // Open
       expect(screen.getByText('Profile Details')).toBeInTheDocument();
       fireEvent.click(myAccountButton); // Close
@@ -334,7 +371,9 @@ describe('Header Component', () => {
       fireEvent.click(screen.getByRole('button', { name: 'My Account' })); // Open collapse
       fireEvent.click(screen.getByText('Wealth Dashboard'));
       expect(mockNavigate).toHaveBeenCalledWith('/profile?tab=wealth');
-      expect(screen.queryByRole('presentation', { name: 'Floating Action Menu' })).not.toBeInTheDocument(); // Drawer should close
+      expect(
+        screen.queryByRole('presentation', { name: 'Floating Action Menu' }),
+      ).not.toBeInTheDocument(); // Drawer should close
     });
 
     it('navigates to Settings from drawer', () => {

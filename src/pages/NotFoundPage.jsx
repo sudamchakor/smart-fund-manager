@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -7,12 +7,12 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
-import { useNavigate } from "react-router-dom";
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import {
   WarningAmber as WarningIcon,
   Dashboard as DashboardIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
 const NotFoundPage = () => {
   const navigate = useNavigate();
@@ -22,37 +22,37 @@ const NotFoundPage = () => {
     <Container maxWidth="sm">
       <Box
         sx={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "80vh",
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '80vh',
           py: 8,
         }}
       >
         <Box
           sx={{
-            width: "100%",
+            width: '100%',
             p: { xs: 4, md: 6 },
             borderRadius: 4,
-            border: "1px solid",
+            border: '1px solid',
             borderColor: alpha(theme.palette.error.main, 0.2),
             bgcolor: theme.palette.background.paper,
-            boxShadow: `0 12px 40px ${alpha(theme.palette.common.black || "#000", 0.05)}`,
-            textAlign: "center",
-            position: "relative",
-            overflow: "hidden",
+            boxShadow: `0 12px 40px ${alpha(theme.palette.common.black || '#000', 0.05)}`,
+            textAlign: 'center',
+            position: 'relative',
+            overflow: 'hidden',
           }}
         >
           {/* Subtle background error tint */}
           <Box
             sx={{
-              position: "absolute",
+              position: 'absolute',
               top: 0,
               left: 0,
               right: 0,
-              height: "4px",
-              bgcolor: "error.main",
+              height: '4px',
+              bgcolor: 'error.main',
             }}
           />
 
@@ -60,11 +60,11 @@ const NotFoundPage = () => {
             {/* Error Icon Well */}
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 p: 2,
                 borderRadius: 3,
                 bgcolor: alpha(theme.palette.error.main, 0.1),
-                color: "error.main",
+                color: 'error.main',
                 mb: 1,
               }}
             >
@@ -77,7 +77,7 @@ const NotFoundPage = () => {
                 variant="h2"
                 sx={{
                   fontWeight: 900,
-                  color: "error.main",
+                  color: 'error.main',
                   letterSpacing: -2,
                   lineHeight: 1,
                 }}
@@ -88,8 +88,8 @@ const NotFoundPage = () => {
                 variant="subtitle1"
                 sx={{
                   fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "text.primary",
+                  textTransform: 'uppercase',
+                  color: 'text.primary',
                   letterSpacing: 2,
                   mt: 1,
                 }}
@@ -109,7 +109,7 @@ const NotFoundPage = () => {
               <Typography
                 variant="body2"
                 sx={{
-                  color: "text.secondary",
+                  color: 'text.secondary',
                   fontWeight: 600,
                   lineHeight: 1.6,
                 }}
@@ -126,19 +126,19 @@ const NotFoundPage = () => {
               color="primary"
               size="large"
               startIcon={<DashboardIcon />}
-              onClick={() => navigate("/")}
+              onClick={() => navigate('/')}
               disableElevation
               sx={{
                 mt: 2,
                 fontWeight: 800,
-                textTransform: "none",
+                textTransform: 'none',
                 borderRadius: 2,
                 px: 4,
                 py: 1.5,
                 boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
-                transition: "transform 0.2s",
-                "&:hover": {
-                  transform: "translateY(-2px)",
+                transition: 'transform 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-2px)',
                 },
               }}
             >

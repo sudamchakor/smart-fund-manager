@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Grid,
   Stack,
@@ -7,10 +7,10 @@ import {
   Divider,
   alpha,
   useTheme,
-} from "@mui/material";
-import DataCard from "../common/DataCard";
-import ExemptionRow from "../common/ExemptionRow";
-import { getWellInputStyle } from "../../styles/formStyles";
+} from '@mui/material';
+import DataCard from '../common/DataCard';
+import ExemptionRow from '../common/ExemptionRow';
+import { getWellInputStyle } from '../../styles/formStyles';
 
 const Declarations = ({
   declarations,
@@ -30,8 +30,8 @@ const Declarations = ({
   ) => {
     const isError = limit && currentValue > limit;
     const helperText = isError
-      ? `Max limit is ₹${limit.toLocaleString("en-IN")}`
-      : "";
+      ? `Max limit is ₹${limit.toLocaleString('en-IN')}`
+      : '';
 
     return (
       <TextField
@@ -49,20 +49,20 @@ const Declarations = ({
             ...getWellInputStyle(theme),
             ...(isError && {
               borderColor: theme.palette.error.main,
-              "&:hover": {
+              '&:hover': {
                 borderColor: theme.palette.error.dark,
               },
             }),
           },
         }}
         sx={{
-          "& .MuiFormHelperText-root": {
-            fontSize: "0.6rem",
-            color: "error.main",
-            position: "absolute",
+          '& .MuiFormHelperText-root': {
+            fontSize: '0.6rem',
+            color: 'error.main',
+            position: 'absolute',
             bottom: -18,
             right: 0,
-            textAlign: "right",
+            textAlign: 'right',
           },
         }}
       />
@@ -77,7 +77,9 @@ const Declarations = ({
             <ExemptionRow
               label="Standard Deduction"
               produced={
-                <Typography sx={{ ...getWellInputStyle(theme), textAlign: "right" }}>
+                <Typography
+                  sx={{ ...getWellInputStyle(theme), textAlign: 'right' }}
+                >
                   ₹75,000
                 </Typography>
               }
@@ -87,9 +89,9 @@ const Declarations = ({
             <ExemptionRow
               label="HRA Exemption"
               produced={createTextField(
-                "exemptions",
-                "hra",
-                "produced",
+                'exemptions',
+                'hra',
+                'produced',
                 declarations.exemptions.hra.produced,
               )}
               limited={declarations.exemptions.hra.limited}
@@ -98,9 +100,9 @@ const Declarations = ({
             <ExemptionRow
               label="Transport Exemption"
               produced={createTextField(
-                "exemptions",
-                "transport",
-                "produced",
+                'exemptions',
+                'transport',
+                'produced',
                 declarations.exemptions.transport.produced,
                 38400,
               )}
@@ -110,9 +112,9 @@ const Declarations = ({
             <ExemptionRow
               label="Gratuity / Other"
               produced={createTextField(
-                "exemptions",
-                "gratuity",
-                "produced",
+                'exemptions',
+                'gratuity',
+                'produced',
                 declarations.exemptions.gratuity.produced,
               )}
               limited={declarations.exemptions.gratuity.limited}
@@ -121,9 +123,9 @@ const Declarations = ({
             <ExemptionRow
               label="Children's Ed. Allowance"
               produced={createTextField(
-                "exemptions",
-                "childrenEduc",
-                "produced",
+                'exemptions',
+                'childrenEduc',
+                'produced',
                 declarations.exemptions.childrenEduc.produced,
                 2400,
               )}
@@ -133,9 +135,9 @@ const Declarations = ({
             <ExemptionRow
               label="LTA Exemption"
               produced={createTextField(
-                "exemptions",
-                "lta",
-                "produced",
+                'exemptions',
+                'lta',
+                'produced',
                 declarations.exemptions.lta.produced,
               )}
               limited={declarations.exemptions.lta.limited}
@@ -144,9 +146,9 @@ const Declarations = ({
             <ExemptionRow
               label="Uniform Expenses"
               produced={createTextField(
-                "exemptions",
-                "uniform",
-                "produced",
+                'exemptions',
+                'uniform',
+                'produced',
                 declarations.exemptions.uniform.produced,
               )}
               limited={declarations.exemptions.uniform.limited}
@@ -158,32 +160,32 @@ const Declarations = ({
         <DataCard title="B. Other Income">
           <Stack spacing={2}>
             {createTextField(
-              "otherIncome",
-              "bonus",
+              'otherIncome',
+              'bonus',
               null,
               declarations.otherIncome.bonus,
             )}
             {createTextField(
-              "otherIncome",
-              "savingsInt",
+              'otherIncome',
+              'savingsInt',
               null,
               declarations.otherIncome.savingsInt,
             )}
             {createTextField(
-              "otherIncome",
-              "dividends",
+              'otherIncome',
+              'dividends',
               null,
               declarations.otherIncome.dividends,
             )}
             {createTextField(
-              "otherIncome",
-              "capitalGains",
+              'otherIncome',
+              'capitalGains',
               null,
               declarations.otherIncome.capitalGains,
             )}
             {createTextField(
-              "otherIncome",
-              "crypto",
+              'otherIncome',
+              'crypto',
               null,
               declarations.otherIncome.crypto,
             )}
@@ -197,9 +199,9 @@ const Declarations = ({
             <ExemptionRow
               label="80D - Health Insurance"
               produced={createTextField(
-                "deductions",
-                "sec80D",
-                "produced",
+                'deductions',
+                'sec80D',
+                'produced',
                 declarations.deductions.sec80D.produced,
                 100000,
               )}
@@ -209,9 +211,9 @@ const Declarations = ({
             <ExemptionRow
               label="80DD/DDB - Medical"
               produced={createTextField(
-                "deductions",
-                "sec80DD_DDB",
-                "produced",
+                'deductions',
+                'sec80DD_DDB',
+                'produced',
                 declarations.deductions.sec80DD_DDB.produced,
                 125000,
               )}
@@ -221,9 +223,9 @@ const Declarations = ({
             <ExemptionRow
               label="80E/EEB - Loan Interest"
               produced={createTextField(
-                "deductions",
-                "sec80E_EEB",
-                "produced",
+                'deductions',
+                'sec80E_EEB',
+                'produced',
                 declarations.deductions.sec80E_EEB.produced,
               )}
               limited={declarations.deductions.sec80E_EEB.limited}
@@ -232,9 +234,9 @@ const Declarations = ({
             <ExemptionRow
               label="80G - Charity Donations"
               produced={createTextField(
-                "deductions",
-                "sec80G",
-                "produced",
+                'deductions',
+                'sec80G',
+                'produced',
                 declarations.deductions.sec80G.produced,
               )}
               limited={declarations.deductions.sec80G.limited}
@@ -243,9 +245,9 @@ const Declarations = ({
             <ExemptionRow
               label="80GG - Rent (No HRA)"
               produced={createTextField(
-                "deductions",
-                "sec80GG",
-                "produced",
+                'deductions',
+                'sec80GG',
+                'produced',
                 declarations.deductions.sec80GG.produced,
                 60000,
               )}
@@ -255,9 +257,9 @@ const Declarations = ({
             <ExemptionRow
               label="80TTA/U - Bank Interest"
               produced={createTextField(
-                "deductions",
-                "sec80TTA_U",
-                "produced",
+                'deductions',
+                'sec80TTA_U',
+                'produced',
                 declarations.deductions.sec80TTA_U.produced,
                 50000,
               )}
@@ -267,8 +269,8 @@ const Declarations = ({
             <ExemptionRow
               label="Sec 24(b) - Home Loan"
               produced={createTextField(
-                "houseProperty",
-                "interest",
+                'houseProperty',
+                'interest',
                 null,
                 houseProperty.interest,
                 200000,
@@ -285,27 +287,27 @@ const Declarations = ({
         <DataCard title="D. Sec 80C Investments">
           <Stack spacing={2}>
             {createTextField(
-              "sec80C",
-              "npsEmployee",
+              'sec80C',
+              'npsEmployee',
               null,
               declarations.sec80C.npsEmployee,
             )}
             {createTextField(
-              "sec80C",
-              "npsEmployer",
+              'sec80C',
+              'npsEmployer',
               null,
               declarations.sec80C.npsEmployer,
             )}
             {createTextField(
-              "sec80C",
-              "standard80C",
+              'sec80C',
+              'standard80C',
               null,
               declarations.sec80C.standard80C,
               150000,
             )}
             {createTextField(
-              "sec80C",
-              "superannuation",
+              'sec80C',
+              'superannuation',
               null,
               declarations.sec80C.superannuation,
             )}
@@ -324,19 +326,19 @@ const Declarations = ({
                 variant="caption"
                 sx={{
                   fontWeight: 800,
-                  textTransform: "uppercase",
-                  color: "text.secondary",
+                  textTransform: 'uppercase',
+                  color: 'text.secondary',
                 }}
               >
                 Total 80C Claimed
               </Typography>
               <Typography
                 variant="subtitle2"
-                sx={{ fontWeight: 900, color: "text.primary" }}
+                sx={{ fontWeight: 900, color: 'text.primary' }}
               >
-                ₹{" "}
+                ₹{' '}
                 {Math.round(declarations.sec80C.limited).toLocaleString(
-                  "en-IN",
+                  'en-IN',
                 )}
               </Typography>
             </Stack>

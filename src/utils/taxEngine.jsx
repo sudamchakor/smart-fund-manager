@@ -1,4 +1,4 @@
-import { taxRules } from "./taxRules";
+import { taxRules } from './taxRules';
 
 // Pure mathematical functions for tax calculations
 const calculateOldRegimeSlabs = (taxableIncome, age) => {
@@ -11,10 +11,7 @@ const calculateOldRegimeSlabs = (taxableIncome, age) => {
   remainingIncome -= exemptionLimit;
 
   if (exemptionLimit < 500000) {
-    let taxableInThisSlab = Math.min(
-      remainingIncome,
-      500000 - exemptionLimit,
-    );
+    let taxableInThisSlab = Math.min(remainingIncome, 500000 - exemptionLimit);
     tax += taxableInThisSlab * 0.05;
     remainingIncome -= taxableInThisSlab;
   }
@@ -22,12 +19,12 @@ const calculateOldRegimeSlabs = (taxableIncome, age) => {
   if (remainingIncome <= 0) return tax;
 
   let taxableIn20Slab = Math.min(remainingIncome, 500000);
-  tax += taxableIn20Slab * 0.20;
+  tax += taxableIn20Slab * 0.2;
   remainingIncome -= taxableIn20Slab;
 
   if (remainingIncome <= 0) return tax;
 
-  tax += remainingIncome * 0.30;
+  tax += remainingIncome * 0.3;
 
   return tax;
 };
@@ -46,7 +43,7 @@ const calculateNewRegimeSlabs = (taxableIncome) => {
   if (remainingIncome <= 0) return tax;
 
   let slab2 = Math.min(remainingIncome, 300000);
-  tax += slab2 * 0.10;
+  tax += slab2 * 0.1;
   remainingIncome -= slab2;
   if (remainingIncome <= 0) return tax;
 
@@ -56,11 +53,11 @@ const calculateNewRegimeSlabs = (taxableIncome) => {
   if (remainingIncome <= 0) return tax;
 
   let slab4 = Math.min(remainingIncome, 300000);
-  tax += slab4 * 0.20;
+  tax += slab4 * 0.2;
   remainingIncome -= slab4;
   if (remainingIncome <= 0) return tax;
 
-  tax += remainingIncome * 0.30;
+  tax += remainingIncome * 0.3;
 
   return tax;
 };
@@ -138,7 +135,7 @@ export const calculateTax = (income, declarations, houseProperty, meta) => {
       taxableIncome: newTaxableIncome,
       tax: newTotalTax,
     },
-    optimal: oldTotalTax < newTotalTax ? "Old Regime" : "New Regime",
+    optimal: oldTotalTax < newTotalTax ? 'Old Regime' : 'New Regime',
     savings: Math.abs(oldTotalTax - newTotalTax),
   };
 };

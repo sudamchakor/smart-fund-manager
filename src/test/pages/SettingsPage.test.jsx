@@ -1,5 +1,11 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -22,19 +28,33 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
-  <div data-testid="mock-page-header">
-    <h1>{title}</h1>
-    <p>{subtitle}</p>
-    {Icon && <Icon data-testid="mock-header-icon" />}
-  </div>
-));
-jest.mock('../../components/common/ThemeSelector', () => ({ selectedTheme, onThemeChange }) => (
-  <div data-testid="mock-theme-selector">
-    <span data-testid="selected-theme">{selectedTheme}</span>
-    <button onClick={() => onThemeChange(selectedTheme === 'light' ? 'dark' : 'light')}>Change Theme</button>
-  </div>
-));
+jest.mock(
+  '../../components/common/PageHeader',
+  () =>
+    ({ title, subtitle, icon: Icon }) => (
+      <div data-testid="mock-page-header">
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+        {Icon && <Icon data-testid="mock-header-icon" />}
+      </div>
+    ),
+);
+jest.mock(
+  '../../components/common/ThemeSelector',
+  () =>
+    ({ selectedTheme, onThemeChange }) => (
+      <div data-testid="mock-theme-selector">
+        <span data-testid="selected-theme">{selectedTheme}</span>
+        <button
+          onClick={() =>
+            onThemeChange(selectedTheme === 'light' ? 'dark' : 'light')
+          }
+        >
+          Change Theme
+        </button>
+      </div>
+    ),
+);
 
 // Mock themePresets globally for consistent testing
 jest.mock('../../theme/ThemeConfig', () => ({
@@ -50,11 +70,17 @@ jest.mock('../../theme/ThemeConfig', () => ({
 }));
 const { themePresets, currencyOptions } = require('../../theme/ThemeConfig');
 
-
 // Mock Material-UI Slide component to render children directly
-jest.mock('@mui/material/Slide', () => ({ children, in: isIn, direction }) => (
-  isIn ? <div data-testid="mock-slide" data-direction={direction}>{children}</div> : null
-));
+jest.mock(
+  '@mui/material/Slide',
+  () =>
+    ({ children, in: isIn, direction }) =>
+      isIn ? (
+        <div data-testid="mock-slide" data-direction={direction}>
+          {children}
+        </div>
+      ) : null,
+);
 
 const mockStore = configureStore([]);
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -78,14 +104,16 @@ describe('SettingsPage Component', () => {
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     // Reset mockUseSelector to default behavior for each test
-    mockUseSelector.mockImplementation((selector) => selector({ emi: initialGlobalSettings }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({ emi: initialGlobalSettings }),
+    );
     mockUseDispatch.mockReturnValue(jest.fn()); // Ensure useDispatch returns a mock function
   });
 
@@ -94,7 +122,9 @@ describe('SettingsPage Component', () => {
     renderComponent();
     expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
     expect(screen.getByText('Settings')).toBeInTheDocument();
-    expect(screen.getByText('Configure your workspace environment.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Configure your workspace environment.'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // SettingsIcon
   });
 
@@ -127,7 +157,9 @@ describe('SettingsPage Component', () => {
 
   it('Currency select shows correct initial value and options', () => {
     renderComponent();
-    expect(screen.getByRole('button', { name: 'Rupee (₹)' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Rupee (₹)' }),
+    ).toBeInTheDocument();
     fireEvent.mouseDown(screen.getByRole('button', { name: 'Rupee (₹)' })); // Open select
     expect(screen.getByText('Dollar ($)')).toBeInTheDocument();
     expect(screen.getByText('Euro (€)')).toBeInTheDocument();
@@ -182,15 +214,21 @@ describe('SettingsPage Component', () => {
   it('action bar becomes visible when settings are dirty', () => {
     const { rerender } = renderComponent();
     // Simulate a change in settings to make it dirty
-    mockUseSelector.mockImplementation((selector) => selector({
-      emi: { ...initialGlobalSettings, themeMode: 'dark' }
-    }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({
+        emi: { ...initialGlobalSettings, themeMode: 'dark' },
+      }),
+    );
     rerender(
-      <Provider store={mockStore({ emi: { ...initialGlobalSettings, themeMode: 'dark' } })}>
+      <Provider
+        store={mockStore({
+          emi: { ...initialGlobalSettings, themeMode: 'dark' },
+        })}
+      >
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     expect(screen.getByTestId('mock-slide')).toBeInTheDocument();
     expect(screen.getByText('Unsaved Preview')).toBeInTheDocument();
@@ -201,21 +239,37 @@ describe('SettingsPage Component', () => {
   it('calls handleSave and hides action bar when Save button is clicked, dispatching current settings', async () => {
     const dispatch = mockUseDispatch();
     const { rerender } = renderComponent();
-    const changedSettings = { ...initialGlobalSettings, themeMode: 'dark', currency: '$' };
-    mockUseSelector.mockImplementation((selector) => selector({ emi: changedSettings }));
+    const changedSettings = {
+      ...initialGlobalSettings,
+      themeMode: 'dark',
+      currency: '$',
+    };
+    mockUseSelector.mockImplementation((selector) =>
+      selector({ emi: changedSettings }),
+    );
     rerender(
       <Provider store={mockStore({ emi: changedSettings })}>
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    expect(dispatch).toHaveBeenCalledWith(setThemeMode(changedSettings.themeMode));
-    expect(dispatch).toHaveBeenCalledWith(setDesignSystem(changedSettings.designSystem));
-    expect(dispatch).toHaveBeenCalledWith(setVisualStyle(changedSettings.visualStyle));
-    expect(dispatch).toHaveBeenCalledWith(setCurrency(changedSettings.currency));
-    expect(dispatch).toHaveBeenCalledWith(setAutoSave(changedSettings.autoSave));
+    expect(dispatch).toHaveBeenCalledWith(
+      setThemeMode(changedSettings.themeMode),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setDesignSystem(changedSettings.designSystem),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setVisualStyle(changedSettings.visualStyle),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setCurrency(changedSettings.currency),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setAutoSave(changedSettings.autoSave),
+    );
     expect(screen.queryByTestId('mock-slide')).not.toBeInTheDocument();
   });
 
@@ -223,23 +277,39 @@ describe('SettingsPage Component', () => {
     const dispatch = mockUseDispatch();
     const { rerender } = renderComponent();
     // Simulate a change in settings to make it dirty
-    mockUseSelector.mockImplementation((selector) => selector({
-      emi: { ...initialGlobalSettings, themeMode: 'dark', currency: '$' }
-    }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({
+        emi: { ...initialGlobalSettings, themeMode: 'dark', currency: '$' },
+      }),
+    );
     rerender(
-      <Provider store={mockStore({ emi: { ...initialGlobalSettings, themeMode: 'dark', currency: '$' } })}>
+      <Provider
+        store={mockStore({
+          emi: { ...initialGlobalSettings, themeMode: 'dark', currency: '$' },
+        })}
+      >
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     fireEvent.click(screen.getByRole('button', { name: 'Discard' }));
     // Expect dispatch to be called with original settings
-    expect(dispatch).toHaveBeenCalledWith(setThemeMode(initialGlobalSettings.themeMode));
-    expect(dispatch).toHaveBeenCalledWith(setDesignSystem(initialGlobalSettings.designSystem));
-    expect(dispatch).toHaveBeenCalledWith(setVisualStyle(initialGlobalSettings.visualStyle));
-    expect(dispatch).toHaveBeenCalledWith(setCurrency(initialGlobalSettings.currency));
-    expect(dispatch).toHaveBeenCalledWith(setAutoSave(initialGlobalSettings.autoSave));
+    expect(dispatch).toHaveBeenCalledWith(
+      setThemeMode(initialGlobalSettings.themeMode),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setDesignSystem(initialGlobalSettings.designSystem),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setVisualStyle(initialGlobalSettings.visualStyle),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setCurrency(initialGlobalSettings.currency),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setAutoSave(initialGlobalSettings.autoSave),
+    );
     expect(screen.queryByTestId('mock-slide')).not.toBeInTheDocument();
   });
 
@@ -248,24 +318,40 @@ describe('SettingsPage Component', () => {
     const dispatch = mockUseDispatch();
     const { rerender, unmount } = renderComponent();
     // Simulate a change in settings
-    mockUseSelector.mockImplementation((selector) => selector({
-      emi: { ...initialGlobalSettings, themeMode: 'dark' }
-    }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({
+        emi: { ...initialGlobalSettings, themeMode: 'dark' },
+      }),
+    );
     rerender(
-      <Provider store={mockStore({ emi: { ...initialGlobalSettings, themeMode: 'dark' } })}>
+      <Provider
+        store={mockStore({
+          emi: { ...initialGlobalSettings, themeMode: 'dark' },
+        })}
+      >
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     // Unmount the component without clicking save
     unmount();
     // Expect dispatch to be called with original settings
-    expect(dispatch).toHaveBeenCalledWith(setThemeMode(initialGlobalSettings.themeMode));
-    expect(dispatch).toHaveBeenCalledWith(setDesignSystem(initialGlobalSettings.designSystem));
-    expect(dispatch).toHaveBeenCalledWith(setVisualStyle(initialGlobalSettings.visualStyle));
-    expect(dispatch).toHaveBeenCalledWith(setCurrency(initialGlobalSettings.currency));
-    expect(dispatch).toHaveBeenCalledWith(setAutoSave(initialGlobalSettings.autoSave));
+    expect(dispatch).toHaveBeenCalledWith(
+      setThemeMode(initialGlobalSettings.themeMode),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setDesignSystem(initialGlobalSettings.designSystem),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setVisualStyle(initialGlobalSettings.visualStyle),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setCurrency(initialGlobalSettings.currency),
+    );
+    expect(dispatch).toHaveBeenCalledWith(
+      setAutoSave(initialGlobalSettings.autoSave),
+    );
   });
 
   it('does not revert settings on unmount if not dirty', () => {
@@ -279,15 +365,21 @@ describe('SettingsPage Component', () => {
     const dispatch = mockUseDispatch();
     const { rerender, unmount } = renderComponent();
     // Simulate a change in settings
-    mockUseSelector.mockImplementation((selector) => selector({
-      emi: { ...initialGlobalSettings, themeMode: 'dark' }
-    }));
+    mockUseSelector.mockImplementation((selector) =>
+      selector({
+        emi: { ...initialGlobalSettings, themeMode: 'dark' },
+      }),
+    );
     rerender(
-      <Provider store={mockStore({ emi: { ...initialGlobalSettings, themeMode: 'dark' } })}>
+      <Provider
+        store={mockStore({
+          emi: { ...initialGlobalSettings, themeMode: 'dark' },
+        })}
+      >
         <ThemeProvider theme={theme}>
           <SettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     // Click save
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -313,11 +405,15 @@ describe('SettingsPage Component', () => {
         <ThemeProvider theme={theme}>
           <MockedSettingsPage />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
     expect(screen.queryByRole('option')).not.toBeInTheDocument(); // No options in Layout Style select
-    expect(screen.queryByRole('button', { name: 'Modern' })).not.toBeInTheDocument(); // No default selected
-    expect(screen.queryByRole('button', { name: 'Rupee (₹)' })).not.toBeInTheDocument(); // No default selected
+    expect(
+      screen.queryByRole('button', { name: 'Modern' }),
+    ).not.toBeInTheDocument(); // No default selected
+    expect(
+      screen.queryByRole('button', { name: 'Rupee (₹)' }),
+    ).not.toBeInTheDocument(); // No default selected
     jest.dontMock('../../theme/ThemeConfig'); // Clean up mock
   });
 
@@ -333,8 +429,12 @@ describe('SettingsPage Component', () => {
     // Should render without crashing, selects might show empty or default values
     expect(screen.getByText('Settings')).toBeInTheDocument();
     // Default currency should be displayed if null
-    expect(screen.getByRole('button', { name: 'Rupee (₹)' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Rupee (₹)' }),
+    ).toBeInTheDocument();
     // autoSave: null should result in unchecked
-    expect(screen.getByRole('checkbox', { name: 'Cloud Sync' })).not.toBeChecked();
+    expect(
+      screen.getByRole('checkbox', { name: 'Cloud Sync' }),
+    ).not.toBeChecked();
   });
 });

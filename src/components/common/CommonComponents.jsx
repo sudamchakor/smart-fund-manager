@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   TextField,
   InputAdornment,
@@ -8,10 +8,10 @@ import {
   Typography,
   useTheme,
   alpha,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-import { labelStyle, getWellInputStyle } from "../../styles/formStyles";
+} from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import { labelStyle, getWellInputStyle } from '../../styles/formStyles';
 
 export const AmountInput = ({
   label,
@@ -22,24 +22,28 @@ export const AmountInput = ({
   placeholder,
 }) => {
   const theme = useTheme();
-  const isPercentage = currency === "%";
+  const isPercentage = currency === '%';
 
   return (
-    <Box sx={{ width: "100%", opacity: disabled ? 0.6 : 1 }}>
-      {label && <Typography sx={labelStyle} id={`${label}-amount-input-label`}>{label}</Typography>}
+    <Box sx={{ width: '100%', opacity: disabled ? 0.6 : 1 }}>
+      {label && (
+        <Typography sx={labelStyle} id={`${label}-amount-input-label`}>
+          {label}
+        </Typography>
+      )}
       <TextField
         variant="standard"
         fullWidth
         disabled={disabled}
         type="number"
-        value={value || ""}
+        value={value || ''}
         onChange={onChange}
         onFocus={(e) => e.target.select()}
         placeholder={placeholder}
         aria-labelledby={`${label}-amount-input-label`}
         inputProps={{
-          min: "0",
-          step: "0.01",
+          min: '0',
+          step: '0.01',
         }}
         InputProps={{
           disableUnderline: true,
@@ -48,10 +52,10 @@ export const AmountInput = ({
               <InputAdornment
                 position="start"
                 sx={{
-                  "& p": {
+                  '& p': {
                     fontWeight: 900,
-                    fontSize: "0.85rem",
-                    color: "primary.main",
+                    fontSize: '0.85rem',
+                    color: 'primary.main',
                   },
                 }}
               >
@@ -62,10 +66,10 @@ export const AmountInput = ({
             <InputAdornment
               position="end"
               sx={{
-                "& p": {
+                '& p': {
                   fontWeight: 900,
-                  fontSize: "0.85rem",
-                  color: "primary.main",
+                  fontSize: '0.85rem',
+                  color: 'primary.main',
                 },
               }}
             >
@@ -74,17 +78,17 @@ export const AmountInput = ({
           ) : null,
           sx: {
             ...getWellInputStyle(theme),
-            "&.Mui-focused": {
+            '&.Mui-focused': {
               bgcolor: alpha(theme.palette.primary.main, 0.1),
               borderColor: alpha(theme.palette.primary.main, 0.3),
             },
           },
         }}
         sx={{
-          "& input": { textAlign: "right" },
-          "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-            { display: "none" },
-          MozAppearance: "textfield",
+          '& input': { textAlign: 'right' },
+          '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+            { display: 'none' },
+          MozAppearance: 'textfield',
         }}
       />
     </Box>
@@ -103,20 +107,24 @@ export const AmountWithUnitInput = ({
   const theme = useTheme();
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {label && <Typography sx={labelStyle} id={`${label}-amount-unit-input-label`}>{label}</Typography>}
+    <Box sx={{ width: '100%' }}>
+      {label && (
+        <Typography sx={labelStyle} id={`${label}-amount-unit-input-label`}>
+          {label}
+        </Typography>
+      )}
 
       {/* Unified Control Strip */}
       <Box
         sx={{
-          display: "flex",
-          alignItems: "stretch",
+          display: 'flex',
+          alignItems: 'stretch',
           borderRadius: 1.5,
           border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           bgcolor: alpha(theme.palette.primary.main, 0.05),
-          overflow: "hidden",
-          transition: "all 0.2s",
-          "&:focus-within": {
+          overflow: 'hidden',
+          transition: 'all 0.2s',
+          '&:focus-within': {
             borderColor: alpha(theme.palette.primary.main, 0.3),
             bgcolor: alpha(theme.palette.primary.main, 0.1),
           },
@@ -127,24 +135,24 @@ export const AmountWithUnitInput = ({
           sx={{
             flex: 1,
             minWidth: 0,
-            "& input": {
-              textAlign: "right",
+            '& input': {
+              textAlign: 'right',
               px: 1.5,
               py: 1,
               fontWeight: 900,
-              color: "primary.main",
+              color: 'primary.main',
             },
-            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-              { display: "none" },
-            MozAppearance: "textfield",
+            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+              { display: 'none' },
+            MozAppearance: 'textfield',
           }}
           type="number"
-          value={value || ""}
+          value={value || ''}
           onChange={onAmountChange}
           onFocus={(e) => e.target.select()}
           placeholder={placeholder}
           aria-labelledby={`${label}-amount-unit-input-label`}
-          inputProps={{ min: "0", step: "0.01" }}
+          inputProps={{ min: '0', step: '0.01' }}
           InputProps={{ disableUnderline: true }}
         />
 
@@ -158,17 +166,17 @@ export const AmountWithUnitInput = ({
           }}
           sx={{
             borderLeft: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-            "& .MuiToggleButton-root": {
-              border: "none",
+            '& .MuiToggleButton-root': {
+              border: 'none',
               borderRadius: 0,
               px: 2,
               fontWeight: 800,
-              fontSize: "0.75rem",
-              color: "text.secondary",
-              "&.Mui-selected": {
+              fontSize: '0.75rem',
+              color: 'text.secondary',
+              '&.Mui-selected': {
                 bgcolor: alpha(theme.palette.primary.main, 0.15),
-                color: "primary.main",
-                "&:hover": { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+                color: 'primary.main',
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
               },
             },
           }}
@@ -188,7 +196,7 @@ export const DatePickerInput = ({ label, value, onChange }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const dayjsValue = value
-    ? typeof value === "string"
+    ? typeof value === 'string'
       ? dayjs(value)
       : value
     : null;
@@ -202,11 +210,15 @@ export const DatePickerInput = ({ label, value, onChange }) => {
   };
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {label && <Typography sx={labelStyle} id={`${label}-date-picker-label`}>{label}</Typography>}
+    <Box sx={{ width: '100%' }}>
+      {label && (
+        <Typography sx={labelStyle} id={`${label}-date-picker-label`}>
+          {label}
+        </Typography>
+      )}
       <DatePicker
         label={label}
-        views={["year", "month"]}
+        views={['year', 'month']}
         openTo="month"
         open={open}
         onOpen={() => setOpen(true)}
@@ -215,16 +227,16 @@ export const DatePickerInput = ({ label, value, onChange }) => {
         onChange={handleChange}
         slotProps={{
           textField: {
-            variant: "standard",
+            variant: 'standard',
             fullWidth: true,
             onClick: () => setOpen(true),
-            "aria-labelledby": `${label}-date-picker-label`,
+            'aria-labelledby': `${label}-date-picker-label`,
             InputProps: {
               disableUnderline: true,
               sx: {
                 ...getWellInputStyle(theme),
-                cursor: "pointer",
-                "& input": { cursor: "pointer", textAlign: "right" },
+                cursor: 'pointer',
+                '& input': { cursor: 'pointer', textAlign: 'right' },
               },
             },
           },

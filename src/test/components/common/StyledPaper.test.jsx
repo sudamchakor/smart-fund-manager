@@ -12,13 +12,15 @@ describe('StyledPaper Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <StyledPaper {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
   // --- Positive Scenarios ---
   it('renders children correctly', () => {
-    renderComponent({ children: <div data-testid="child-element">Test Child</div> });
+    renderComponent({
+      children: <div data-testid="child-element">Test Child</div>,
+    });
     expect(screen.getByTestId('child-element')).toBeInTheDocument();
     expect(screen.getByText('Test Child')).toBeInTheDocument();
   });

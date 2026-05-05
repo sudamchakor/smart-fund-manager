@@ -1,19 +1,19 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 
 const initialState = {
   assets: [],
   investmentTypes: [
-    { value: "Equity", label: "Equity (Stocks, Mutual Funds)" },
-    { value: "Debt", label: "Debt (Bonds, FDs, PPF)" },
-    { value: "Gold", label: "Gold (Digital, Physical, SGBs)" },
-    { value: "Real Estate", label: "Real Estate" },
-    { value: "NPS", label: "National Pension System (NPS)" },
-    { value: "Cash", label: "Cash & Equivalents" },
+    { value: 'Equity', label: 'Equity (Stocks, Mutual Funds)' },
+    { value: 'Debt', label: 'Debt (Bonds, FDs, PPF)' },
+    { value: 'Gold', label: 'Gold (Digital, Physical, SGBs)' },
+    { value: 'Real Estate', label: 'Real Estate' },
+    { value: 'NPS', label: 'National Pension System (NPS)' },
+    { value: 'Cash', label: 'Cash & Equivalents' },
   ],
 };
 
 const corpusSlice = createSlice({
-  name: "corpus",
+  name: 'corpus',
   initialState,
   reducers: {
     addAsset: (state, action) => {

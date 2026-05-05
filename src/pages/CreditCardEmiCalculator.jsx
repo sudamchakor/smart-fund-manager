@@ -1,16 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  Box,
-  Typography,
-  Grid,
-  Stack,
-  useTheme,
-  alpha,
-} from "@mui/material";
-import { CreditCard as CreditCardIcon } from "@mui/icons-material";
-import PageHeader from "../components/common/PageHeader";
-import InputSlider from "../components/common/InputSlider";
-import LoanSummaryTerminal from "../components/common/LoanSummaryTerminal";
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Grid, Stack, useTheme, alpha } from '@mui/material';
+import { CreditCard as CreditCardIcon } from '@mui/icons-material';
+import PageHeader from '../components/common/PageHeader';
+import InputSlider from '../components/common/InputSlider';
+import LoanSummaryTerminal from '../components/common/LoanSummaryTerminal';
 
 const CreditCardEMICalculator = () => {
   const theme = useTheme();
@@ -63,12 +56,12 @@ const CreditCardEMICalculator = () => {
       sx={{
         p: { xs: 2, md: 4 },
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
 
-        mx: "auto",
+        mx: 'auto',
       }}
     >
       <PageHeader

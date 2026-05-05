@@ -1,20 +1,20 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 // Define the default initial state
 const defaultInitialState = {
   loanDetails: {
     homeValue: 5000000,
     marginAmount: 1000000,
-    marginUnit: "Rs", // 'Rs' or '%'
+    marginUnit: 'Rs', // 'Rs' or '%'
     loanInsurance: 0,
     interestRate: 8.5,
     loanTenure: 20,
-    tenureUnit: "years", // 'years' or 'months'
+    tenureUnit: 'years', // 'years' or 'months'
     loanFees: 10000,
-    feesUnit: "Rs", // 'Rs' or '%'
+    feesUnit: 'Rs', // 'Rs' or '%'
     startDate: new Date().toISOString(),
     yearlyPaymentIncreaseAmount: 0,
-    yearlyPaymentIncreaseUnit: "%",
+    yearlyPaymentIncreaseUnit: '%',
   },
   prepayments: {
     monthly: { amount: 0, startDate: new Date().toISOString() },
@@ -24,26 +24,26 @@ const defaultInitialState = {
   },
   expenses: {
     oneTimeExpenses: 0,
-    oneTimeUnit: "Rs",
+    oneTimeUnit: 'Rs',
     propertyTaxes: 0,
-    taxesUnit: "Rs",
+    taxesUnit: 'Rs',
     homeInsurance: 0,
-    homeInsUnit: "Rs",
+    homeInsUnit: 'Rs',
     maintenance: 0,
   },
   isLoanActive: true,
-  currency: "₹",
-  themeMode: "dodgerblue",
+  currency: '₹',
+  themeMode: 'dodgerblue',
 
   // --- ARCHITECTURAL STATE ---
-  designSystem: "material", // 'material' | 'apple' | 'fluent'
-  visualStyle: "flat",      // 'flat' | 'minimalist' | 'glass' | 'neumorphic'
+  designSystem: 'material', // 'material' | 'apple' | 'fluent'
+  visualStyle: 'flat', // 'flat' | 'minimalist' | 'glass' | 'neumorphic'
 
   autoSave: true,
 };
 
 const emiSlice = createSlice({
-  name: "emi",
+  name: 'emi',
   initialState: defaultInitialState,
   reducers: {
     // Financial Reducers
@@ -61,12 +61,14 @@ const emiSlice = createSlice({
       state.prepayments[type][key] = value;
     },
     changeLoanUnit: (state, action) => {
-      const { unitField, amountField, newUnit, convertedAmount } = action.payload;
+      const { unitField, amountField, newUnit, convertedAmount } =
+        action.payload;
       state.loanDetails[unitField] = newUnit;
       state.loanDetails[amountField] = convertedAmount;
     },
     changeExpenseUnit: (state, action) => {
-      const { unitField, amountField, newUnit, convertedAmount } = action.payload;
+      const { unitField, amountField, newUnit, convertedAmount } =
+        action.payload;
       state.expenses[unitField] = newUnit;
       state.expenses[amountField] = convertedAmount;
     },

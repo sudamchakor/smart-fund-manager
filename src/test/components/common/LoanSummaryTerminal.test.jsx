@@ -23,7 +23,7 @@ describe('LoanSummaryTerminal Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <LoanSummaryTerminal {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -56,7 +56,9 @@ describe('LoanSummaryTerminal Component', () => {
     renderComponent({ interestColor: 'error.main' });
     const totalInterestElement = screen.getByText(/₹1,00,000/);
     // MUI uses theme.palette.error.main for 'error.main'
-    expect(totalInterestElement).toHaveStyle(`color: ${theme.palette.error.main}`);
+    expect(totalInterestElement).toHaveStyle(
+      `color: ${theme.palette.error.main}`,
+    );
   });
 
   it('renders children correctly', () => {

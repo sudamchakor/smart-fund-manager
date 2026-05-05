@@ -4,27 +4,57 @@ body {
   padding: 0;
   min-height: 100vh;
 
-  background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.02) 1px, transparent 0);
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(0, 0, 0, 0.02) 1px,
+    transparent 0
+  );
   background-size: 30px 30px;
 }
 
 /* --- DATA ATTRIBUTE THEME OVERRIDES --- */
-[data-theme="dodgerblue"] { background-color: #F8FAFF; }
-[data-theme="dark"] { background-color: #1C1B1F; color: #E6E1E5; }
-[data-theme="zinc"] { background-color: #FFFFFF; }
-[data-theme="green"] { background-color: #F1F8F1; }
-[data-theme="rose"] { background-color: #FFF8F9; }
-[data-theme="amber"] { background-color: #FFF8F1; }
-[data-theme="indigo"] { background-color: #FEFBFF; }
+[data-theme='dodgerblue'] {
+  background-color: #f8faff;
+}
+[data-theme='dark'] {
+  background-color: #1c1b1f;
+  color: #e6e1e5;
+}
+[data-theme='zinc'] {
+  background-color: #ffffff;
+}
+[data-theme='green'] {
+  background-color: #f1f8f1;
+}
+[data-theme='rose'] {
+  background-color: #fff8f9;
+}
+[data-theme='amber'] {
+  background-color: #fff8f1;
+}
+[data-theme='indigo'] {
+  background-color: #fefbff;
+}
 
 /* NEW THEMES */
-[data-theme="teal"] { background-color: #F4FBFB; }
-[data-theme="slate"] { background-color: #F8FAFC; }
-[data-theme="violet"] { background-color: #FFFBFE; }
+[data-theme='teal'] {
+  background-color: #f4fbfb;
+}
+[data-theme='slate'] {
+  background-color: #f8fafc;
+}
+[data-theme='violet'] {
+  background-color: #fffbfe;
+}
 
 /* Dark Grid Adjustment */
-[data-theme="dark"] body, [data-theme="slate"] body {
-  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.03) 1px, transparent 0);
+[data-theme='dark'] body,
+[data-theme='slate'] body {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(255, 255, 255, 0.03) 1px,
+    transparent 0
+  );
 }
 
 /* --- Layout Stability --- */
@@ -40,12 +70,12 @@ main {
   width: calc(100% - 40px);
   max-width: 1200px;
   align-self: center;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   backdrop-filter: blur(12px);
 }
 
-.MuiPaper-root[elevation="24"] {
+.MuiPaper-root[elevation='24'] {
   border-radius: 100px;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.3) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3) !important;
 }

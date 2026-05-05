@@ -1,11 +1,11 @@
-import { createSlice, createSelector } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 
 const currentYear = new Date().getFullYear();
 
 const initialState = {
-  name: "",
-  occupation: "",
-  riskTolerance: "medium",
+  name: '',
+  occupation: '',
+  riskTolerance: 'medium',
   currentAge: 30,
   retirementAge: 60,
   considerInflation: false,
@@ -15,39 +15,39 @@ const initialState = {
   expectedReturnRate: 0.12,
   stepUpPercentage: 0.05,
   postTax: false,
-  scenario: "current", // "current", "frugal", "aggressive"
-  taxRegime: "new", // 'new' vs 'old'
+  scenario: 'current', // "current", "frugal", "aggressive"
+  taxRegime: 'new', // 'new' vs 'old'
   emergencyFundTarget: 6, // in months
   riskProfile: { q1: 3, q2: 3, q3: 3, q4: 3, q5: 3 }, // 5 questions, default to neutral
   totalDebt: 0,
   incomes: {
-    1: { id: 1, name: "Salary", amount: 100000, frequency: "monthly" },
+    1: { id: 1, name: 'Salary', amount: 100000, frequency: 'monthly' },
   },
   expenses: [
     {
       id: 1,
-      name: "Basic Needs",
+      name: 'Basic Needs',
       amount: 30000,
-      type: "monthly",
-      category: "basic",
-      frequency: "monthly",
+      type: 'monthly',
+      category: 'basic',
+      frequency: 'monthly',
     },
     {
       id: 2,
-      name: "Discretionary",
+      name: 'Discretionary',
       amount: 20000,
-      type: "monthly",
-      category: "discretionary",
-      frequency: "monthly",
+      type: 'monthly',
+      category: 'discretionary',
+      frequency: 'monthly',
     },
   ],
   goals: {
     1: {
       id: 1,
-      name: "Retirement",
+      name: 'Retirement',
       targetAmount: 20000000,
       targetYear: currentYear + 30,
-      category: "retirement",
+      category: 'retirement',
       investmentPlans: [],
       priority: 1, // Add priority
     },
@@ -55,7 +55,7 @@ const initialState = {
 };
 
 const profileSlice = createSlice({
-  name: "profile",
+  name: 'profile',
   initialState,
   reducers: {
     setBasicInfo: (state, action) => {
@@ -142,9 +142,7 @@ const profileSlice = createSlice({
       });
     },
     updateExpense: (state, action) => {
-      const index = state.expenses.findIndex(
-        (e) => e.id === action.payload.id,
-      );
+      const index = state.expenses.findIndex((e) => e.id === action.payload.id);
       if (index !== -1) state.expenses[index] = action.payload;
     },
     deleteExpense: (state, action) => {
@@ -207,37 +205,37 @@ const profileSlice = createSlice({
       const priority = Object.keys(state.goals).length + 1;
 
       switch (type) {
-        case "emergencyFund":
+        case 'emergencyFund':
           newGoal = {
             id: newId,
-            name: "Emergency Fund",
+            name: 'Emergency Fund',
             targetAmount: monthlyExpenses * 6,
             targetYear: currentYear + 1,
             investmentPlans: [],
-            category: "safety",
+            category: 'safety',
             priority,
           };
           break;
-        case "childEducation":
+        case 'childEducation':
           newGoal = {
             id: newId,
             name: "Child's Higher Education",
             targetAmount: 5000000,
             targetYear: currentYear + 18,
             investmentPlans: [],
-            category: "education",
+            category: 'education',
             priority,
           };
           break;
-        case "retirement":
+        case 'retirement':
           newGoal = {
             id: newId,
-            name: "Retirement",
+            name: 'Retirement',
             targetAmount: 20000000,
             targetYear:
               state.currentAge + (state.retirementAge - state.currentAge),
             investmentPlans: [],
-            category: "retirement",
+            category: 'retirement',
             priority,
           };
           break;
@@ -316,16 +314,16 @@ export const selectTotalMonthlyIncome = createSelector(
     const currentYear = new Date().getFullYear();
     return incomes.reduce((total, income) => {
       if (
-        (typeof income.startYear === "number" &&
+        (typeof income.startYear === 'number' &&
           currentYear < income.startYear) ||
-        (typeof income.endYear === "number" && currentYear > income.endYear)
+        (typeof income.endYear === 'number' && currentYear > income.endYear)
       ) {
         return total;
       }
       let monthlyAmount = income.amount || 0;
-      if (income.frequency === "quarterly") {
+      if (income.frequency === 'quarterly') {
         monthlyAmount /= 3;
-      } else if (income.frequency === "yearly") {
+      } else if (income.frequency === 'yearly') {
         monthlyAmount /= 12;
       }
       return total + monthlyAmount;
@@ -338,9 +336,9 @@ export const selectTotalMonthlyExpenses = createSelector(
   (expenses) =>
     expenses.reduce((total, expense) => {
       let monthlyAmount = expense.amount || 0;
-      if (expense.frequency === "quarterly") {
+      if (expense.frequency === 'quarterly') {
         monthlyAmount /= 3;
-      } else if (expense.frequency === "yearly") {
+      } else if (expense.frequency === 'yearly') {
         monthlyAmount /= 12;
       }
       return total + monthlyAmount;
@@ -355,38 +353,38 @@ export const selectIndividualGoalInvestmentContributions = createSelector(
       (goal.investmentPlans || []).forEach((plan, index) => {
         const uniqueKey = plan.id || index;
         if (
-          (plan.type === "sip" || plan.type === "stepUpSip") &&
+          (plan.type === 'sip' || plan.type === 'stepUpSip') &&
           plan.monthlyContribution > 0
         ) {
           let planTypeName =
-            plan.type === "sip"
-              ? "SIP"
+            plan.type === 'sip'
+              ? 'SIP'
               : `Step-up SIP (${plan.stepUpRate || 0}%)`;
           contributions.push({
             id: `goal-${goal.id}-plan-${uniqueKey}`,
             name: `${goal.name} (${planTypeName})`,
             amount: plan.monthlyContribution,
-            type: "monthly",
-            category: "investment",
-            frequency: "monthly",
+            type: 'monthly',
+            category: 'investment',
+            frequency: 'monthly',
             goalId: goal.id,
             goalTargetYear: goal.targetYear,
             startYear: plan.startYear || currentYear,
             endYear: plan.endYear || goal.targetYear,
           });
         } else if (
-          (plan.type === "lumpsum" || plan.type === "fd") &&
+          (plan.type === 'lumpsum' || plan.type === 'fd') &&
           plan.investedAmount > 0
         ) {
           const planTypeName =
-            plan.type === "lumpsum" ? "Lumpsum" : "Fixed Deposit";
+            plan.type === 'lumpsum' ? 'Lumpsum' : 'Fixed Deposit';
           contributions.push({
             id: `goal-${goal.id}-plan-${uniqueKey}`,
             name: `${goal.name} (${planTypeName})`,
             amount: plan.investedAmount,
-            type: "one-time-yearly",
-            category: "investment",
-            frequency: "yearly",
+            type: 'one-time-yearly',
+            category: 'investment',
+            frequency: 'yearly',
             goalId: goal.id,
             year: plan.startYear || currentYear,
             goalTargetYear: goal.targetYear,
@@ -405,9 +403,9 @@ export const selectTotalMonthlyGoalContributions = createSelector(
   (contributions) =>
     contributions.reduce((total, contribution) => {
       let monthlyAmount = contribution.amount || 0;
-      if (contribution.frequency === "yearly") {
+      if (contribution.frequency === 'yearly') {
         monthlyAmount /= 12;
-      } else if (contribution.frequency === "quarterly") {
+      } else if (contribution.frequency === 'quarterly') {
         monthlyAmount /= 3;
       }
       return total + monthlyAmount;
@@ -451,8 +449,8 @@ export const selectIsTotalOutflowExceedingIncome = createSelector(
 export const selectDebtFreeCountdown = createSelector(
   [selectTotalDebt, selectCurrentSurplus],
   (totalDebt, currentSurplus) => {
-    if (totalDebt <= 0) return "Debt-Free!";
-    if (currentSurplus <= 0) return "Cannot pay off debt with current surplus.";
+    if (totalDebt <= 0) return 'Debt-Free!';
+    if (currentSurplus <= 0) return 'Cannot pay off debt with current surplus.';
     const monthsToPayOff = totalDebt / currentSurplus;
     const years = Math.floor(monthsToPayOff / 12);
     const months = Math.round(monthsToPayOff % 12);
@@ -497,11 +495,11 @@ export const selectNeedsExpenses = createSelector(
   [selectProfileExpenses],
   (expenses) =>
     expenses
-      .filter((e) => e.category === "basic")
+      .filter((e) => e.category === 'basic')
       .reduce((total, expense) => {
         let monthlyAmount = expense.amount || 0;
-        if (expense.frequency === "quarterly") monthlyAmount /= 3;
-        else if (expense.frequency === "yearly") monthlyAmount /= 12;
+        if (expense.frequency === 'quarterly') monthlyAmount /= 3;
+        else if (expense.frequency === 'yearly') monthlyAmount /= 12;
         return total + monthlyAmount;
       }, 0),
 );
@@ -510,11 +508,11 @@ export const selectWantsExpenses = createSelector(
   [selectProfileExpenses],
   (expenses) =>
     expenses
-      .filter((e) => e.category === "discretionary")
+      .filter((e) => e.category === 'discretionary')
       .reduce((total, expense) => {
         let monthlyAmount = expense.amount || 0;
-        if (expense.frequency === "quarterly") monthlyAmount /= 3;
-        else if (expense.frequency === "yearly") monthlyAmount /= 12;
+        if (expense.frequency === 'quarterly') monthlyAmount /= 3;
+        else if (expense.frequency === 'yearly') monthlyAmount /= 12;
         return total + monthlyAmount;
       }, 0),
 );
@@ -570,8 +568,8 @@ export const selectWealthProjection = createSelector(
     let committedSurplusInvestment = 0;
 
     let adjustedStepUp = stepUpPercentage;
-    if (scenario === "aggressive") {
-      adjustedStepUp = 0.10;
+    if (scenario === 'aggressive') {
+      adjustedStepUp = 0.1;
     }
 
     for (let age = currentAge; age <= retirementAge; age++) {
@@ -581,8 +579,8 @@ export const selectWealthProjection = createSelector(
 
       const currentAnnualIncome = incomes.reduce((total, income) => {
         if (
-          (typeof income.startYear === "number" && year < income.startYear) ||
-          (typeof income.endYear === "number" && year > income.endYear)
+          (typeof income.startYear === 'number' && year < income.startYear) ||
+          (typeof income.endYear === 'number' && year > income.endYear)
         ) {
           return total;
         }
@@ -590,42 +588,42 @@ export const selectWealthProjection = createSelector(
           income.amount * Math.pow(1 + (careerGrowthRate || 0), yearsElapsed) ||
           income.amount;
         let annualAmount = 0;
-        if (income.frequency === "monthly")
+        if (income.frequency === 'monthly')
           annualAmount = currentYearAmount * 12;
-        else if (income.frequency === "quarterly")
+        else if (income.frequency === 'quarterly')
           annualAmount = currentYearAmount * 4;
-        else if (income.frequency === "yearly")
+        else if (income.frequency === 'yearly')
           annualAmount = currentYearAmount;
         return total + annualAmount;
       }, 0);
 
       const currentAnnualExpenses = expenses.reduce((total, expense) => {
         let expenseAmount = expense.amount;
-        if (scenario === "frugal" && expense.category === "discretionary") {
+        if (scenario === 'frugal' && expense.category === 'discretionary') {
           expenseAmount *= 0.5;
         }
         const currentYearAmount =
           expenseAmount *
           Math.pow(1 + (generalInflationRate || 0), yearsElapsed);
         let annualAmount = 0;
-        if (expense.frequency === "monthly")
+        if (expense.frequency === 'monthly')
           annualAmount = currentYearAmount * 12;
-        else if (expense.frequency === "quarterly")
+        else if (expense.frequency === 'quarterly')
           annualAmount = currentYearAmount * 4;
-        else if (expense.frequency === "yearly")
+        else if (expense.frequency === 'yearly')
           annualAmount = currentYearAmount;
         return total + annualAmount;
       }, 0);
 
       const annualGoalInvestment = goalInvestments.reduce((total, inv) => {
         if (
-          inv.frequency === "monthly" &&
+          inv.frequency === 'monthly' &&
           year >= inv.startYear &&
           year < inv.endYear
         ) {
           return total + inv.amount * 12;
         }
-        if (inv.frequency === "yearly" && year === inv.year) {
+        if (inv.frequency === 'yearly' && year === inv.year) {
           return total + inv.amount;
         }
         return total;
@@ -714,7 +712,8 @@ export const selectPrioritizedGoalFunding = createSelector(
   ) => {
     if (!projection.length) return [];
 
-    const finalWealth = projection[projection.length - 1].inflationAdjustedWealth;
+    const finalWealth =
+      projection[projection.length - 1].inflationAdjustedWealth;
     let remainingWealth = finalWealth;
 
     // Use priority if available, otherwise fallback to targetYear
@@ -728,7 +727,7 @@ export const selectPrioritizedGoalFunding = createSelector(
     return sortedGoals.map((goal) => {
       const yearsToGoal = goal.targetYear - currentYear;
       const inflationRate =
-        goal.category === "education"
+        goal.category === 'education'
           ? educationInflationRate
           : generalInflationRate;
       const futureValue =
@@ -737,19 +736,19 @@ export const selectPrioritizedGoalFunding = createSelector(
         futureValue /
         Math.pow(1 + generalInflationRate, goal.targetYear - currentYear);
 
-      let status = "At Risk";
+      let status = 'At Risk';
       let fundedAmount = 0;
       let shortfall = inflationAdjustedTarget;
       let requiredSip = 0;
 
       if (remainingWealth > 0) {
         if (remainingWealth >= inflationAdjustedTarget) {
-          status = "Fully Funded";
+          status = 'Fully Funded';
           fundedAmount = inflationAdjustedTarget;
           shortfall = 0;
           remainingWealth -= inflationAdjustedTarget;
         } else {
-          status = "Partially Funded";
+          status = 'Partially Funded';
           fundedAmount = remainingWealth;
           shortfall = inflationAdjustedTarget - remainingWealth;
           remainingWealth = 0;

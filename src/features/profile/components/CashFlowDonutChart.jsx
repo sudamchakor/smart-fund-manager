@@ -1,6 +1,6 @@
-import React from "react";
-import { Box, Typography, useTheme, alpha, Stack } from "@mui/material";
-import { PieChart as PieChartIcon } from "@mui/icons-material";
+import React from 'react';
+import { Box, Typography, useTheme, alpha, Stack } from '@mui/material';
+import { PieChart as PieChartIcon } from '@mui/icons-material';
 import {
   PieChart,
   Pie,
@@ -8,11 +8,11 @@ import {
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   Label,
-} from "recharts";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
-import { selectCurrentSurplus } from "../../../store/profileSlice";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from 'recharts';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
+import { selectCurrentSurplus } from '../../../store/profileSlice';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 // STRICT THEME: Replaced hardcoded #fff and #ccc with background.paper and divider
 const CustomTooltip = ({ active, payload, currency, theme }) => {
@@ -25,18 +25,18 @@ const CustomTooltip = ({ active, payload, currency, theme }) => {
           p: 1.5,
           borderRadius: 2,
           bgcolor: alpha(theme.palette.background.paper, 0.9), // STRICT THEME
-          backdropFilter: "blur(8px)",
+          backdropFilter: 'blur(8px)',
           border: `1px solid ${alpha(theme.palette.divider, 0.2)}`, // STRICT THEME
-          boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || "#000", 0.12)}`,
+          boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || '#000', 0.12)}`,
         }}
       >
         <Typography
           variant="caption"
           sx={{
             fontWeight: 800,
-            color: "text.secondary",
-            textTransform: "uppercase",
-            display: "block",
+            color: 'text.secondary',
+            textTransform: 'uppercase',
+            display: 'block',
             mb: 0.5,
           }}
         >
@@ -47,7 +47,7 @@ const CustomTooltip = ({ active, payload, currency, theme }) => {
           sx={{ fontWeight: 900, color: payload[0].payload.fill }}
         >
           {currency}
-          {Number(value).toLocaleString("en-IN", { maximumFractionDigits: 0 })}
+          {Number(value).toLocaleString('en-IN', { maximumFractionDigits: 0 })}
         </Typography>
       </Box>
     );
@@ -70,19 +70,19 @@ const CustomLabel = ({ viewBox, surplusValue, surplusFormatted, theme }) => {
         dy="-0.5em"
         fill={theme.palette.text.secondary} // STRICT THEME
         style={{
-          fontSize: "0.65rem",
+          fontSize: '0.65rem',
           fontWeight: 800,
-          textTransform: "uppercase",
+          textTransform: 'uppercase',
           letterSpacing: 0.5,
         }}
       >
-        {isDeficit ? "Current Deficit" : "Current Surplus"}
+        {isDeficit ? 'Current Deficit' : 'Current Surplus'}
       </tspan>
       <tspan
         x={cx}
         dy="1.6em"
         fill={valueColor} // STRICT THEME
-        style={{ fontSize: "1.2rem", fontWeight: 900, letterSpacing: -0.5 }}
+        style={{ fontSize: '1.2rem', fontWeight: 900, letterSpacing: -0.5 }}
       >
         {surplusFormatted}
       </tspan>
@@ -98,15 +98,15 @@ export default function CashFlowDonutChart({ donutData }) {
   // STRICT THEME: Replaced the static PIE_CHART_COLORS array with contextual theme mapping
   const getColorForCategory = (name) => {
     switch (name) {
-      case "Needs":
+      case 'Needs':
         return theme.palette.info.main;
-      case "Wants":
+      case 'Wants':
         return theme.palette.warning.main;
-      case "Loan EMIs":
+      case 'Loan EMIs':
         return theme.palette.error.main;
-      case "Future Wealth (Goals)":
+      case 'Future Wealth (Goals)':
         return theme.palette.primary.main;
-      case "Surplus":
+      case 'Surplus':
         return theme.palette.success.main;
       default:
         return theme.palette.secondary.main;
@@ -114,30 +114,28 @@ export default function CashFlowDonutChart({ donutData }) {
   };
 
   const formatCurrency = (val) =>
-    `${currency}${Math.abs(Number(val || 0)).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+    `${currency}${Math.abs(Number(val || 0)).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   let surplusFormatted;
   const absSurplus = Math.abs(investableSurplus);
 
   // Compact formatting for the center of the donut
   if (absSurplus >= 100000) {
-    surplusFormatted = `${investableSurplus < 0 ? "-" : ""}${currency}${(absSurplus / 100000).toFixed(1)}L`;
+    surplusFormatted = `${investableSurplus < 0 ? '-' : ''}${currency}${(absSurplus / 100000).toFixed(1)}L`;
   } else if (absSurplus >= 1000) {
-    surplusFormatted = `${investableSurplus < 0 ? "-" : ""}${currency}${(absSurplus / 1000).toFixed(0)}k`;
+    surplusFormatted = `${investableSurplus < 0 ? '-' : ''}${currency}${(absSurplus / 1000).toFixed(0)}k`;
   } else {
-    surplusFormatted = `${investableSurplus < 0 ? "-" : ""}${formatCurrency(absSurplus)}`;
+    surplusFormatted = `${investableSurplus < 0 ? '-' : ''}${formatCurrency(absSurplus)}`;
   }
 
   return (
     <Box
       sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
-
-
       {/* Chart Container */}
       <Box sx={{ flexGrow: 1, minHeight: 250 }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -153,7 +151,7 @@ export default function CashFlowDonutChart({ donutData }) {
                 `${name} ${(percent * 100).toFixed(0)}%`
               }
               labelStyle={{
-                fontSize: "10px",
+                fontSize: '10px',
                 fontWeight: 700,
                 fill: theme.palette.text.secondary,
               }} // STRICT THEME

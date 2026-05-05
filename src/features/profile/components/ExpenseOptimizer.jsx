@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, Slider, useTheme, alpha, Stack } from "@mui/material";
-import { Tune as OptimizeIcon } from "@mui/icons-material";
+import React, { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { Box, Typography, Slider, useTheme, alpha, Stack } from '@mui/material';
+import { Tune as OptimizeIcon } from '@mui/icons-material';
 import {
   selectProfileExpenses,
   selectTotalMonthlyIncome,
   selectTotalMonthlyGoalContributions,
   updateExpense,
-} from "../../../store/profileSlice";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
-import { selectCurrency } from "../../../store/emiSlice";
-import { formatCurrency } from "../../../utils/formatting";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '../../../store/profileSlice';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
+import { selectCurrency } from '../../../store/emiSlice';
+import { formatCurrency } from '../../../utils/formatting';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const ExpenseOptimizer = () => {
   const theme = useTheme();
@@ -55,20 +55,20 @@ const ExpenseOptimizer = () => {
   // Map slider colors to themes based on expense category
   const getSliderThemeColor = (category) => {
     switch (category) {
-      case "basic":
-        return "info";
-      case "discretionary":
-        return "warning";
+      case 'basic':
+        return 'info';
+      case 'discretionary':
+        return 'warning';
       default:
-        return "primary";
+        return 'primary';
     }
   };
 
   const getLabelColor = (category) => {
     switch (category) {
-      case "basic":
+      case 'basic':
         return theme.palette.info.main;
-      case "discretionary":
+      case 'discretionary':
         return theme.palette.warning.main;
       default:
         return theme.palette.primary.main;
@@ -80,13 +80,13 @@ const ExpenseOptimizer = () => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <SectionHeader
@@ -96,16 +96,16 @@ const ExpenseOptimizer = () => {
         color={theme.palette.secondary.main}
       />
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto", overflowX: "hidden", pr: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', pr: 1 }}>
         {localExpenses.map((expense) => {
           const initialExpense =
             initialExpenses.find((e) => e.id === expense.id) || expense;
           const initialAmount = initialExpense.amount;
 
           let maxLimit;
-          if (expense.category === "basic") {
+          if (expense.category === 'basic') {
             maxLimit = Math.max(totalIncome * 2, initialAmount * 1.5, 500000);
-          } else if (expense.category === "discretionary") {
+          } else if (expense.category === 'discretionary') {
             maxLimit = Math.max(totalIncome, initialAmount * 2, 200000);
           } else {
             maxLimit = Math.max(totalIncome * 2, initialAmount * 2, 500000);
@@ -125,12 +125,12 @@ const ExpenseOptimizer = () => {
                   variant="caption"
                   sx={{
                     fontWeight: 800,
-                    textTransform: "uppercase",
-                    color: "text.secondary",
+                    textTransform: 'uppercase',
+                    color: 'text.secondary',
                     letterSpacing: 0.5,
                   }}
                 >
-                  {expense.name}{" "}
+                  {expense.name}{' '}
                   <Box
                     component="span"
                     sx={{ color: labelColor, opacity: 0.8 }}
@@ -158,9 +158,9 @@ const ExpenseOptimizer = () => {
                 }
                 sx={{
                   py: 1,
-                  "& .MuiSlider-thumb": { width: 14, height: 14 },
-                  "& .MuiSlider-track": { height: 4 },
-                  "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+                  '& .MuiSlider-thumb': { width: 14, height: 14 },
+                  '& .MuiSlider-track': { height: 4 },
+                  '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
                 }}
               />
             </Box>
@@ -179,8 +179,8 @@ const ExpenseOptimizer = () => {
               variant="caption"
               sx={{
                 fontWeight: 800,
-                textTransform: "uppercase",
-                color: "text.disabled",
+                textTransform: 'uppercase',
+                color: 'text.disabled',
                 letterSpacing: 0.5,
               }}
             >
@@ -188,7 +188,7 @@ const ExpenseOptimizer = () => {
             </Typography>
             <Typography
               variant="caption"
-              sx={{ fontWeight: 900, color: "text.disabled" }}
+              sx={{ fontWeight: 900, color: 'text.disabled' }}
             >
               {currency}
               {formatCurrency(monthlyEmi || 0)}
@@ -200,8 +200,8 @@ const ExpenseOptimizer = () => {
             max={Math.max(totalIncome * 2, (monthlyEmi || 0) * 2, 500000)}
             sx={{
               py: 1,
-              "& .MuiSlider-thumb": { width: 12, height: 12 },
-              "& .MuiSlider-track": { height: 4 },
+              '& .MuiSlider-thumb': { width: 12, height: 12 },
+              '& .MuiSlider-track': { height: 4 },
             }}
           />
         </Box>
@@ -217,29 +217,29 @@ const ExpenseOptimizer = () => {
             isDeficit ? theme.palette.error.main : theme.palette.success.main,
             0.05,
           ),
-          border: "1px dashed",
+          border: '1px dashed',
           borderColor: alpha(
             isDeficit ? theme.palette.error.main : theme.palette.success.main,
             0.3,
           ),
-          transition: "all 0.3s ease",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
+          transition: 'all 0.3s ease',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
         }}
       >
         <Typography
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
+            textTransform: 'uppercase',
             letterSpacing: 1,
             color: isDeficit
               ? theme.palette.error.dark
               : theme.palette.success.dark,
           }}
         >
-          {isDeficit ? "Current Deficit" : "Current Surplus"}
+          {isDeficit ? 'Current Deficit' : 'Current Surplus'}
         </Typography>
         <Typography
           variant="h6"
@@ -251,7 +251,7 @@ const ExpenseOptimizer = () => {
               : theme.palette.success.main,
           }}
         >
-          {isDeficit ? "-" : ""}
+          {isDeficit ? '-' : ''}
           {currency}
           {formatCurrency(Math.abs(currentDynamicSurplus))}
         </Typography>

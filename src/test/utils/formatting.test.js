@@ -59,7 +59,12 @@ describe('Formatting Utility Functions', () => {
     });
 
     it('should format number with custom locale options', () => {
-      expect(formatting.formatNumber(12345.67, { style: 'decimal', minimumFractionDigits: 0 })).toBe('12,346');
+      expect(
+        formatting.formatNumber(12345.67, {
+          style: 'decimal',
+          minimumFractionDigits: 0,
+        }),
+      ).toBe('12,346');
     });
 
     it('should handle zero', () => {
@@ -120,7 +125,9 @@ describe('Formatting Utility Functions', () => {
 
   describe.skip('truncateText', () => {
     it('should truncate text longer than max length', () => {
-      expect(formatting.truncateText('This is a long text', 10)).toBe('This is a...');
+      expect(formatting.truncateText('This is a long text', 10)).toBe(
+        'This is a...',
+      );
     });
 
     it('should not truncate text shorter than max length', () => {
@@ -169,7 +176,9 @@ describe('Formatting Utility Functions', () => {
   describe.skip('isValidEmail', () => {
     it('should return true for valid emails', () => {
       expect(formatting.isValidEmail('test@example.com')).toBe(true);
-      expect(formatting.isValidEmail('john.doe123@sub.domain.co.in')).toBe(true);
+      expect(formatting.isValidEmail('john.doe123@sub.domain.co.in')).toBe(
+        true,
+      );
     });
 
     it('should return false for invalid emails', () => {

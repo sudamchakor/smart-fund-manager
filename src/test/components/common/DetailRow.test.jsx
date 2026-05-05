@@ -12,7 +12,7 @@ describe('DetailRow Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <DetailRow {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -25,7 +25,11 @@ describe('DetailRow Component', () => {
 
   it('renders with an indicatorColor when provided', () => {
     const color = '#FF0000'; // Red
-    renderComponent({ label: 'Colored Label', value: 'Colored Value', indicatorColor: color });
+    renderComponent({
+      label: 'Colored Label',
+      value: 'Colored Value',
+      indicatorColor: color,
+    });
     const indicator = screen.getByText('Colored Label').previousSibling; // The Box with the color
     expect(indicator).toBeInTheDocument();
     expect(indicator).toHaveStyle(`background-color: ${color}`);
@@ -65,7 +69,10 @@ describe('DetailRow Component', () => {
     // Direct testing of :hover pseudo-classes with JSDOM is not straightforward.
     // This test primarily ensures the component renders without errors and has the prop.
     // The visual effect would be confirmed via manual testing or visual regression.
-    const { container } = renderComponent({ label: 'Hover Test', value: 'Value' });
+    const { container } = renderComponent({
+      label: 'Hover Test',
+      value: 'Value',
+    });
     const row = container.firstChild;
     expect(row).toHaveStyle('transition: background-color 0.2s');
   });
@@ -73,7 +80,10 @@ describe('DetailRow Component', () => {
   it('applies odd/even row background colors (visual check, not directly testable with JSDOM)', () => {
     // Similar to hover, :nth-of-type is a CSS pseudo-class.
     // We can check for the presence of the `sx` prop that defines it.
-    const { container } = renderComponent({ label: 'Odd Row Test', value: 'Value' });
+    const { container } = renderComponent({
+      label: 'Odd Row Test',
+      value: 'Value',
+    });
     const row = container.firstChild;
     expect(row).toBeInTheDocument();
   });

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Grid,
   TextField,
@@ -8,14 +8,14 @@ import {
   alpha,
   useTheme,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   AutoFixHigh as MagicIcon,
   ErrorOutline as WarningIcon,
-} from "@mui/icons-material";
-import SliderInput from "../../../components/common/SliderInput";
-import InvestmentSummary from "./InvestmentSummary";
-import { labelStyle, getWellInputStyle } from "../../../styles/formStyles";
+} from '@mui/icons-material';
+import SliderInput from '../../../components/common/SliderInput';
+import InvestmentSummary from './InvestmentSummary';
+import { labelStyle, getWellInputStyle } from '../../../styles/formStyles';
 
 const GoalFormHeader = ({
   editedGoal,
@@ -30,7 +30,7 @@ const GoalFormHeader = ({
   const isTargetYearInvalid = editedGoal.targetYear > retirementYear;
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Box sx={{ width: '100%' }}>
       <Grid container spacing={2}>
         {/* 1. Goal Name - High Density */}
         <Grid item xs={12} md={6}>
@@ -40,11 +40,14 @@ const GoalFormHeader = ({
             variant="standard"
             size="small"
             placeholder="e.g., Retirement, Education..."
-            value={editedGoal.name || ""}
+            value={editedGoal.name || ''}
             onChange={(e) =>
               setEditedGoal({ ...editedGoal, name: e.target.value })
             }
-            InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
+            InputProps={{
+              disableUnderline: true,
+              sx: getWellInputStyle(theme),
+            }}
           />
         </Grid>
 
@@ -94,8 +97,8 @@ const GoalFormHeader = ({
             {isTargetYearInvalid && (
               <Box
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
+                  display: 'flex',
+                  alignItems: 'center',
                   gap: 1,
                   p: 1,
                   borderRadius: 1.5,
@@ -104,7 +107,7 @@ const GoalFormHeader = ({
                 }}
               >
                 <WarningIcon
-                  sx={{ fontSize: "1rem", color: theme.palette.error.main }}
+                  sx={{ fontSize: '1rem', color: theme.palette.error.main }}
                 />
                 <Typography
                   variant="caption"
@@ -121,8 +124,8 @@ const GoalFormHeader = ({
         <Grid item xs={12}>
           <Box
             sx={{
-              display: "flex",
-              justifyContent: "flex-start",
+              display: 'flex',
+              justifyContent: 'flex-start',
               pt: 1,
             }}
           >
@@ -137,11 +140,11 @@ const GoalFormHeader = ({
                   borderRadius: 2,
                   px: 3,
                   fontWeight: 800,
-                  textTransform: "none",
+                  textTransform: 'none',
                   letterSpacing: 0.5,
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-1px)",
+                  transition: 'all 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-1px)',
                     boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.3)}`,
                   },
                 }}

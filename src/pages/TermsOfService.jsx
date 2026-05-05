@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -8,10 +8,10 @@ import {
   Stack,
   Divider,
   Link,
-} from "@mui/material";
-import { Gavel as GavelIcon } from "@mui/icons-material";
-import PageHeader from "../components/common/PageHeader";
-import { getSectionHeaderStyle, bodyStyle } from "../styles/legalStyles";
+} from '@mui/material';
+import { Gavel as GavelIcon } from '@mui/icons-material';
+import PageHeader from '../components/common/PageHeader';
+import { getSectionHeaderStyle, bodyStyle } from '../styles/legalStyles';
 
 const TermsOfService = () => {
   const theme = useTheme();
@@ -23,10 +23,10 @@ const TermsOfService = () => {
         sx={{
           p: { xs: 3, md: 5 },
           borderRadius: 3,
-          border: "1px solid",
+          border: '1px solid',
           borderColor: alpha(theme.palette.divider, 0.1),
           bgcolor: theme.palette.background.paper,
-          boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+          boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
         }}
       >
         <PageHeader
@@ -53,7 +53,7 @@ const TermsOfService = () => {
           SmartFund Manager provides precision algorithms and data projection
           tools for calculating Equated Monthly Installments (EMIs), investment
           growth, and loan amortization. This service is intended strictly for
-          informational and simulation purposes and{" "}
+          informational and simulation purposes and{' '}
           <strong>does not constitute certified financial advice</strong>. You
           are solely responsible for verifying the accuracy of any calculations
           before executing real-world financial decisions.
@@ -129,7 +129,7 @@ const TermsOfService = () => {
 
         <Typography
           variant="h2"
-          sx={{ ...sectionHeaderStyle, borderBottom: "none", mt: 0 }}
+          sx={{ ...sectionHeaderStyle, borderBottom: 'none', mt: 0 }}
         >
           8. Contact & Support
         </Typography>
@@ -138,11 +138,11 @@ const TermsOfService = () => {
           please escalate your query to the support team:
         </Typography>
         <Typography
-          sx={{ ...bodyStyle, fontWeight: 700, color: "text.primary" }}
+          sx={{ ...bodyStyle, fontWeight: 700, color: 'text.primary' }}
         >
           <Link
             href="mailto:support@smartfundmanager.com"
-            sx={{ color: "primary.main", textDecoration: "none" }}
+            sx={{ color: 'primary.main', textDecoration: 'none' }}
           >
             support@smartfundmanager.com
           </Link>

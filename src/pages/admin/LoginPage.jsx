@@ -36,7 +36,8 @@ const LoginPage = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await signInWithEmailAndPassword(getAuthentication, email, password);
+      // FIX: Call getAuthentication() to get the auth instance
+      await signInWithEmailAndPassword(getAuthentication(), email, password);
       setSnackbar({
         open: true,
         message: 'Login successful!',
@@ -58,7 +59,8 @@ const LoginPage = () => {
   const handleSocialLogin = async (providerInstance, providerName) => {
     setLoading(true);
     try {
-      await signInWithPopup(getAuthentication, providerInstance);
+      // FIX: Call getAuthentication() to get the auth instance
+      await signInWithPopup(getAuthentication(), providerInstance);
       setSnackbar({
         open: true,
         message: `${providerName} login successful!`,

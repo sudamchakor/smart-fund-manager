@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -7,13 +7,13 @@ import {
   Stack,
   useTheme,
   alpha,
-} from "@mui/material";
+} from '@mui/material';
 import {
   Assignment as DetailsIcon,
   TrendingUp as IncrementIcon,
   ReceiptLong as ExpenseIcon,
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   updateLoanDetails,
   updateExpenses,
@@ -22,19 +22,19 @@ import {
   selectLoanDetails,
   selectExpenses,
   selectCurrency,
-} from "../../../store/emiSlice";
-import { selectCalculatedValues } from "../utils/emiCalculator";
+} from '../../../store/emiSlice';
+import { selectCalculatedValues } from '../utils/emiCalculator';
 import {
   AmountInput,
   AmountWithUnitInput,
   DatePickerInput,
-} from "../../../components/common/CommonComponents";
+} from '../../../components/common/CommonComponents';
 import {
   convertAmount,
   convertTenure,
   convertYearlyPaymentIncrease,
-} from "../utils/emiCalculator";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '../utils/emiCalculator';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const HomeLoanForm = () => {
   const theme = useTheme();
@@ -50,9 +50,9 @@ const HomeLoanForm = () => {
     const currentAmount = loanDetails[amountField];
     let convertedAmount;
 
-    if (unitField === "tenureUnit") {
+    if (unitField === 'tenureUnit') {
       convertedAmount = convertTenure(currentAmount, oldUnit, newUnit);
-    } else if (unitField === "yearlyPaymentIncreaseUnit") {
+    } else if (unitField === 'yearlyPaymentIncreaseUnit') {
       convertedAmount = convertYearlyPaymentIncrease(
         currentAmount,
         oldUnit,
@@ -61,7 +61,7 @@ const HomeLoanForm = () => {
       );
     } else {
       let baseValue = loanDetails.homeValue;
-      if (unitField === "feesUnit") baseValue = calculatedValues.loanAmount;
+      if (unitField === 'feesUnit') baseValue = calculatedValues.loanAmount;
       convertedAmount = convertAmount(
         currentAmount,
         oldUnit,
@@ -115,7 +115,7 @@ const HomeLoanForm = () => {
           <AmountInput
             label="Home Value (HV)"
             value={loanDetails.homeValue}
-            onChange={(e) => handleChange("homeValue", e)}
+            onChange={(e) => handleChange('homeValue', e)}
             currency={currency}
             placeholder="Enter home value"
           />
@@ -125,27 +125,27 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="Margin / Down Payment"
             value={loanDetails.marginAmount}
-            onAmountChange={(e) => handleChange("marginAmount", e)}
+            onAmountChange={(e) => handleChange('marginAmount', e)}
             unitValue={loanDetails.marginUnit}
             onUnitChange={(e) =>
-              handleUnitChange("marginUnit", "marginAmount", e)
+              handleUnitChange('marginUnit', 'marginAmount', e)
             }
             unitOptions={[
-              { value: "Rs", label: currency },
-              { value: "%", label: "%" },
+              { value: 'Rs', label: currency },
+              { value: '%', label: '%' },
             ]}
           />
           <Typography
             variant="caption"
             sx={{
               mt: 0.5,
-              display: "block",
+              display: 'block',
               fontWeight: 500,
-              color: "text.secondary",
+              color: 'text.secondary',
             }}
           >
-            Total: {currency}{" "}
-            {(calculatedValues?.marginInRs ?? 0).toLocaleString("en-IN")}
+            Total: {currency}{' '}
+            {(calculatedValues?.marginInRs ?? 0).toLocaleString('en-IN')}
           </Typography>
         </Grid>
 
@@ -153,7 +153,7 @@ const HomeLoanForm = () => {
           <AmountInput
             label="Loan Insurance (LI)"
             value={loanDetails.loanInsurance}
-            onChange={(e) => handleChange("loanInsurance", e)}
+            onChange={(e) => handleChange('loanInsurance', e)}
             currency={currency}
           />
         </Grid>
@@ -174,7 +174,7 @@ const HomeLoanForm = () => {
           <AmountInput
             label="Interest Rate"
             value={loanDetails.interestRate}
-            onChange={(e) => handleChange("interestRate", e)}
+            onChange={(e) => handleChange('interestRate', e)}
             currency="%"
           />
         </Grid>
@@ -183,14 +183,14 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="Loan Tenure"
             value={loanDetails.loanTenure}
-            onAmountChange={(e) => handleChange("loanTenure", e)}
+            onAmountChange={(e) => handleChange('loanTenure', e)}
             unitValue={loanDetails.tenureUnit}
             onUnitChange={(e) =>
-              handleUnitChange("tenureUnit", "loanTenure", e)
+              handleUnitChange('tenureUnit', 'loanTenure', e)
             }
             unitOptions={[
-              { value: "years", label: "Y" },
-              { value: "months", label: "M" },
+              { value: 'years', label: 'Y' },
+              { value: 'months', label: 'M' },
             ]}
           />
         </Grid>
@@ -199,12 +199,12 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="Loan Fees & Charges"
             value={loanDetails.loanFees}
-            onAmountChange={(e) => handleChange("loanFees", e)}
+            onAmountChange={(e) => handleChange('loanFees', e)}
             unitValue={loanDetails.feesUnit}
-            onUnitChange={(e) => handleUnitChange("feesUnit", "loanFees", e)}
+            onUnitChange={(e) => handleUnitChange('feesUnit', 'loanFees', e)}
             unitOptions={[
-              { value: "Rs", label: currency },
-              { value: "%", label: "%" },
+              { value: 'Rs', label: currency },
+              { value: '%', label: '%' },
             ]}
           />
         </Grid>
@@ -214,13 +214,13 @@ const HomeLoanForm = () => {
             label="Start Month & Year"
             value={loanDetails.startDate}
             onChange={(newValue) =>
-              dispatch(updateLoanDetails({ key: "startDate", value: newValue }))
+              dispatch(updateLoanDetails({ key: 'startDate', value: newValue }))
             }
           />
         </Grid>
       </Grid>
 
-      <Divider sx={{ my: 4, borderStyle: "dashed" }} />
+      <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
 
       {/* SECTION 2: YEARLY INCREMENT */}
       <SectionHeader
@@ -239,40 +239,40 @@ const HomeLoanForm = () => {
               label="Yearly Payment Increase"
               value={loanDetails.yearlyPaymentIncreaseAmount}
               onAmountChange={(e) =>
-                handleChange("yearlyPaymentIncreaseAmount", e)
+                handleChange('yearlyPaymentIncreaseAmount', e)
               }
               unitValue={loanDetails.yearlyPaymentIncreaseUnit}
               onUnitChange={(e) =>
                 handleUnitChange(
-                  "yearlyPaymentIncreaseUnit",
-                  "yearlyPaymentIncreaseAmount",
+                  'yearlyPaymentIncreaseUnit',
+                  'yearlyPaymentIncreaseAmount',
                   e,
                 )
               }
               unitOptions={[
-                { value: "Rs", label: currency },
-                { value: "%", label: "%" },
+                { value: 'Rs', label: currency },
+                { value: '%', label: '%' },
               ]}
             />
             <Typography
               variant="caption"
               sx={{
                 mt: 0.5,
-                display: "block",
+                display: 'block',
                 fontWeight: 500,
-                color: "text.secondary",
+                color: 'text.secondary',
               }}
             >
-              Value: {currency}{" "}
+              Value: {currency}{' '}
               {(calculatedValues?.yearlyIncreaseAmountRs ?? 0).toLocaleString(
-                "en-IN",
+                'en-IN',
               )}
             </Typography>
           </Grid>
         </Grid>
       </Box>
 
-      <Divider sx={{ my: 4, borderStyle: "dashed" }} />
+      <Divider sx={{ my: 4, borderStyle: 'dashed' }} />
 
       {/* SECTION 3: HOMEOWNER EXPENSES */}
       <SectionHeader
@@ -285,14 +285,14 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="One-time Expenses"
             value={expenses.oneTimeExpenses}
-            onAmountChange={(e) => handleExpenseChange("oneTimeExpenses", e)}
+            onAmountChange={(e) => handleExpenseChange('oneTimeExpenses', e)}
             unitValue={expenses.oneTimeUnit}
             onUnitChange={(e) =>
-              handleExpenseUnitChange("oneTimeUnit", "oneTimeExpenses", e)
+              handleExpenseUnitChange('oneTimeUnit', 'oneTimeExpenses', e)
             }
             unitOptions={[
-              { value: "Rs", label: currency },
-              { value: "%", label: "%" },
+              { value: 'Rs', label: currency },
+              { value: '%', label: '%' },
             ]}
           />
         </Grid>
@@ -301,14 +301,14 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="Property Taxes / year"
             value={expenses.propertyTaxes}
-            onAmountChange={(e) => handleExpenseChange("propertyTaxes", e)}
+            onAmountChange={(e) => handleExpenseChange('propertyTaxes', e)}
             unitValue={expenses.taxesUnit}
             onUnitChange={(e) =>
-              handleExpenseUnitChange("taxesUnit", "propertyTaxes", e)
+              handleExpenseUnitChange('taxesUnit', 'propertyTaxes', e)
             }
             unitOptions={[
-              { value: "Rs", label: currency },
-              { value: "%", label: "%" },
+              { value: 'Rs', label: currency },
+              { value: '%', label: '%' },
             ]}
           />
         </Grid>
@@ -317,14 +317,14 @@ const HomeLoanForm = () => {
           <AmountWithUnitInput
             label="Home Insurance / year"
             value={expenses.homeInsurance}
-            onAmountChange={(e) => handleExpenseChange("homeInsurance", e)}
+            onAmountChange={(e) => handleExpenseChange('homeInsurance', e)}
             unitValue={expenses.homeInsUnit}
             onUnitChange={(e) =>
-              handleExpenseUnitChange("homeInsUnit", "homeInsurance", e)
+              handleExpenseUnitChange('homeInsUnit', 'homeInsurance', e)
             }
             unitOptions={[
-              { value: "Rs", label: currency },
-              { value: "%", label: "%" },
+              { value: 'Rs', label: currency },
+              { value: '%', label: '%' },
             ]}
           />
         </Grid>
@@ -333,7 +333,7 @@ const HomeLoanForm = () => {
           <AmountInput
             label="Maintenance / month"
             value={expenses.maintenance}
-            onChange={(e) => handleExpenseChange("maintenance", e)}
+            onChange={(e) => handleExpenseChange('maintenance', e)}
             currency={currency}
           />
         </Grid>

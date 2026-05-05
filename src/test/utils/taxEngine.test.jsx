@@ -24,10 +24,7 @@ const calculateOldRegimeSlabsInternal = (taxableIncome, age) => {
   remainingIncome -= exemptionLimit;
 
   if (exemptionLimit < 500000) {
-    let taxableInThisSlab = Math.min(
-      remainingIncome,
-      500000 - exemptionLimit,
-    );
+    let taxableInThisSlab = Math.min(remainingIncome, 500000 - exemptionLimit);
     tax += taxableInThisSlab * 0.05;
     remainingIncome -= taxableInThisSlab;
   }
@@ -35,12 +32,12 @@ const calculateOldRegimeSlabsInternal = (taxableIncome, age) => {
   if (remainingIncome <= 0) return tax;
 
   let taxableIn20Slab = Math.min(remainingIncome, 500000);
-  tax += taxableIn20Slab * 0.20;
+  tax += taxableIn20Slab * 0.2;
   remainingIncome -= taxableIn20Slab;
 
   if (remainingIncome <= 0) return tax;
 
-  tax += remainingIncome * 0.30;
+  tax += remainingIncome * 0.3;
 
   return tax;
 };
@@ -60,7 +57,7 @@ const calculateNewRegimeSlabsInternal = (taxableIncome) => {
   if (remainingIncome <= 0) return tax;
 
   let slab2 = Math.min(remainingIncome, 300000); // 6L-9L
-  tax += slab2 * 0.10;
+  tax += slab2 * 0.1;
   remainingIncome -= slab2;
   if (remainingIncome <= 0) return tax;
 
@@ -70,15 +67,14 @@ const calculateNewRegimeSlabsInternal = (taxableIncome) => {
   if (remainingIncome <= 0) return tax;
 
   let slab4 = Math.min(remainingIncome, 300000); // 12L-15L
-  tax += slab4 * 0.20;
+  tax += slab4 * 0.2;
   remainingIncome -= slab4;
   if (remainingIncome <= 0) return tax;
 
-  tax += remainingIncome * 0.30;
+  tax += remainingIncome * 0.3;
 
   return tax;
 };
-
 
 describe.skip('Tax Engine', () => {
   const defaultIncome = { salary: 1000000 }; // 10 Lakhs
@@ -108,7 +104,7 @@ describe.skip('Tax Engine', () => {
       defaultIncome,
       defaultDeclarations,
       defaultHouseProperty,
-      defaultMeta
+      defaultMeta,
     );
 
     // Expected calculations for Old Regime:
@@ -144,7 +140,7 @@ describe.skip('Tax Engine', () => {
       defaultIncome,
       defaultDeclarations,
       defaultHouseProperty,
-      defaultMeta
+      defaultMeta,
     );
 
     // Expected calculations for New Regime:
@@ -174,7 +170,7 @@ describe.skip('Tax Engine', () => {
       defaultIncome,
       defaultDeclarations,
       defaultHouseProperty,
-      defaultMeta
+      defaultMeta,
     );
     expect(result.optimal).toBe('Old Regime');
     expect(result.savings).toBe(46800); // 46800 (new) - 0 (old)
@@ -240,7 +236,12 @@ describe.skip('Tax Engine', () => {
 
   it('should handle zero income correctly', () => {
     const income = { salary: 0 };
-    const result = calculateTax(income, defaultDeclarations, defaultHouseProperty, defaultMeta);
+    const result = calculateTax(
+      income,
+      defaultDeclarations,
+      defaultHouseProperty,
+      defaultMeta,
+    );
 
     expect(result.oldRegime.grossIncome).toBe(0);
     expect(result.oldRegime.taxableIncome).toBe(0);
@@ -267,7 +268,12 @@ describe.skip('Tax Engine', () => {
       },
     };
 
-    const result = calculateTax(income, declarationsWithOtherIncome, defaultHouseProperty, defaultMeta);
+    const result = calculateTax(
+      income,
+      declarationsWithOtherIncome,
+      defaultHouseProperty,
+      defaultMeta,
+    );
 
     // Total Other Income: 500000 + 50000 + 10000 + 5000 + 20000 + 15000 = 600000
     // Total Gross Income: 500000 + 100000 = 600000
@@ -347,19 +353,28 @@ describe.skip('Tax Engine', () => {
     const houseProperty = {};
 
     // Age < 60 (exemption 2.5L)
-    let result = calculateTax(income, declarations, houseProperty, { age: 30, profTax: 0 });
+    let result = calculateTax(income, declarations, houseProperty, {
+      age: 30,
+      profTax: 0,
+    });
     // Taxable: 500000 - 50000 (SD) = 450000
     // Tax: (450000 - 250000) * 0.05 = 200000 * 0.05 = 10000. Rebate 87A applies. Tax = 0
     expect(result.oldRegime.tax).toBe(0);
 
     // Age 60-80 (exemption 3L)
-    result = calculateTax(income, declarations, houseProperty, { age: 65, profTax: 0 });
+    result = calculateTax(income, declarations, houseProperty, {
+      age: 65,
+      profTax: 0,
+    });
     // Taxable: 500000 - 50000 (SD) = 450000
     // Tax: (450000 - 300000) * 0.05 = 150000 * 0.05 = 7500. Rebate 87A applies. Tax = 0
     expect(result.oldRegime.tax).toBe(0);
 
     // Age > 80 (exemption 5L)
-    result = calculateTax(income, declarations, houseProperty, { age: 85, profTax: 0 });
+    result = calculateTax(income, declarations, houseProperty, {
+      age: 85,
+      profTax: 0,
+    });
     // Taxable: 500000 - 50000 (SD) = 450000
     // Tax: 0 (below 5L exemption)
     expect(result.oldRegime.tax).toBe(0);
@@ -391,12 +406,16 @@ describe.skip('Tax Engine', () => {
     const result = calculateTax(income, declarations, houseProperty, meta);
 
     expect(result.oldRegime.grossIncome).toBe(0);
-    expect(result.oldRegime.deductions).toBe(taxRules.standardDeduction.old.amount); // Only standard deduction
+    expect(result.oldRegime.deductions).toBe(
+      taxRules.standardDeduction.old.amount,
+    ); // Only standard deduction
     expect(result.oldRegime.taxableIncome).toBe(0);
     expect(result.oldRegime.tax).toBe(0);
 
     expect(result.newRegime.grossIncome).toBe(0);
-    expect(result.newRegime.deductions).toBe(taxRules.standardDeduction.new.amount); // Only standard deduction
+    expect(result.newRegime.deductions).toBe(
+      taxRules.standardDeduction.new.amount,
+    ); // Only standard deduction
     expect(result.newRegime.taxableIncome).toBe(0);
     expect(result.newRegime.tax).toBe(0);
   });

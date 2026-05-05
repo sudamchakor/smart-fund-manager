@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -9,23 +9,23 @@ import {
   Grid,
   Stack,
   useTheme,
-} from "@mui/material";
-import { Speed as SpeedIcon } from "@mui/icons-material";
-import SliderInput from "../../../../components/common/SliderInput";
-import { labelStyle, getWellInputStyle } from "../../../../styles/formStyles";
+} from '@mui/material';
+import { Speed as SpeedIcon } from '@mui/icons-material';
+import SliderInput from '../../../../components/common/SliderInput';
+import { labelStyle, getWellInputStyle } from '../../../../styles/formStyles';
 
 export default function SystemParameters({ basicInfo, setBasicInfoState }) {
   const theme = useTheme();
   return (
     <Box sx={{ mt: 3 }}>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <SpeedIcon sx={{ fontSize: "1.2rem", color: "primary.main" }} />
+        <SpeedIcon sx={{ fontSize: '1.2rem', color: 'primary.main' }} />
         <Typography
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "text.secondary",
+            textTransform: 'uppercase',
+            color: 'text.secondary',
           }}
         >
           System & Demographics

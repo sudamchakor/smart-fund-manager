@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -15,70 +15,70 @@ import {
   MenuItem,
   useTheme,
   alpha,
-} from "@mui/material";
+} from '@mui/material';
 import {
   AttachMoney as IncomeIcon,
   MoneyOff as ExpenseIcon,
   AccountBalanceWallet as AssetIcon,
   Close as CloseIcon,
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
-import IncomeExpenseForm from "../../../components/common/IncomeExpenseForm";
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
+import IncomeExpenseForm from '../../../components/common/IncomeExpenseForm';
 import {
   addIncome,
   addExpense,
   updateIncome,
   updateExpense,
-} from "../../../store/profileSlice";
+} from '../../../store/profileSlice';
 import {
   addAsset,
   updateAsset,
   addInvestmentType,
   selectInvestmentTypes,
-} from "../../corpus/corpusSlice";
+} from '../../corpus/corpusSlice';
 import {
   updateDeclaration,
   updateHouseProperty,
   updateMonthData,
-} from "../../../store/taxSlice";
+} from '../../../store/taxSlice';
 
 const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
   const investmentTypes = useSelector(selectInvestmentTypes);
   const [newAsset, setNewAsset] = useState({
-    label: "",
-    value: "",
-    expectedReturn: "",
-    category: "Equity",
+    label: '',
+    value: '',
+    expectedReturn: '',
+    category: 'Equity',
   });
-  const [newInvestmentType, setNewInvestmentType] = useState("");
+  const [newInvestmentType, setNewInvestmentType] = useState('');
 
   useEffect(() => {
-    if (assetToEdit && mode === "edit") {
+    if (assetToEdit && mode === 'edit') {
       setNewAsset({ ...assetToEdit });
     }
   }, [assetToEdit, mode]);
 
   const handleAddInvestmentType = () => {
-    if (newInvestmentType.trim() !== "") {
+    if (newInvestmentType.trim() !== '') {
       dispatch(
         addInvestmentType({
           value: newInvestmentType,
           label: newInvestmentType,
         }),
       );
-      setNewInvestmentType("");
+      setNewInvestmentType('');
     }
   };
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         gap: 2,
-        width: "100%",
+        width: '100%',
       }}
     >
       <Box>
@@ -94,7 +94,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
               onChange={(e) =>
                 setNewAsset({ ...newAsset, label: e.target.value })
               }
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             />
           </Grid>
 
@@ -107,7 +107,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
               onChange={(e) =>
                 setNewAsset({ ...newAsset, category: e.target.value })
               }
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             >
               {investmentTypes.map((cat) => (
                 <MenuItem key={cat.value} value={cat.value}>
@@ -131,14 +131,14 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
                   <InputAdornment position="end">
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 700, color: "text.secondary" }}
+                      sx={{ fontWeight: 700, color: 'text.secondary' }}
                     >
                       %
                     </Typography>
                   </InputAdornment>
                 ),
               }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 2 } }}
+              sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2 } }}
             />
           </Grid>
 
@@ -154,14 +154,14 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <Typography sx={{ fontWeight: 800, color: "primary.main" }}>
+                    <Typography sx={{ fontWeight: 800, color: 'primary.main' }}>
                       ₹
                     </Typography>
                   </InputAdornment>
                 ),
               }}
               sx={{
-                "& .MuiOutlinedInput-root": {
+                '& .MuiOutlinedInput-root': {
                   borderRadius: 2,
                   backgroundColor: alpha(theme.palette.background.default, 0.5),
                 },
@@ -183,8 +183,8 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
       <Box sx={{ mx: -4, mb: -3 }}>
         <Box
           sx={{
-            display: "flex",
-            justifyContent: "flex-end",
+            display: 'flex',
+            justifyContent: 'flex-end',
             gap: 2,
             px: 4, // Re-applies the horizontal padding for the buttons
             py: 2.5,
@@ -195,7 +195,7 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
             onClick={onCancel}
             variant="text"
             color="inherit"
-            sx={{ fontWeight: 700, textTransform: "none" }}
+            sx={{ fontWeight: 700, textTransform: 'none' }}
           >
             Cancel
           </Button>
@@ -207,11 +207,11 @@ const CorpusForm = ({ onSave, onCancel, assetToEdit, mode }) => {
               px: 4,
               borderRadius: 2.5,
               fontWeight: 800,
-              textTransform: "none",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              textTransform: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
             }}
           >
-            {mode === "edit" ? "Update Asset" : "Add to Corpus"}
+            {mode === 'edit' ? 'Update Asset' : 'Add to Corpus'}
           </Button>
         </Box>
       </Box>
@@ -224,10 +224,18 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
   const theme = useTheme();
 
   const config = {
-    income: { title: "Income", icon: <IncomeIcon />, color: theme.palette.success.main },
-    expense: { title: "Expense", icon: <ExpenseIcon />, color: theme.palette.error.main },
+    income: {
+      title: 'Income',
+      icon: <IncomeIcon />,
+      color: theme.palette.success.main,
+    },
+    expense: {
+      title: 'Expense',
+      icon: <ExpenseIcon />,
+      color: theme.palette.error.main,
+    },
     corpus: {
-      title: "Investment Asset",
+      title: 'Investment Asset',
       icon: <AssetIcon />,
       color: theme.palette.primary.main,
     },
@@ -238,41 +246,41 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
   const handleFormSave = (formData) => {
     if (formData.isTaxDeductible && formData.taxCategory) {
       const annualAmount =
-        formData.frequency === "monthly"
+        formData.frequency === 'monthly'
           ? formData.amount * 12
-          : formData.frequency === "quarterly"
-          ? formData.amount * 4
-          : formData.amount;
+          : formData.frequency === 'quarterly'
+            ? formData.amount * 4
+            : formData.amount;
 
       switch (formData.taxCategory) {
-        case "hra":
+        case 'hra':
           dispatch(
             updateDeclaration({
-              section: "exemptions",
-              field: "hra",
+              section: 'exemptions',
+              field: 'hra',
               value: { produced: annualAmount },
             }),
           );
           break;
-        case "80c":
+        case '80c':
           dispatch(
             updateDeclaration({
-              section: "sec80C",
-              field: "standard80C",
+              section: 'sec80C',
+              field: 'standard80C',
               value: annualAmount,
             }),
           );
           break;
-        case "80d":
+        case '80d':
           dispatch(
             updateDeclaration({
-              section: "deductions",
-              field: "sec80D",
+              section: 'deductions',
+              field: 'sec80D',
               value: { produced: annualAmount },
             }),
           );
           break;
-        case "24b":
+        case '24b':
           dispatch(updateHouseProperty({ interest: annualAmount }));
           break;
         default:
@@ -280,35 +288,32 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
       }
     }
 
-    if (
-      type === "expense" &&
-      formData.name.toLowerCase().includes("rent")
-    ) {
+    if (type === 'expense' && formData.name.toLowerCase().includes('rent')) {
       const monthlyAmount =
-        formData.frequency === "monthly"
+        formData.frequency === 'monthly'
           ? formData.amount
-          : formData.frequency === "quarterly"
-          ? formData.amount / 3
-          : formData.amount / 12;
+          : formData.frequency === 'quarterly'
+            ? formData.amount / 3
+            : formData.amount / 12;
       dispatch(
         updateMonthData({
           index: 0,
-          field: "rent",
+          field: 'rent',
           value: monthlyAmount,
           populateRemaining: true,
         }),
       );
     }
 
-    if (mode === "edit") {
+    if (mode === 'edit') {
       const payload = { ...formData, id: asset.id };
-      if (type === "income") dispatch(updateIncome(payload));
-      else if (type === "expense") dispatch(updateExpense(payload));
-      else if (type === "corpus") dispatch(updateAsset(payload));
+      if (type === 'income') dispatch(updateIncome(payload));
+      else if (type === 'expense') dispatch(updateExpense(payload));
+      else if (type === 'corpus') dispatch(updateAsset(payload));
     } else {
-      if (type === "income") dispatch(addIncome(formData));
-      else if (type === "expense") dispatch(addExpense(formData));
-      else if (type === "corpus") {
+      if (type === 'income') dispatch(addIncome(formData));
+      else if (type === 'expense') dispatch(addExpense(formData));
+      else if (type === 'corpus') {
         dispatch(addAsset(formData));
       }
     }
@@ -322,7 +327,7 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
       maxWidth="sm"
       fullWidth
       PaperProps={{
-        sx: { borderRadius: 4, boxShadow: "0 24px 64px rgba(0,0,0,0.2)" },
+        sx: { borderRadius: 4, boxShadow: '0 24px 64px rgba(0,0,0,0.2)' },
       }}
     >
       <DialogTitle sx={{ px: 4, py: 3 }}>
@@ -338,7 +343,7 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
                 color: active.color,
                 p: 1.2,
                 borderRadius: 2.5,
-                display: "flex",
+                display: 'flex',
               }}
             >
               {active.icon}
@@ -346,15 +351,15 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
             <Box>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 900, lineHeight: 1.2, color: "text.primary" }}
+                sx={{ fontWeight: 900, lineHeight: 1.2, color: 'text.primary' }}
               >
-                {mode === "edit"
+                {mode === 'edit'
                   ? `Edit ${active.title}`
                   : `Add ${active.title}`}
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ color: "text.secondary", fontWeight: 600 }}
+                sx={{ color: 'text.secondary', fontWeight: 600 }}
               >
                 Manage your financial details
               </Typography>
@@ -373,7 +378,7 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
       <Divider />
 
       <DialogContent sx={{ px: 4, py: 4 }}>
-        {type === "corpus" ? (
+        {type === 'corpus' ? (
           <CorpusForm
             onSave={handleFormSave}
             onCancel={onClose}
@@ -382,11 +387,11 @@ export default function FinancialModal({ open, onClose, type, asset, mode }) {
           />
         ) : (
           <IncomeExpenseForm
-            initialData={mode === "edit" ? asset : null}
-            isExpense={type === "expense"}
+            initialData={mode === 'edit' ? asset : null}
+            isExpense={type === 'expense'}
             onSave={handleFormSave}
             onCancel={onClose}
-            submitLabel={mode === "edit" ? "Apply Changes" : "Add Entry"}
+            submitLabel={mode === 'edit' ? 'Apply Changes' : 'Add Entry'}
           />
         )}
       </DialogContent>

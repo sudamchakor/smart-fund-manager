@@ -4,8 +4,12 @@ import ProjectedCashFlowChart from '../../../features/profile/components/Project
 
 // Mock Recharts components
 jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }) => <div data-testid="recharts-responsive-container">{children}</div>,
-  ComposedChart: ({ children }) => <div data-testid="recharts-composed-chart">{children}</div>,
+  ResponsiveContainer: ({ children }) => (
+    <div data-testid="recharts-responsive-container">{children}</div>
+  ),
+  ComposedChart: ({ children }) => (
+    <div data-testid="recharts-composed-chart">{children}</div>
+  ),
   Area: () => <div data-testid="recharts-area"></div>,
   Bar: () => <div data-testid="recharts-bar"></div>,
   Line: () => <div data-testid="recharts-line"></div>,
@@ -19,10 +23,14 @@ jest.mock('recharts', () => ({
 
 describe.skip('ProjectedCashFlowChart', () => {
   it('renders without crashing', () => {
-    const mockData = [{ year: 2023, income: 100000, expenses: 50000, surplus: 50000 }];
+    const mockData = [
+      { year: 2023, income: 100000, expenses: 50000, surplus: 50000 },
+    ];
     render(<ProjectedCashFlowChart data={mockData} />);
     expect(screen.getByText(/Projected Cash Flow/i)).toBeInTheDocument();
-    expect(screen.getByTestId('recharts-responsive-container')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('recharts-responsive-container'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('recharts-composed-chart')).toBeInTheDocument();
   });
 });

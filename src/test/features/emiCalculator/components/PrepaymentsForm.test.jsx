@@ -14,31 +14,35 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../../../../src/components/common/AmountInputWithDate', () => ({
-  title,
-  icon,
-  iconColor,
-  amountValue,
-  onAmountChange,
-  dateLabel,
-  dateValue,
-  onDateChange,
-  currency,
-}) => (
-  <div data-testid={`mock-amount-input-with-date-${title}`}>
-    <span>{title}</span>
-    <input
-      data-testid={`amount-input-${title}`}
-      value={amountValue}
-      onChange={onAmountChange}
-    />
-    <input
-      data-testid={`date-input-${title}`}
-      value={dateValue}
-      onChange={onDateChange}
-    />
-  </div>
-));
+jest.mock(
+  '../../../../../src/components/common/AmountInputWithDate',
+  () =>
+    ({
+      title,
+      icon,
+      iconColor,
+      amountValue,
+      onAmountChange,
+      dateLabel,
+      dateValue,
+      onDateChange,
+      currency,
+    }) => (
+      <div data-testid={`mock-amount-input-with-date-${title}`}>
+        <span>{title}</span>
+        <input
+          data-testid={`amount-input-${title}`}
+          value={amountValue}
+          onChange={onAmountChange}
+        />
+        <input
+          data-testid={`date-input-${title}`}
+          value={dateValue}
+          onChange={onDateChange}
+        />
+      </div>
+    ),
+);
 
 const mockStore = configureStore([]);
 const theme = createTheme();
@@ -63,7 +67,7 @@ describe.skip('PrepaymentsForm', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     useDispatch.mockReturnValue(mockDispatch);
-    useSelector.mockImplementation(selector => selector(defaultState));
+    useSelector.mockImplementation((selector) => selector(defaultState));
   });
 
   const renderComponent = () => {
@@ -72,16 +76,24 @@ describe.skip('PrepaymentsForm', () => {
         <ThemeProvider theme={theme}>
           <PrepaymentsForm />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
   it('renders without crashing', () => {
     renderComponent();
     expect(screen.getByText(/Prepayments/i)).toBeInTheDocument();
-    expect(screen.getByTestId('mock-amount-input-with-date-Monthly Prepayment')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-amount-input-with-date-Yearly Prepayment')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-amount-input-with-date-Quarterly Prepayment')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-amount-input-with-date-One-Time Prepayment')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-amount-input-with-date-Monthly Prepayment'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-amount-input-with-date-Yearly Prepayment'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-amount-input-with-date-Quarterly Prepayment'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-amount-input-with-date-One-Time Prepayment'),
+    ).toBeInTheDocument();
   });
 });

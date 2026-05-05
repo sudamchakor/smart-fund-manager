@@ -1,5 +1,5 @@
-import React, { useRef, useImperativeHandle, forwardRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useRef, useImperativeHandle, forwardRef } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Box,
   Typography,
@@ -11,14 +11,14 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   InfoOutlined as InfoIcon,
   Timeline as TimelineIcon,
   CheckCircle as SuccessIcon,
   Cancel as ErrorIcon,
   Settings as SettingsIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 import {
   selectWealthProjection,
   selectFinancialIndependenceYear,
@@ -28,7 +28,7 @@ import {
   setExpectedReturnRate,
   setStepUpPercentage,
   setPostTax,
-} from "../../../store/profileSlice";
+} from '../../../store/profileSlice';
 import {
   AreaChart,
   Area,
@@ -40,12 +40,12 @@ import {
   Legend,
   ComposedChart,
   Line,
-} from "recharts";
-import { formatCurrency } from "../../../utils/formatting";
-import { selectCurrency } from "../../../store/emiSlice";
-import ScenarioManager from "./ScenarioManager";
-import SectionHeader from "../../../components/common/SectionHeader";
-import ChartTooltip from "../../../components/common/ChartTooltip";
+} from 'recharts';
+import { formatCurrency } from '../../../utils/formatting';
+import { selectCurrency } from '../../../store/emiSlice';
+import ScenarioManager from './ScenarioManager';
+import SectionHeader from '../../../components/common/SectionHeader';
+import ChartTooltip from '../../../components/common/ChartTooltip';
 
 // Helper function to format large numbers for Y-axis ticks
 const formatLargeNumber = (num, currency) => {
@@ -56,8 +56,8 @@ const formatLargeNumber = (num, currency) => {
   else if (absNum >= 1000) formattedNum = `${(num / 1000).toFixed(1)}K`;
   else formattedNum = num.toString();
 
-  if (currency === "INR") return `₹${formattedNum}`;
-  if (currency === "USD") return `$${formattedNum}`;
+  if (currency === 'INR') return `₹${formattedNum}`;
+  if (currency === 'USD') return `$${formattedNum}`;
   return `${currency} ${formattedNum}`;
 };
 
@@ -68,22 +68,22 @@ const DataWell = ({ title, value, subValue, tooltipText, colorToken }) => {
     <Box
       sx={{
         p: 2,
-        height: "100%",
+        height: '100%',
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(colorToken || theme.palette.divider, 0.1),
         bgcolor: alpha(colorToken || theme.palette.background.paper, 0.03),
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.01)",
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.01)',
       }}
     >
       <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "flex-start",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
           mb: 1,
         }}
       >
@@ -91,8 +91,8 @@ const DataWell = ({ title, value, subValue, tooltipText, colorToken }) => {
           variant="caption"
           sx={{
             fontWeight: 800,
-            color: "text.disabled",
-            textTransform: "uppercase",
+            color: 'text.disabled',
+            textTransform: 'uppercase',
             letterSpacing: 0.5,
           }}
         >
@@ -101,7 +101,7 @@ const DataWell = ({ title, value, subValue, tooltipText, colorToken }) => {
         {tooltipText && (
           <MuiTooltip title={tooltipText} arrow placement="top">
             <InfoIcon
-              sx={{ fontSize: "1rem", color: "text.disabled", cursor: "help" }}
+              sx={{ fontSize: '1rem', color: 'text.disabled', cursor: 'help' }}
             />
           </MuiTooltip>
         )}
@@ -111,7 +111,7 @@ const DataWell = ({ title, value, subValue, tooltipText, colorToken }) => {
           variant="h5"
           sx={{
             fontWeight: 900,
-            color: colorToken || "text.primary",
+            color: colorToken || 'text.primary',
             letterSpacing: -0.5,
           }}
         >
@@ -120,7 +120,7 @@ const DataWell = ({ title, value, subValue, tooltipText, colorToken }) => {
         {subValue && (
           <Typography
             variant="caption"
-            sx={{ fontWeight: 700, color: "text.secondary" }}
+            sx={{ fontWeight: 700, color: 'text.secondary' }}
           >
             {subValue}
           </Typography>
@@ -137,11 +137,11 @@ const StyledChartPaper = ({ children }) => {
       sx={{
         p: 2,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
-        height: "100%",
+        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
+        height: '100%',
       }}
     >
       {children}
@@ -173,22 +173,22 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     getSummaryData: () => [
       {
-        title: "Projected Corpus at 55",
+        title: 'Projected Corpus at 55',
         value: formatCurrency(projectedCorpus, currency),
       },
       {
-        title: "Inflation-Adjusted Value",
+        title: 'Inflation-Adjusted Value',
         value: formatCurrency(inflationAdjustedValue, currency),
       },
       {
-        title: "Passive Income Potential",
+        title: 'Passive Income Potential',
         value: `${formatCurrency(passiveIncome, currency)} / year`,
       },
     ],
     getDashboardRef: () => dashboardRef,
     getChartRefs: () => [
-      { ref: areaChartRef, name: "areaChart" },
-      { ref: composedChartRef, name: "composedChart" },
+      { ref: areaChartRef, name: 'areaChart' },
+      { ref: composedChartRef, name: 'composedChart' },
     ],
   }));
 
@@ -260,13 +260,13 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
         }}
       >
         <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
-          <SettingsIcon sx={{ fontSize: "1rem", color: "text.secondary" }} />
+          <SettingsIcon sx={{ fontSize: '1rem', color: 'text.secondary' }} />
           <Typography
             variant="caption"
             sx={{
               fontWeight: 800,
-              color: "text.secondary",
-              textTransform: "uppercase",
+              color: 'text.secondary',
+              textTransform: 'uppercase',
             }}
           >
             Active Strategy Overrides
@@ -280,7 +280,7 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ fontWeight: 900, color: "primary.main" }}
+                sx={{ fontWeight: 900, color: 'primary.main' }}
               >
                 {Math.round(expectedReturnRate * 100)}%
               </Typography>
@@ -301,7 +301,7 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
               </Typography>
               <Typography
                 variant="caption"
-                sx={{ fontWeight: 900, color: "primary.main" }}
+                sx={{ fontWeight: 900, color: 'primary.main' }}
               >
                 {Math.round(stepUpPercentage * 100)}%
               </Typography>
@@ -359,7 +359,7 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
                   />
                   <Legend
                     iconType="circle"
-                    wrapperStyle={{ fontSize: "12px", fontWeight: 700 }}
+                    wrapperStyle={{ fontSize: '12px', fontWeight: 700 }}
                   />
                   <Area
                     type="monotone"
@@ -421,7 +421,7 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
                   />
                   <Legend
                     iconType="circle"
-                    wrapperStyle={{ fontSize: "12px", fontWeight: 700 }}
+                    wrapperStyle={{ fontSize: '12px', fontWeight: 700 }}
                   />
                   <Area
                     type="monotone"
@@ -458,9 +458,9 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
         sx={{
           p: 2,
           borderRadius: 3,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           gap: 1.5,
           bgcolor: financialIndependence
             ? alpha(theme.palette.success.main, 0.1)
@@ -470,15 +470,15 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
       >
         {financialIndependence ? (
           <>
-            <SuccessIcon sx={{ color: "success.main" }} />
+            <SuccessIcon sx={{ color: 'success.main' }} />
             <Typography
               variant="subtitle1"
-              sx={{ color: "success.dark", fontWeight: 800 }}
+              sx={{ color: 'success.dark', fontWeight: 800 }}
             >
-              Financial Independence Achievable by Age{" "}
+              Financial Independence Achievable by Age{' '}
               <Box
                 component="span"
-                sx={{ fontSize: "1.2rem", fontWeight: 900 }}
+                sx={{ fontSize: '1.2rem', fontWeight: 900 }}
               >
                 {financialIndependence.age}
               </Box>
@@ -486,10 +486,10 @@ const WealthProjectionEngine = forwardRef((props, ref) => {
           </>
         ) : (
           <>
-            <ErrorIcon sx={{ color: "error.main" }} />
+            <ErrorIcon sx={{ color: 'error.main' }} />
             <Typography
               variant="subtitle1"
-              sx={{ color: "error.dark", fontWeight: 800 }}
+              sx={{ color: 'error.dark', fontWeight: 800 }}
             >
               Financial Independence Not Currently Achievable. Adjust Strategy.
             </Typography>

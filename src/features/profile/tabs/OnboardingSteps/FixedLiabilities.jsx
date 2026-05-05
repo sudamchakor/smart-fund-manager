@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -15,13 +15,13 @@ import {
   Stack,
   useTheme,
   alpha,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DeleteOutline as DeleteIcon,
   ReceiptLong as ExpenseIcon,
-} from "@mui/icons-material";
-import SliderInput from "../../../../components/common/SliderInput";
-import { labelStyle, getWellInputStyle } from "../../../../styles/formStyles";
+} from '@mui/icons-material';
+import SliderInput from '../../../../components/common/SliderInput';
+import { labelStyle, getWellInputStyle } from '../../../../styles/formStyles';
 
 export default function FixedLiabilities({
   expense,
@@ -36,13 +36,13 @@ export default function FixedLiabilities({
   return (
     <Box sx={{ mt: 3 }}>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <ExpenseIcon sx={{ fontSize: "1.2rem", color: "warning.main" }} />
+        <ExpenseIcon sx={{ fontSize: '1.2rem', color: 'warning.main' }} />
         <Typography
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "warning.main",
+            textTransform: 'uppercase',
+            color: 'warning.main',
           }}
         >
           Operational Liabilities
@@ -67,7 +67,7 @@ export default function FixedLiabilities({
               onChange={(e) => setExpense({ ...expense, name: e.target.value })}
               InputProps={{
                 disableUnderline: true,
-                sx: getWellInputStyle(theme, "warning"),
+                sx: getWellInputStyle(theme, 'warning'),
               }}
             />
           </Grid>
@@ -93,7 +93,7 @@ export default function FixedLiabilities({
                   setExpense({ ...expense, category: e.target.value })
                 }
                 disableUnderline
-                sx={getWellInputStyle(theme, "warning")}
+                sx={getWellInputStyle(theme, 'warning')}
               >
                 <MenuItem value="basic" sx={{ fontWeight: 700 }}>
                   Mandatory Need
@@ -113,7 +113,7 @@ export default function FixedLiabilities({
                   setExpense({ ...expense, frequency: e.target.value })
                 }
                 disableUnderline
-                sx={getWellInputStyle(theme, "warning")}
+                sx={getWellInputStyle(theme, 'warning')}
               >
                 <MenuItem value="monthly" sx={{ fontWeight: 700 }}>
                   Monthly
@@ -156,7 +156,7 @@ export default function FixedLiabilities({
           <Grid
             item
             xs={12}
-            sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}
+            sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}
           >
             <Button
               variant="contained"
@@ -179,7 +179,7 @@ export default function FixedLiabilities({
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             borderRadius: 2,
             maxHeight: 200,
-            overflow: "auto",
+            overflow: 'auto',
           }}
         >
           {expensesList.map((exp, index) => (

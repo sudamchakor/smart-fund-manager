@@ -20,7 +20,7 @@ describe('SectionHeader Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <SectionHeader {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -34,33 +34,54 @@ describe('SectionHeader Component', () => {
   });
 
   it('renders with a title and subtitle', () => {
-    renderComponent({ title: 'Test Section Header', subtitle: 'Test Subtitle' });
+    renderComponent({
+      title: 'Test Section Header',
+      subtitle: 'Test Subtitle',
+    });
     expect(screen.getByText('Test Section Header')).toBeInTheDocument();
     expect(screen.getByText('Test Subtitle')).toBeInTheDocument();
   });
 
   it('renders with a title and icon', () => {
-    renderComponent({ title: 'Test Section Header', icon: <SettingsIcon data-testid="SettingsIcon" /> });
+    renderComponent({
+      title: 'Test Section Header',
+      icon: <SettingsIcon data-testid="SettingsIcon" />,
+    });
     expect(screen.getByText('Test Section Header')).toBeInTheDocument();
     expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
     // Check default icon color (primary)
-    const iconWrapper = screen.getByTestId('SettingsIcon').closest('.MuiBox-root');
-    expect(iconWrapper).toHaveStyle(`background-color: ${alpha(theme.palette.primary.main, 0.1)}`);
+    const iconWrapper = screen
+      .getByTestId('SettingsIcon')
+      .closest('.MuiBox-root');
+    expect(iconWrapper).toHaveStyle(
+      `background-color: ${alpha(theme.palette.primary.main, 0.1)}`,
+    );
     expect(iconWrapper).toHaveStyle(`color: ${theme.palette.primary.main}`);
   });
 
   it('renders with a title, icon, and custom color', () => {
-    renderComponent({ title: 'Test Section Header', icon: <SettingsIcon data-testid="SettingsIcon" />, color: 'secondary' });
+    renderComponent({
+      title: 'Test Section Header',
+      icon: <SettingsIcon data-testid="SettingsIcon" />,
+      color: 'secondary',
+    });
     expect(screen.getByText('Test Section Header')).toBeInTheDocument();
     expect(screen.getByTestId('SettingsIcon')).toBeInTheDocument();
     // Check custom icon color (secondary)
-    const iconWrapper = screen.getByTestId('SettingsIcon').closest('.MuiBox-root');
-    expect(iconWrapper).toHaveStyle(`background-color: ${alpha(theme.palette.secondary.main, 0.1)}`);
+    const iconWrapper = screen
+      .getByTestId('SettingsIcon')
+      .closest('.MuiBox-root');
+    expect(iconWrapper).toHaveStyle(
+      `background-color: ${alpha(theme.palette.secondary.main, 0.1)}`,
+    );
     expect(iconWrapper).toHaveStyle(`color: ${theme.palette.secondary.main}`);
   });
 
   it('renders with a title and action element', () => {
-    renderComponent({ title: 'Test Section Header', action: <button data-testid="action-element">Action</button> });
+    renderComponent({
+      title: 'Test Section Header',
+      action: <button data-testid="action-element">Action</button>,
+    });
     expect(screen.getByText('Test Section Header')).toBeInTheDocument();
     expect(screen.getByTestId('action-element')).toBeInTheDocument();
   });

@@ -27,7 +27,11 @@ jest.mock('@mui/material/useMediaQuery');
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
 describe('AdminHeader Component', () => {
-  const renderComponent = (initialPath = '/admin/articles', isMobile = false, authState = { user: null, logout: jest.fn() }) => {
+  const renderComponent = (
+    initialPath = '/admin/articles',
+    isMobile = false,
+    authState = { user: null, logout: jest.fn() },
+  ) => {
     mockUseLocation.mockReturnValue({ pathname: initialPath });
     useMediaQuery.mockReturnValue(isMobile);
     mockUseAuth.mockReturnValue(authState);
@@ -37,7 +41,7 @@ describe('AdminHeader Component', () => {
         <Router>
           <AdminHeader />
         </Router>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -48,138 +52,231 @@ describe('AdminHeader Component', () => {
   // --- Desktop View Tests ---
   describe('Desktop View', () => {
     it('renders admin dashboard title and navigation buttons when authenticated', () => {
-      renderComponent('/admin/articles', false, { user: { uid: '123', displayName: 'Admin User' }, logout: jest.fn() });
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123', displayName: 'Admin User' },
+        logout: jest.fn(),
+      });
       expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Manage Articles' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Create Article' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'My Author Profile' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Go to App' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Manage Articles' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Create Article' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'My Author Profile' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Go to App' }),
+      ).toBeInTheDocument();
       expect(screen.getByText('Welcome, Admin User!')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Logout' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Logout' }),
+      ).toBeInTheDocument();
       expect(screen.queryByLabelText('Menu')).not.toBeInTheDocument(); // No mobile menu icon
     });
 
     it('navigates to /admin/articles when Admin Dashboard title is clicked', () => {
-      renderComponent('/admin/profile', false, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/profile', false, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByText('Admin Dashboard'));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
 
     it('navigates to /admin/articles when "Manage Articles" button is clicked', () => {
-      renderComponent('/admin/profile', false, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/profile', false, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByRole('button', { name: 'Manage Articles' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
 
     it('navigates to /admin/articles/new when "Create Article" button is clicked', () => {
-      renderComponent('/admin/articles', false, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByRole('button', { name: 'Create Article' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles/new');
     });
 
     it('navigates to /admin/profile when "My Author Profile" button is clicked', () => {
-      renderComponent('/admin/articles', false, { user: { uid: '123' }, logout: jest.fn() });
-      fireEvent.click(screen.getByRole('button', { name: 'My Author Profile' }));
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
+      fireEvent.click(
+        screen.getByRole('button', { name: 'My Author Profile' }),
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/admin/profile');
     });
 
     it('navigates to / when "Go to App" button is clicked', () => {
-      renderComponent('/admin/articles', false, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByRole('button', { name: 'Go to App' }));
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
     it('calls logout and navigates to / when "Logout" button is clicked', () => {
       const mockLogout = jest.fn();
-      renderComponent('/admin/articles', false, { user: { uid: '123' }, logout: mockLogout });
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123' },
+        logout: mockLogout,
+      });
       fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
       expect(mockLogout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
     it('displays user email if displayName is not available', () => {
-      renderComponent('/admin/articles', false, { user: { uid: '123', email: 'admin@example.com' }, logout: jest.fn() });
-      expect(screen.getByText('Welcome, admin@example.com!')).toBeInTheDocument();
+      renderComponent('/admin/articles', false, {
+        user: { uid: '123', email: 'admin@example.com' },
+        logout: jest.fn(),
+      });
+      expect(
+        screen.getByText('Welcome, admin@example.com!'),
+      ).toBeInTheDocument();
     });
 
     it('does not render welcome message or logout button if user is null', () => {
-      renderComponent('/admin/articles', false, { user: null, logout: jest.fn() });
+      renderComponent('/admin/articles', false, {
+        user: null,
+        logout: jest.fn(),
+      });
       expect(screen.queryByText(/Welcome,/i)).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Logout' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Logout' }),
+      ).not.toBeInTheDocument();
     });
   });
 
   // --- Mobile View Tests ---
   describe('Mobile View', () => {
     it('renders mobile menu icon and admin dashboard title, hides desktop nav', () => {
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() }); // isMobile = true
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      }); // isMobile = true
       expect(screen.getByLabelText('Menu')).toBeInTheDocument();
       expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Manage Articles' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Create Article' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'My Author Profile' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Go to App' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Manage Articles' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Create Article' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'My Author Profile' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Go to App' }),
+      ).not.toBeInTheDocument();
       expect(screen.queryByText(/Welcome,/i)).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Logout' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Logout' }),
+      ).not.toBeInTheDocument();
     });
 
     it('opens and closes the Drawer when menu icon is clicked', () => {
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       const menuButton = screen.getByLabelText('Menu');
       fireEvent.click(menuButton);
-      expect(screen.getByRole('presentation', { name: 'Admin Menu' })).toBeInTheDocument(); // Drawer is a presentation role
+      expect(
+        screen.getByRole('presentation', { name: 'Admin Menu' }),
+      ).toBeInTheDocument(); // Drawer is a presentation role
       expect(screen.getByText('Admin Menu')).toBeInTheDocument(); // Drawer header
 
       fireEvent.click(menuButton); // Click again to close
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to /admin/articles from drawer when "Manage Articles" is clicked', () => {
-      renderComponent('/admin/profile', true, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/profile', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Manage Articles' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument(); // Drawer should close
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument(); // Drawer should close
     });
 
     it('navigates to /admin/articles/new when "Create Article" is clicked', () => {
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Create Article' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles/new');
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to /admin/profile from drawer when "Author Profile" is clicked', () => {
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Author Profile' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/profile');
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('navigates to / from drawer when "Go to App" is clicked', () => {
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: jest.fn() });
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Go to App' }));
       expect(mockNavigate).toHaveBeenCalledWith('/');
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('calls logout and navigates to / from drawer when "Logout" is clicked', () => {
       const mockLogout = jest.fn();
-      renderComponent('/admin/articles', true, { user: { uid: '123' }, logout: mockLogout });
+      renderComponent('/admin/articles', true, {
+        user: { uid: '123' },
+        logout: mockLogout,
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
       fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
       expect(mockLogout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/');
-      expect(screen.queryByRole('presentation', { name: 'Admin Menu' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('presentation', { name: 'Admin Menu' }),
+      ).not.toBeInTheDocument();
     });
 
     it('does not render logout button in drawer if user is null', () => {
-      renderComponent('/admin/articles', true, { user: null, logout: jest.fn() });
+      renderComponent('/admin/articles', true, {
+        user: null,
+        logout: jest.fn(),
+      });
       fireEvent.click(screen.getByLabelText('Menu'));
-      expect(screen.queryByRole('button', { name: 'Logout' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Logout' }),
+      ).not.toBeInTheDocument();
     });
   });
 });

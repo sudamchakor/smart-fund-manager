@@ -15,11 +15,18 @@ jest.mock('react-router-dom', () => ({
 // Mock OnboardingModal (lazy loaded)
 jest.mock('../../features/profile/tabs/OnboardingModal', () => {
   const React = require('react');
-  return ({ open, onClose }) => (
-    open ? React.createElement('div', { 'data-testid': 'mock-onboarding-modal' },
-      React.createElement('button', { onClick: onClose }, 'Close Onboarding')
-    ) : null
-  );
+  return ({ open, onClose }) =>
+    open
+      ? React.createElement(
+          'div',
+          { 'data-testid': 'mock-onboarding-modal' },
+          React.createElement(
+            'button',
+            { onClick: onClose },
+            'Close Onboarding',
+          ),
+        )
+      : null;
 });
 
 // Mock localStorage
@@ -27,9 +34,15 @@ const localStorageMock = (() => {
   let store = {};
   return {
     getItem: (key) => store[key] || null,
-    setItem: (key, value) => { store[key] = value.toString(); },
-    clear: () => { store = {}; },
-    removeItem: (key) => { delete store[key]; }
+    setItem: (key, value) => {
+      store[key] = value.toString();
+    },
+    clear: () => {
+      store = {};
+    },
+    removeItem: (key) => {
+      delete store[key];
+    },
   };
 })();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
@@ -41,19 +54,62 @@ jest.mock('../../pages/Home', () => {
   const actual = jest.requireActual('../../pages/Home');
   // Define mockSystemModules INSIDE the factory function to avoid hoisting issues
   const mockSystemModules = [
-    { title: "User Profile", description: "Desc 1", icon: React.createElement('div', { 'data-testid': 'icon-user-profile' }), path: "/profile", colorToken: "secondary" },
-    { title: "EMI Calculator", description: "Desc 2", icon: React.createElement('div', { 'data-testid': 'icon-emi-calculator' }), path: "/calculator", colorToken: "primary" },
-    { title: "Credit Card EMI", description: "Desc 3", icon: React.createElement('div', { 'data-testid': 'icon-credit-card-emi' }), path: "/credit-card-emi", colorToken: "success" },
-    { title: "Investment Strategy", description: "Desc 4", icon: React.createElement('div', { 'data-testid': 'icon-investment-strategy' }), path: "/investment/sip", colorToken: "info" },
-    { title: "Personal Loan", description: "Desc 5", icon: React.createElement('div', { 'data-testid': 'icon-personal-loan' }), path: "/personal-loan", colorToken: "warning" },
-    { title: "Tax Optimization", description: "Desc 6", icon: React.createElement('div', { 'data-testid': 'icon-tax-optimization' }), path: "/tax-calculator", colorToken: "error" },
+    {
+      title: 'User Profile',
+      description: 'Desc 1',
+      icon: React.createElement('div', { 'data-testid': 'icon-user-profile' }),
+      path: '/profile',
+      colorToken: 'secondary',
+    },
+    {
+      title: 'EMI Calculator',
+      description: 'Desc 2',
+      icon: React.createElement('div', {
+        'data-testid': 'icon-emi-calculator',
+      }),
+      path: '/calculator',
+      colorToken: 'primary',
+    },
+    {
+      title: 'Credit Card EMI',
+      description: 'Desc 3',
+      icon: React.createElement('div', {
+        'data-testid': 'icon-credit-card-emi',
+      }),
+      path: '/credit-card-emi',
+      colorToken: 'success',
+    },
+    {
+      title: 'Investment Strategy',
+      description: 'Desc 4',
+      icon: React.createElement('div', {
+        'data-testid': 'icon-investment-strategy',
+      }),
+      path: '/investment/sip',
+      colorToken: 'info',
+    },
+    {
+      title: 'Personal Loan',
+      description: 'Desc 5',
+      icon: React.createElement('div', { 'data-testid': 'icon-personal-loan' }),
+      path: '/personal-loan',
+      colorToken: 'warning',
+    },
+    {
+      title: 'Tax Optimization',
+      description: 'Desc 6',
+      icon: React.createElement('div', {
+        'data-testid': 'icon-tax-optimization',
+      }),
+      path: '/tax-calculator',
+      colorToken: 'error',
+    },
   ];
   return {
     ...actual,
     systemModules: mockSystemModules, // Use our mock array
   };
 });
-
 
 describe('Home Component', () => {
   // Helper function to render the component with ThemeProvider and Router
@@ -63,7 +119,7 @@ describe('Home Component', () => {
         <Router>
           <Home />
         </Router>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -77,7 +133,11 @@ describe('Home Component', () => {
     renderComponent();
     expect(screen.getByText('SmartFund')).toBeInTheDocument();
     expect(screen.getByText('Manager')).toBeInTheDocument();
-    expect(screen.getByText('Your centralized financial command center for precision planning and capital growth.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Your centralized financial command center for precision planning and capital growth.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('navigates to /profile when "Get Started" button is clicked', () => {
@@ -91,17 +151,21 @@ describe('Home Component', () => {
     renderComponent();
     // Access the mocked systemModules from the Home module itself
     const { systemModules: mockedSystemModules } = require('../../pages/Home');
-    mockedSystemModules.forEach(module => {
+    mockedSystemModules.forEach((module) => {
       expect(screen.getByText(module.title)).toBeInTheDocument();
       expect(screen.getByText(module.description)).toBeInTheDocument();
-      expect(screen.getByTestId(`icon-${module.title.toLowerCase().replace(/\s/g, '-')}`)).toBeInTheDocument();
+      expect(
+        screen.getByTestId(
+          `icon-${module.title.toLowerCase().replace(/\s/g, '-')}`,
+        ),
+      ).toBeInTheDocument();
     });
   });
 
   it('navigates to the correct path when each module card is clicked', () => {
     renderComponent();
     const { systemModules: mockedSystemModules } = require('../../pages/Home');
-    mockedSystemModules.forEach(module => {
+    mockedSystemModules.forEach((module) => {
       fireEvent.click(screen.getByText(module.title).closest('button'));
       expect(mockNavigate).toHaveBeenCalledWith(module.path);
     });
@@ -119,7 +183,9 @@ describe('Home Component', () => {
   it('does not show OnboardingModal if "hasOnboarded" is true in localStorage', () => {
     localStorage.setItem('hasOnboarded', 'true');
     renderComponent();
-    expect(screen.queryByTestId('mock-onboarding-modal')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mock-onboarding-modal'),
+    ).not.toBeInTheDocument();
   });
 
   it('closes OnboardingModal and sets "hasOnboarded" in localStorage when onClose is called', async () => {
@@ -129,7 +195,9 @@ describe('Home Component', () => {
     });
     fireEvent.click(screen.getByText('Close Onboarding'));
     await waitFor(() => {
-      expect(screen.queryByTestId('mock-onboarding-modal')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('mock-onboarding-modal'),
+      ).not.toBeInTheDocument();
     });
     expect(localStorage.getItem('hasOnboarded')).toBe('true');
   });
@@ -150,12 +218,14 @@ describe('Home Component', () => {
         <Router>
           <Home />
         </Router>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.queryByText('User Profile')).not.toBeInTheDocument();
     // Check that no module cards are rendered, only the "Get Started" button in the hero section
-    expect(screen.queryAllByRole('button', { name: /System Module/i })).toHaveLength(0);
+    expect(
+      screen.queryAllByRole('button', { name: /System Module/i }),
+    ).toHaveLength(0);
 
     // Restore original mock for subsequent tests
     jest.dontMock('../../pages/Home');
@@ -166,7 +236,7 @@ describe('Home Component', () => {
         <Router>
           <OriginalHome />
         </Router>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   });
 

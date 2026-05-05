@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo } from 'react';
 import {
   Table,
   TableBody,
@@ -13,16 +13,16 @@ import {
   Skeleton,
   alpha,
   useTheme,
-} from "@mui/material";
-import { useSelector } from "react-redux";
-import { selectCalculatedValues } from "../utils/emiCalculator";
-import { selectCurrency } from "../../../store/emiSlice";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import RemoveCircleOutlineIcon from "@mui/icons-material/RemoveCircleOutline";
+} from '@mui/material';
+import { useSelector } from 'react-redux';
+import { selectCalculatedValues } from '../utils/emiCalculator';
+import { selectCurrency } from '../../../store/emiSlice';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline';
 
 // Formatting helper
 const formatVal = (val, curr) =>
-  `${curr} ${Math.round(val).toLocaleString("en-IN")}`;
+  `${curr} ${Math.round(val).toLocaleString('en-IN')}`;
 
 const Row = ({ yearData, currency }) => {
   const [open, setOpen] = useState(false);
@@ -31,7 +31,7 @@ const Row = ({ yearData, currency }) => {
   const cellStyle = {
     py: 1,
     px: 1.5,
-    fontSize: "0.85rem",
+    fontSize: '0.85rem',
     borderColor: alpha(theme.palette.divider, 0.1),
   };
 
@@ -39,17 +39,17 @@ const Row = ({ yearData, currency }) => {
     <React.Fragment>
       <TableRow
         sx={{
-          bgcolor: open ? alpha(theme.palette.primary.main, 0.05) : "inherit",
-          "&:nth-of-type(odd)": {
+          bgcolor: open ? alpha(theme.palette.primary.main, 0.05) : 'inherit',
+          '&:nth-of-type(odd)': {
             bgcolor: open
               ? alpha(theme.palette.primary.main, 0.08)
               : alpha(theme.palette.primary.main, 0.02),
           },
-          transition: "background-color 0.2s",
+          transition: 'background-color 0.2s',
         }}
       >
         <TableCell sx={{ ...cellStyle, fontWeight: 800 }}>
-          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <IconButton
               size="small"
               onClick={() => setOpen(!open)}
@@ -75,7 +75,7 @@ const Row = ({ yearData, currency }) => {
         </TableCell>
         <TableCell
           align="right"
-          sx={{ ...cellStyle, fontWeight: 800, color: "primary.main" }}
+          sx={{ ...cellStyle, fontWeight: 800, color: 'primary.main' }}
         >
           {formatVal(
             yearData.totalPrincipal +
@@ -102,52 +102,52 @@ const Row = ({ yearData, currency }) => {
                   {yearData.months.map((monthRow) => (
                     <TableRow
                       key={monthRow.date}
-                      sx={{ "&:hover": { bgcolor: "white" } }}
+                      sx={{ '&:hover': { bgcolor: 'white' } }}
                     >
                       <TableCell
                         sx={{
                           ...cellStyle,
-                          width: "15%",
+                          width: '15%',
                           border: 0,
                           pl: 6,
-                          color: "text.secondary",
+                          color: 'text.secondary',
                         }}
                       >
-                        {monthRow.date.split(" ")[0]}
+                        {monthRow.date.split(' ')[0]}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "14%", border: 0 }}
+                        sx={{ ...cellStyle, width: '14%', border: 0 }}
                       >
                         {formatVal(monthRow.principal, currency)}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "14%", border: 0 }}
+                        sx={{ ...cellStyle, width: '14%', border: 0 }}
                       >
                         {formatVal(monthRow.interest, currency)}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "14%", border: 0 }}
+                        sx={{ ...cellStyle, width: '14%', border: 0 }}
                       >
                         {formatVal(monthRow.prepayment, currency)}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "15%", border: 0 }}
+                        sx={{ ...cellStyle, width: '15%', border: 0 }}
                       >
                         {formatVal(monthRow.totalPayment, currency)}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "14%", border: 0 }}
+                        sx={{ ...cellStyle, width: '14%', border: 0 }}
                       >
                         {formatVal(monthRow.balance, currency)}
                       </TableCell>
                       <TableCell
                         align="right"
-                        sx={{ ...cellStyle, width: "14%", border: 0 }}
+                        sx={{ ...cellStyle, width: '14%', border: 0 }}
                       >
                         {monthRow.paidPercent}%
                       </TableCell>
@@ -172,7 +172,7 @@ const PaymentScheduleTable = () => {
   const groupedSchedule = useMemo(() => {
     const years = {};
     schedule.forEach((row) => {
-      const year = row.date.split(" ")[1];
+      const year = row.date.split(' ')[1];
       if (!years[year]) {
         years[year] = {
           year,
@@ -195,10 +195,10 @@ const PaymentScheduleTable = () => {
 
   const headerStyle = (bgColor) => ({
     bgcolor: bgColor,
-    color: "white",
+    color: 'white',
     fontWeight: 800,
-    fontSize: "0.75rem",
-    textTransform: "uppercase",
+    fontSize: '0.75rem',
+    textTransform: 'uppercase',
     letterSpacing: 0.5,
     py: 1.5,
     border: 0,
@@ -215,10 +215,10 @@ const PaymentScheduleTable = () => {
       component={Paper}
       elevation={0}
       sx={{
-        border: "1px solid",
-        borderColor: "divider",
+        border: '1px solid',
+        borderColor: 'divider',
         borderRadius: 3,
-        overflow: "auto",
+        overflow: 'auto',
       }}
     >
       <Table size="small" stickyHeader sx={{ minWidth: 800 }}>

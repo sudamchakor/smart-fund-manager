@@ -1,29 +1,31 @@
-import React, { useState, useEffect, Suspense, lazy } from "react";
-import {
-  Box,
-  Tabs,
-  Tab,
-  useTheme,
-  alpha,
-} from "@mui/material";
-import { useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, Suspense, lazy } from 'react';
+import { Box, Tabs, Tab, useTheme, alpha } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   selectCurrentSurplus,
   selectDebtFreeCountdown,
-} from "../store/profileSlice";
-import { selectCurrency } from "../store/emiSlice";
-import CustomTabPanel from "../components/CustomTabPanel";
-import PreviewBanner from "../components/PreviewBanner";
-import FloatingStatusIsland from "../components/FloatingStatusIsland";
-import SuspenseFallback from "../components/common/SuspenseFallback";
+} from '../store/profileSlice';
+import { selectCurrency } from '../store/emiSlice';
+import CustomTabPanel from '../components/CustomTabPanel';
+import PreviewBanner from '../components/PreviewBanner';
+import FloatingStatusIsland from '../components/FloatingStatusIsland';
+import SuspenseFallback from '../components/common/SuspenseFallback';
 
 // Feature Tabs
-const PersonalProfileTab = lazy(() => import("../features/profile/tabs/PersonalProfileTab"));
-const FutureGoalsTab = lazy(() => import("../features/profile/tabs/FutureGoalsTab"));
-const WealthTab = lazy(() => import("../features/profile/tabs/WealthTab"));
-const OnboardingModal = lazy(() => import("../features/profile/tabs/OnboardingModal"));
-const FinancialModal = lazy(() => import("../features/profile/components/FinancialModal"));
+const PersonalProfileTab = lazy(
+  () => import('../features/profile/tabs/PersonalProfileTab'),
+);
+const FutureGoalsTab = lazy(
+  () => import('../features/profile/tabs/FutureGoalsTab'),
+);
+const WealthTab = lazy(() => import('../features/profile/tabs/WealthTab'));
+const OnboardingModal = lazy(
+  () => import('../features/profile/tabs/OnboardingModal'),
+);
+const FinancialModal = lazy(
+  () => import('../features/profile/components/FinancialModal'),
+);
 
 export default function UserProfile() {
   const theme = useTheme();
@@ -37,26 +39,26 @@ export default function UserProfile() {
   };
 
   const searchParams = new URLSearchParams(location.search);
-  const tabParam = searchParams.get("tab");
+  const tabParam = searchParams.get('tab');
 
   const [tabValue, setTabValue] = useState(() => getTabIndex(tabParam));
   const [goalToEditId, setGoalToEditId] = useState(null);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState("");
+  const [modalType, setModalType] = useState('');
 
   // Profile Status
   const [isProfileCreated, setIsProfileCreated] = useState(
-    localStorage.getItem("isProfileCreated") === "true",
+    localStorage.getItem('isProfileCreated') === 'true',
   );
 
   useEffect(() => {
     setTabValue(getTabIndex(tabParam));
-    if (tabParam !== "goals") setGoalToEditId(null);
+    if (tabParam !== 'goals') setGoalToEditId(null);
   }, [tabParam]);
 
   const handleTabChange = (event, newValue) => {
-    const tabs = ["personal", "goals", "wealth"];
+    const tabs = ['personal', 'goals', 'wealth'];
     navigate(`/profile?tab=${tabs[newValue]}`);
     setGoalToEditId(null);
   };
@@ -78,7 +80,7 @@ export default function UserProfile() {
 
   return (
     // FIX: Greatly increased 'pb' (padding-bottom) so the user can scroll past the floating footer
-    <Box sx={{ width: "100%", pb: { xs: 16, sm: 20 } }}>
+    <Box sx={{ width: '100%', pb: { xs: 16, sm: 20 } }}>
       {/* 1. Integrated Action Banner */}
       {!isProfileCreated && (
         <Suspense fallback={<SuspenseFallback />}>
@@ -102,18 +104,18 @@ export default function UserProfile() {
           variant="scrollable"
           sx={{
             minHeight: 48,
-            "& .MuiTabs-indicator": {
+            '& .MuiTabs-indicator': {
               height: 3,
-              borderRadius: "3px 3px 0 0",
-              backgroundColor: "primary.main",
+              borderRadius: '3px 3px 0 0',
+              backgroundColor: 'primary.main',
             },
-            "& .MuiTab-root": {
-              textTransform: "none",
+            '& .MuiTab-root': {
+              textTransform: 'none',
               fontWeight: 700,
-              fontSize: "0.9rem",
-              color: "text.secondary",
-              "&.Mui-selected": {
-                color: "primary.main",
+              fontSize: '0.9rem',
+              color: 'text.secondary',
+              '&.Mui-selected': {
+                color: 'primary.main',
               },
             },
           }}
@@ -149,7 +151,7 @@ export default function UserProfile() {
           onClose={() => {
             setOnboardingOpen(false);
             setIsProfileCreated(
-              localStorage.getItem("isProfileCreated") === "true",
+              localStorage.getItem('isProfileCreated') === 'true',
             );
           }}
         />

@@ -7,9 +7,17 @@ import '@testing-library/jest-dom';
 // Mock the themeColors import
 jest.mock('../../../theme/ThemeConfig', () => ({
   themeColors: [
-    { name: 'Default', value: 'default', colors: ['#1976d2', '#90caf9', '#e3f2fd'] },
+    {
+      name: 'Default',
+      value: 'default',
+      colors: ['#1976d2', '#90caf9', '#e3f2fd'],
+    },
     { name: 'Dark', value: 'dark', colors: ['#212121', '#424242', '#616161'] },
-    { name: 'Custom', value: 'custom', colors: ['#ff0000', '#00ff00', '#0000ff'] },
+    {
+      name: 'Custom',
+      value: 'custom',
+      colors: ['#ff0000', '#00ff00', '#0000ff'],
+    },
   ],
 }));
 
@@ -33,7 +41,7 @@ describe('ThemeSelector Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <ThemeSelector {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -55,9 +63,13 @@ describe('ThemeSelector Component', () => {
     const darkCard = screen.getByText('Dark').closest('.MuiCard-root');
     const customCard = screen.getByText('Custom').closest('.MuiCard-root');
 
-    expect(defaultCard).toHaveStyle(`border-color: ${alpha(theme.palette.divider, 0.2)}`);
+    expect(defaultCard).toHaveStyle(
+      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
+    );
     expect(darkCard).toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(customCard).toHaveStyle(`border-color: ${alpha(theme.palette.divider, 0.2)}`);
+    expect(customCard).toHaveStyle(
+      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
+    );
   });
 
   it('calls onThemeChange with the correct value when a theme is selected', () => {
@@ -69,8 +81,12 @@ describe('ThemeSelector Component', () => {
   it('renders color boxes for each theme option', () => {
     renderComponent();
     const defaultCard = screen.getByText('Default').closest('.MuiCard-root');
-    expect(defaultCard.querySelectorAll('.MuiBox-root')[0]).toHaveStyle('background-color: #1976d2');
-    expect(defaultCard.querySelectorAll('.MuiBox-root')[1]).toHaveStyle('background-color: #90caf9');
+    expect(defaultCard.querySelectorAll('.MuiBox-root')[0]).toHaveStyle(
+      'background-color: #1976d2',
+    );
+    expect(defaultCard.querySelectorAll('.MuiBox-root')[1]).toHaveStyle(
+      'background-color: #90caf9',
+    );
   });
 
   // --- Negative Scenarios / Edge Cases ---
@@ -87,7 +103,7 @@ describe('ThemeSelector Component', () => {
     const { container } = render(
       <ThemeProvider theme={theme}>
         <ThemeSelector {...defaultProps} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
     expect(container).toBeEmptyDOMElement();
   });
@@ -95,16 +111,26 @@ describe('ThemeSelector Component', () => {
   it('handles selectedTheme not matching any option', () => {
     renderComponent({ selectedTheme: 'nonexistent' });
     const defaultCard = screen.getByText('Default').closest('.MuiCard-root');
-    expect(defaultCard).toHaveStyle(`border-color: ${alpha(theme.palette.divider, 0.2)}`);
+    expect(defaultCard).toHaveStyle(
+      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
+    );
     // No card should be highlighted with primary color
-    expect(screen.queryByText('Default').closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(screen.queryByText('Dark').closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(screen.queryByText('Custom').closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
+    expect(
+      screen.queryByText('Default').closest('.MuiCard-root'),
+    ).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
+    expect(screen.queryByText('Dark').closest('.MuiCard-root')).not.toHaveStyle(
+      `border-color: ${theme.palette.primary.main}`,
+    );
+    expect(
+      screen.queryByText('Custom').closest('.MuiCard-root'),
+    ).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
   });
 
   it('renders with disabled styling when disabled prop is true', () => {
     renderComponent({ disabled: true });
-    const defaultCardActionArea = screen.getByText('Default').closest('.MuiCardActionArea-root');
+    const defaultCardActionArea = screen
+      .getByText('Default')
+      .closest('.MuiCardActionArea-root');
     expect(defaultCardActionArea).toBeDisabled();
   });
 });

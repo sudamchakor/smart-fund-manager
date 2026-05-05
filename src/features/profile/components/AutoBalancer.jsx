@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Typography,
   Box,
@@ -9,12 +9,12 @@ import {
   alpha,
   Stack,
   Grid,
-} from "@mui/material";
+} from '@mui/material';
 import {
   BuildCircle as BuildIcon,
   CheckCircleOutline as SuccessIcon,
   WarningAmber as WarningIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
 import {
   selectCurrentSurplus,
@@ -22,11 +22,11 @@ import {
   selectStepUpPercentage,
   updateExpense,
   setStepUpPercentage,
-} from "../../../store/profileSlice";
-import { selectCurrency } from "../../../store/emiSlice";
-import { formatCurrency } from "../../../utils/formatting";
-import SectionHeader from "../../../components/common/SectionHeader";
-import { labelStyle } from "../../../styles/formStyles";
+} from '../../../store/profileSlice';
+import { selectCurrency } from '../../../store/emiSlice';
+import { formatCurrency } from '../../../utils/formatting';
+import SectionHeader from '../../../components/common/SectionHeader';
+import { labelStyle } from '../../../styles/formStyles';
 
 const AutoBalancer = () => {
   const theme = useTheme();
@@ -44,7 +44,7 @@ const AutoBalancer = () => {
     if (surplus >= 0) return null;
 
     const deficit = Math.abs(surplus);
-    const basicExpenses = expenses.filter((e) => e.category === "basic");
+    const basicExpenses = expenses.filter((e) => e.category === 'basic');
     const totalBasic = basicExpenses.reduce((sum, e) => sum + e.amount, 0);
 
     if (totalBasic === 0) {
@@ -65,7 +65,7 @@ const AutoBalancer = () => {
     let newStepUp = currentStepUp;
     let requiredReduction = 0;
     let achievable = false;
-    let message = "";
+    let message = '';
 
     if (maxAllowedReduction >= deficit) {
       requiredReduction = deficit;
@@ -135,10 +135,10 @@ const AutoBalancer = () => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.secondary.main, 0.2),
         bgcolor: alpha(theme.palette.secondary.main, 0.02),
-        boxShadow: "0 2px 12px rgba(0,0,0,0.02)",
+        boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
       }}
     >
       <SectionHeader
@@ -150,7 +150,7 @@ const AutoBalancer = () => {
       {hasSucceeded ? (
         <Box
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             py: 3,
             bgcolor: alpha(theme.palette.success.main, 0.05),
             border: `1px dashed ${alpha(theme.palette.success.main, 0.3)}`,
@@ -165,14 +165,14 @@ const AutoBalancer = () => {
             sx={{
               color: theme.palette.success.dark,
               fontWeight: 800,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
             }}
           >
             System Optimized
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontWeight: 600, color: "text.secondary" }}
+            sx={{ fontWeight: 600, color: 'text.secondary' }}
           >
             Budget balanced successfully. Parameters updated.
           </Typography>
@@ -182,10 +182,10 @@ const AutoBalancer = () => {
           <Typography
             variant="caption"
             sx={{
-              display: "block",
+              display: 'block',
               mb: 2,
               fontWeight: 600,
-              color: "text.secondary",
+              color: 'text.secondary',
             }}
           >
             System detected a negative cash flow. Use this diagnostic tool to
@@ -198,7 +198,7 @@ const AutoBalancer = () => {
               <Typography sx={labelStyle}>Max Reduction Limit</Typography>
               <Typography
                 variant="h6"
-                sx={{ fontWeight: 900, color: "secondary.main" }}
+                sx={{ fontWeight: 900, color: 'secondary.main' }}
               >
                 {maxReductionPercent}%
               </Typography>
@@ -212,9 +212,9 @@ const AutoBalancer = () => {
                 onChange={(e, val) => setMaxReductionPercent(val)}
                 color="secondary"
                 sx={{
-                  "& .MuiSlider-thumb": { width: 14, height: 14 },
-                  "& .MuiSlider-track": { height: 4 },
-                  "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+                  '& .MuiSlider-thumb': { width: 14, height: 14 },
+                  '& .MuiSlider-track': { height: 4 },
+                  '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
                 }}
               />
             </Grid>
@@ -228,7 +228,7 @@ const AutoBalancer = () => {
                 bgcolor: simulation.achievable
                   ? alpha(theme.palette.info.main, 0.05)
                   : alpha(theme.palette.error.main, 0.05),
-                border: "1px dashed",
+                border: '1px dashed',
                 borderColor: simulation.achievable
                   ? alpha(theme.palette.info.main, 0.3)
                   : alpha(theme.palette.error.main, 0.3),
@@ -243,7 +243,7 @@ const AutoBalancer = () => {
                 {simulation.achievable ? (
                   <BuildIcon
                     sx={{
-                      fontSize: "1.2rem",
+                      fontSize: '1.2rem',
                       color: theme.palette.info.main,
                       mt: 0.2,
                     }}
@@ -251,7 +251,7 @@ const AutoBalancer = () => {
                 ) : (
                   <WarningIcon
                     sx={{
-                      fontSize: "1.2rem",
+                      fontSize: '1.2rem',
                       color: theme.palette.error.main,
                       mt: 0.2,
                     }}
@@ -261,7 +261,7 @@ const AutoBalancer = () => {
                   variant="caption"
                   sx={{
                     fontWeight: 700,
-                    color: simulation.achievable ? "info.dark" : "error.dark",
+                    color: simulation.achievable ? 'info.dark' : 'error.dark',
                     lineHeight: 1.5,
                   }}
                 >
@@ -278,11 +278,11 @@ const AutoBalancer = () => {
                   disableElevation
                   sx={{
                     fontWeight: 800,
-                    textTransform: "none",
+                    textTransform: 'none',
                     borderRadius: 1.5,
-                    transition: "transform 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-1px)",
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
                       boxShadow: `0 4px 12px ${alpha(theme.palette.secondary.main, 0.3)}`,
                     },
                   }}

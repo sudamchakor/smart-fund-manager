@@ -1,5 +1,5 @@
-import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { useSelector } from "react-redux";
+import React, { forwardRef, useImperativeHandle, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Box,
   Typography,
@@ -7,11 +7,11 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
-import { TrackChanges as TargetIcon } from "@mui/icons-material";
-import { selectGoals } from "../../../store/profileSlice";
-import { selectCurrency } from "../../../store/emiSlice";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '@mui/material';
+import { TrackChanges as TargetIcon } from '@mui/icons-material';
+import { selectGoals } from '../../../store/profileSlice';
+import { selectCurrency } from '../../../store/emiSlice';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const GoalCoverage = forwardRef((props, ref) => {
   const theme = useTheme();
@@ -26,11 +26,11 @@ const GoalCoverage = forwardRef((props, ref) => {
   // Match the color mapping logic from your other components
   const getColorForCategory = (category) => {
     switch (category?.toLowerCase()) {
-      case "retirement":
+      case 'retirement':
         return theme.palette.primary.main;
-      case "education":
+      case 'education':
         return theme.palette.info.main;
-      case "safety":
+      case 'safety':
         return theme.palette.warning.main;
       default:
         return theme.palette.secondary.main;
@@ -41,7 +41,7 @@ const GoalCoverage = forwardRef((props, ref) => {
     const absVal = Math.abs(val || 0);
     if (absVal >= 100000) return `${(absVal / 100000).toFixed(1)}L`;
     if (absVal >= 1000) return `${(absVal / 1000).toFixed(0)}k`;
-    return absVal.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    return absVal.toLocaleString('en-IN', { maximumFractionDigits: 0 });
   };
 
   return (
@@ -50,13 +50,13 @@ const GoalCoverage = forwardRef((props, ref) => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
+        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
       }}
     >
       <SectionHeader
@@ -65,7 +65,7 @@ const GoalCoverage = forwardRef((props, ref) => {
         color={theme.palette.success.main}
       />
 
-      <Box sx={{ flexGrow: 1, overflowY: "auto", pr: 1 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', pr: 1 }}>
         {goals.length > 0 ? (
           <Stack spacing={3}>
             {goals.map((goal) => {
@@ -94,8 +94,8 @@ const GoalCoverage = forwardRef((props, ref) => {
                       variant="caption"
                       sx={{
                         fontWeight: 800,
-                        textTransform: "uppercase",
-                        color: "text.secondary",
+                        textTransform: 'uppercase',
+                        color: 'text.secondary',
                         letterSpacing: 0.5,
                       }}
                     >
@@ -107,7 +107,7 @@ const GoalCoverage = forwardRef((props, ref) => {
                         fontWeight: 900,
                         color: isFullyFunded
                           ? theme.palette.success.main
-                          : "text.primary",
+                          : 'text.primary',
                       }}
                     >
                       {currency}
@@ -118,13 +118,13 @@ const GoalCoverage = forwardRef((props, ref) => {
 
                   <Box
                     sx={{
-                      position: "relative",
-                      display: "flex",
-                      alignItems: "center",
+                      position: 'relative',
+                      display: 'flex',
+                      alignItems: 'center',
                       gap: 1.5,
                     }}
                   >
-                    <Box sx={{ flexGrow: 1, position: "relative" }}>
+                    <Box sx={{ flexGrow: 1, position: 'relative' }}>
                       <LinearProgress
                         variant="determinate"
                         value={percentage}
@@ -132,7 +132,7 @@ const GoalCoverage = forwardRef((props, ref) => {
                           height: 8,
                           borderRadius: 4,
                           bgcolor: alpha(barColor, 0.15),
-                          "& .MuiLinearProgress-bar": {
+                          '& .MuiLinearProgress-bar': {
                             bgcolor: isFullyFunded
                               ? theme.palette.success.main
                               : barColor,
@@ -145,8 +145,8 @@ const GoalCoverage = forwardRef((props, ref) => {
                       variant="caption"
                       sx={{
                         fontWeight: 900,
-                        minWidth: "40px",
-                        textAlign: "right",
+                        minWidth: '40px',
+                        textAlign: 'right',
                         color: isFullyFunded
                           ? theme.palette.success.main
                           : barColor,
@@ -162,11 +162,11 @@ const GoalCoverage = forwardRef((props, ref) => {
         ) : (
           <Box
             sx={{
-              height: "100%",
+              height: '100%',
               minHeight: 150,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
               borderRadius: 2,
               border: `1px dashed ${alpha(theme.palette.divider, 0.2)}`,
               bgcolor: alpha(theme.palette.background.default, 0.5),
@@ -176,8 +176,8 @@ const GoalCoverage = forwardRef((props, ref) => {
               variant="caption"
               sx={{
                 fontWeight: 700,
-                color: "text.disabled",
-                textTransform: "uppercase",
+                color: 'text.disabled',
+                textTransform: 'uppercase',
                 letterSpacing: 1,
               }}
             >

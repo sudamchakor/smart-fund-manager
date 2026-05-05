@@ -24,7 +24,7 @@ describe.skip('DebtAccelerator', () => {
     render(
       <Provider store={store}>
         <DebtAccelerator />
-      </Provider>
+      </Provider>,
     );
     expect(screen.getByText(/Debt Accelerator/i)).toBeInTheDocument(); // Placeholder
   });

@@ -1,21 +1,37 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AmountInput, AmountWithUnitInput, DatePickerInput } from '../../../components/common/CommonComponents';
+import {
+  AmountInput,
+  AmountWithUnitInput,
+  DatePickerInput,
+} from '../../../components/common/CommonComponents';
 import '@testing-library/jest-dom';
 import dayjs from 'dayjs';
 
 // Mock formStyles to prevent issues with actual style objects
 jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
-  getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
+  getWellInputStyle: jest.fn(() => ({
+    border: '1px solid #ccc',
+    padding: '8px',
+  })),
 }));
 
 // Mock @mui/x-date-pickers/DatePicker to control its behavior
 jest.mock('@mui/x-date-pickers/DatePicker', () => {
   const dayjs = require('dayjs');
   return {
-    DatePicker: ({ label, value, onChange, open, onOpen, onClose, slotProps, ...props }) => (
+    DatePicker: ({
+      label,
+      value,
+      onChange,
+      open,
+      onOpen,
+      onClose,
+      slotProps,
+      ...props
+    }) => (
       <div data-testid={`mock-datepicker-${label}`}>
         <label htmlFor={`mock-datepicker-input-${label}`}>{label}</label>
         <input
@@ -27,8 +43,22 @@ jest.mock('@mui/x-date-pickers/DatePicker', () => {
         />
         {open && (
           <div data-testid={`mock-datepicker-popup-${label}`}>
-            <button onClick={() => { onChange(dayjs('2023-01-15')); onClose(); }}>Select 2023-01-15</button>
-            <button onClick={() => { onChange(null); onClose(); }}>Clear</button>
+            <button
+              onClick={() => {
+                onChange(dayjs('2023-01-15'));
+                onClose();
+              }}
+            >
+              Select 2023-01-15
+            </button>
+            <button
+              onClick={() => {
+                onChange(null);
+                onClose();
+              }}
+            >
+              Clear
+            </button>
           </div>
         )}
       </div>
@@ -52,7 +82,7 @@ describe('AmountInput Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <AmountInput {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -76,26 +106,30 @@ describe('AmountInput Component', () => {
 
   it('calls onChange with numeric value when input changes', () => {
     const { rerender } = renderComponent();
-    fireEvent.change(screen.getByDisplayValue('100'), { target: { value: '150' } });
+    fireEvent.change(screen.getByDisplayValue('100'), {
+      target: { value: '150' },
+    });
     expect(defaultProps.onChange).toHaveBeenCalledWith(expect.any(Object)); // Event object
-    
+
     rerender(
-        <ThemeProvider theme={theme}>
-            <AmountInput {...defaultProps} value={150} />
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <AmountInput {...defaultProps} value={150} />
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('150')).toBeInTheDocument();
   });
 
   it('calls onChange with empty string when input is cleared', () => {
     const { rerender } = renderComponent();
-    fireEvent.change(screen.getByDisplayValue('100'), { target: { value: '' } });
+    fireEvent.change(screen.getByDisplayValue('100'), {
+      target: { value: '' },
+    });
     expect(defaultProps.onChange).toHaveBeenCalledWith(expect.any(Object));
-    
+
     rerender(
-        <ThemeProvider theme={theme}>
-            <AmountInput {...defaultProps} value="" />
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <AmountInput {...defaultProps} value="" />
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('')).toBeInTheDocument();
   });
@@ -157,7 +191,7 @@ describe('AmountWithUnitInput Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <AmountWithUnitInput {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -176,19 +210,29 @@ describe('AmountWithUnitInput Component', () => {
 
   it('highlights the selected unit button', () => {
     renderComponent({ unitValue: 'years' });
-    expect(screen.getByRole('button', { name: 'Months' })).not.toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'Years' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'Months' })).not.toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Years' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
   });
 
   it('calls onAmountChange when amount input changes', () => {
     const { rerender } = renderComponent();
-    fireEvent.change(screen.getByDisplayValue('12'), { target: { value: '24' } });
-    expect(defaultProps.onAmountChange).toHaveBeenCalledWith(expect.any(Object));
-    
+    fireEvent.change(screen.getByDisplayValue('12'), {
+      target: { value: '24' },
+    });
+    expect(defaultProps.onAmountChange).toHaveBeenCalledWith(
+      expect.any(Object),
+    );
+
     rerender(
-        <ThemeProvider theme={theme}>
-            <AmountWithUnitInput {...defaultProps} value={24} />
-        </ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <AmountWithUnitInput {...defaultProps} value={24} />
+      </ThemeProvider>,
     );
     expect(screen.getByDisplayValue('24')).toBeInTheDocument();
   });
@@ -196,7 +240,9 @@ describe('AmountWithUnitInput Component', () => {
   it('calls onUnitChange when a unit button is clicked', () => {
     renderComponent();
     fireEvent.click(screen.getByRole('button', { name: 'Years' }));
-    expect(defaultProps.onUnitChange).toHaveBeenCalledWith({ target: { value: 'years' } });
+    expect(defaultProps.onUnitChange).toHaveBeenCalledWith({
+      target: { value: 'years' },
+    });
   });
 
   it('selects all text on focus for amount input', () => {
@@ -227,8 +273,12 @@ describe('AmountWithUnitInput Component', () => {
 
   it('handles empty unitOptions array gracefully', () => {
     renderComponent({ unitOptions: [] });
-    expect(screen.queryByRole('button', { name: 'Months' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Years' })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Months' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Years' }),
+    ).not.toBeInTheDocument();
   });
 
   it('does not call onUnitChange if newUnit is null (e.g., clicking already selected button)', () => {
@@ -249,7 +299,7 @@ describe('DatePickerInput Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <DatePickerInput {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -261,7 +311,9 @@ describe('DatePickerInput Component', () => {
   it('renders with label and input field', () => {
     renderComponent();
     expect(screen.getByLabelText('Select Date')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-datepicker-input-Select Date')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-datepicker-input-Select Date'),
+    ).toBeInTheDocument();
   });
 
   it('displays formatted date when value is provided as a dayjs object', () => {
@@ -279,7 +331,9 @@ describe('DatePickerInput Component', () => {
     renderComponent();
     fireEvent.click(screen.getByTestId('mock-datepicker-input-Select Date'));
     await waitFor(() => {
-      expect(screen.getByTestId('mock-datepicker-popup-Select Date')).toBeInTheDocument();
+      expect(
+        screen.getByTestId('mock-datepicker-popup-Select Date'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -287,9 +341,13 @@ describe('DatePickerInput Component', () => {
     renderComponent();
     fireEvent.click(screen.getByTestId('mock-datepicker-input-Select Date'));
     fireEvent.click(screen.getByRole('button', { name: 'Select 2023-01-15' }));
-    expect(defaultProps.onChange).toHaveBeenCalledWith(dayjs('2023-01-15').toISOString());
+    expect(defaultProps.onChange).toHaveBeenCalledWith(
+      dayjs('2023-01-15').toISOString(),
+    );
     await waitFor(() => {
-      expect(screen.queryByTestId('mock-datepicker-popup-Select Date')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('mock-datepicker-popup-Select Date'),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -299,7 +357,9 @@ describe('DatePickerInput Component', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(defaultProps.onChange).toHaveBeenCalledWith(null);
     await waitFor(() => {
-      expect(screen.queryByTestId('mock-datepicker-popup-Select Date')).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('mock-datepicker-popup-Select Date'),
+      ).not.toBeInTheDocument();
     });
   });
 

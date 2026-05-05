@@ -1,24 +1,24 @@
-import React, { useRef, useEffect } from "react";
-import { Grid, Box, Stack } from "@mui/material";
-import { useSelector } from "react-redux";
+import React, { useRef, useEffect } from 'react';
+import { Grid, Box, Stack } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 // Redux Selectors
 import {
   selectProfileExpenses,
   selectTotalMonthlyGoalContributions,
   selectCurrentSurplus,
-} from "../../../store/profileSlice";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
+} from '../../../store/profileSlice';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
 
 // Feature Components
-import CashFlowDonutChart from "../components/CashFlowDonutChart";
-import WealthProjectionEngine from "../components/WealthProjectionEngine";
-import GoalCoverage from "../components/GoalCoverage";
-import ExpenseOptimizer from "../components/ExpenseOptimizer";
-import DebtAccelerator from "../components/DebtAccelerator";
-import CorrectionEngine from "../components/CorrectionEngine";
-import AutoBalancer from "../components/AutoBalancer";
-import AssetAllocationChart from "../components/AssetAllocationChart";
+import CashFlowDonutChart from '../components/CashFlowDonutChart';
+import WealthProjectionEngine from '../components/WealthProjectionEngine';
+import GoalCoverage from '../components/GoalCoverage';
+import ExpenseOptimizer from '../components/ExpenseOptimizer';
+import DebtAccelerator from '../components/DebtAccelerator';
+import CorrectionEngine from '../components/CorrectionEngine';
+import AutoBalancer from '../components/AutoBalancer';
+import AssetAllocationChart from '../components/AssetAllocationChart';
 
 export default function WealthTab() {
   const expenses = useSelector(selectProfileExpenses) || [];
@@ -30,19 +30,19 @@ export default function WealthTab() {
 
   // Cash Flow Breakdown Logic
   const needsValue = expenses
-    .filter((e) => e.category === "basic")
+    .filter((e) => e.category === 'basic')
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const wantsValue = expenses
-    .filter((e) => e.category === "discretionary")
+    .filter((e) => e.category === 'discretionary')
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const donutData = [
-    { name: "Needs", value: needsValue },
-    { name: "Wants", value: wantsValue },
-    { name: "Loan EMIs", value: monthlyEmi || 0 },
-    { name: "Future Wealth (Goals)", value: totalMonthlyGoalContributions },
-    { name: "Surplus", value: investableSurplus > 0 ? investableSurplus : 0 },
+    { name: 'Needs', value: needsValue },
+    { name: 'Wants', value: wantsValue },
+    { name: 'Loan EMIs', value: monthlyEmi || 0 },
+    { name: 'Future Wealth (Goals)', value: totalMonthlyGoalContributions },
+    { name: 'Surplus', value: investableSurplus > 0 ? investableSurplus : 0 },
   ].filter((item) => item.value > 0);
 
   // Component Refs for Export/Printing
@@ -66,7 +66,7 @@ export default function WealthTab() {
   }, []);
 
   return (
-    <Box sx={{ width: "100%", overflowX: "hidden" }}>
+    <Box sx={{ width: '100%', overflowX: 'hidden' }}>
       {/* Stack completely ignores null components, eliminating dead space */}
       <Stack spacing={2.5}>
         {/* 1. Background Logic Engines */}
@@ -80,12 +80,12 @@ export default function WealthTab() {
         {/* 3. Current State Analysis (Grid used here ONLY because it's side-by-side) */}
         <Grid container spacing={2.5}>
           <Grid item xs={12} md={6}>
-            <Box sx={{ height: "100%", minHeight: 350 }}>
+            <Box sx={{ height: '100%', minHeight: 350 }}>
               <CashFlowDonutChart donutData={donutData} />
             </Box>
           </Grid>
           <Grid item xs={12} md={6}>
-            <Box sx={{ height: "100%" }}>
+            <Box sx={{ height: '100%' }}>
               <GoalCoverage ref={goalCoverageRef} />
             </Box>
           </Grid>

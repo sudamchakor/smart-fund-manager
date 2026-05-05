@@ -1,7 +1,7 @@
-import React, { useMemo, forwardRef, useImperativeHandle, useRef } from "react";
-import { useSelector } from "react-redux";
-import { Typography, Box, useTheme, alpha, Stack } from "@mui/material";
-import { DonutLarge as AllocationIcon } from "@mui/icons-material";
+import React, { useMemo, forwardRef, useImperativeHandle, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { Typography, Box, useTheme, alpha, Stack } from '@mui/material';
+import { DonutLarge as AllocationIcon } from '@mui/icons-material';
 import {
   AreaChart,
   Area,
@@ -11,13 +11,13 @@ import {
   Tooltip,
   ResponsiveContainer,
   Legend,
-} from "recharts";
+} from 'recharts';
 import {
   selectCurrentAge,
   selectRetirementAge,
-} from "../../../store/profileSlice";
-import SectionHeader from "../../../components/common/SectionHeader";
-import ChartTooltip from "../../../components/common/ChartTooltip";
+} from '../../../store/profileSlice';
+import SectionHeader from '../../../components/common/SectionHeader';
+import ChartTooltip from '../../../components/common/ChartTooltip';
 
 const AssetAllocationChart = forwardRef((props, ref) => {
   const currentAge = useSelector(selectCurrentAge);
@@ -66,11 +66,11 @@ const AssetAllocationChart = forwardRef((props, ref) => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: "0 2px 12px rgba(0,0,0,0.02)",
-        height: "100%",
+        boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
+        height: '100%',
         mb: 2.5,
       }}
     >
@@ -82,7 +82,7 @@ const AssetAllocationChart = forwardRef((props, ref) => {
       />
 
       {/* High-Density Chart */}
-      <Box sx={{ width: "100%", height: 320 }}>
+      <Box sx={{ width: '100%', height: 320 }}>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={glidePathData}
@@ -112,7 +112,7 @@ const AssetAllocationChart = forwardRef((props, ref) => {
             />
             <Legend
               iconType="circle"
-              wrapperStyle={{ fontSize: "12px", fontWeight: 700 }}
+              wrapperStyle={{ fontSize: '12px', fontWeight: 700 }}
             />
 
             {/* Debt - Bottom Layer (Safer) */}

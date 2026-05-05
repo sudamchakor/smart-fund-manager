@@ -10,12 +10,12 @@ describe('corpusSlice', () => {
   const initialState = {
     assets: [],
     investmentTypes: [
-      { value: "Equity", label: "Equity (Stocks, Mutual Funds)" },
-      { value: "Debt", label: "Debt (Bonds, FDs, PPF)" },
-      { value: "Gold", label: "Gold (Digital, Physical, SGBs)" },
-      { value: "Real Estate", label: "Real Estate" },
-      { value: "NPS", label: "National Pension System (NPS)" },
-      { value: "Cash", label: "Cash & Equivalents" },
+      { value: 'Equity', label: 'Equity (Stocks, Mutual Funds)' },
+      { value: 'Debt', label: 'Debt (Bonds, FDs, PPF)' },
+      { value: 'Gold', label: 'Gold (Digital, Physical, SGBs)' },
+      { value: 'Real Estate', label: 'Real Estate' },
+      { value: 'NPS', label: 'National Pension System (NPS)' },
+      { value: 'Cash', label: 'Cash & Equivalents' },
     ],
   };
 
@@ -24,7 +24,12 @@ describe('corpusSlice', () => {
   });
 
   it('should handle addAsset', () => {
-    const newAsset = { label: 'Stocks', value: 10000, expectedReturn: 0.12, category: 'Equity' };
+    const newAsset = {
+      label: 'Stocks',
+      value: 10000,
+      expectedReturn: 0.12,
+      category: 'Equity',
+    };
     const result = corpusReducer(initialState, addAsset(newAsset));
     expect(result.assets.length).toBe(1);
     expect(result.assets[0]).toEqual(expect.objectContaining(newAsset));
@@ -33,7 +38,15 @@ describe('corpusSlice', () => {
   it('should handle updateAsset', () => {
     const stateWithAsset = {
       ...initialState,
-      assets: [{ id: 1, label: 'Stocks', value: 10000, expectedReturn: 0.12, category: 'Equity' }],
+      assets: [
+        {
+          id: 1,
+          label: 'Stocks',
+          value: 10000,
+          expectedReturn: 0.12,
+          category: 'Equity',
+        },
+      ],
     };
     const updatedAsset = { id: 1, value: 15000 };
     const result = corpusReducer(stateWithAsset, updateAsset(updatedAsset));
@@ -43,7 +56,15 @@ describe('corpusSlice', () => {
   it('should handle removeAsset', () => {
     const stateWithAsset = {
       ...initialState,
-      assets: [{ id: 1, label: 'Stocks', value: 10000, expectedReturn: 0.12, category: 'Equity' }],
+      assets: [
+        {
+          id: 1,
+          label: 'Stocks',
+          value: 10000,
+          expectedReturn: 0.12,
+          category: 'Equity',
+        },
+      ],
     };
     const result = corpusReducer(stateWithAsset, removeAsset(1));
     expect(result.assets.length).toBe(0);
@@ -59,6 +80,8 @@ describe('corpusSlice', () => {
   it('should handle removeInvestmentType', () => {
     const result = corpusReducer(initialState, removeInvestmentType('Equity'));
     expect(result.investmentTypes.length).toBe(5);
-    expect(result.investmentTypes.find(t => t.value === 'Equity')).toBeUndefined();
+    expect(
+      result.investmentTypes.find((t) => t.value === 'Equity'),
+    ).toBeUndefined();
   });
 });

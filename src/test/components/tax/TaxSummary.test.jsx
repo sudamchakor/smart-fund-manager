@@ -66,7 +66,7 @@ describe('TaxSummary Component', () => {
         <ThemeProvider theme={theme}>
           <TaxSummary {...props} />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -101,7 +101,9 @@ describe('TaxSummary Component', () => {
       hraBreakdown: defaultHraBreakdown,
     });
     expect(screen.getByText(defaultTaxComparison.optimal)).toBeInTheDocument();
-    expect(screen.getByText(/Saves ₹49,900 in liabilities./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Saves ₹49,900 in liabilities./i),
+    ).toBeInTheDocument();
   });
 
   // --- HRA Breakdown Alert ---
@@ -114,7 +116,9 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: { eligibleHra: 50000 },
     });
-    expect(screen.getByText(/Potential HRA deduction of ₹50,000 calculated./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Potential HRA deduction of ₹50,000 calculated./i),
+    ).toBeInTheDocument();
   });
 
   it('does not show HRA alert when eligibleHra is 0', () => {
@@ -126,7 +130,9 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: { eligibleHra: 0 },
     });
-    expect(screen.queryByText(/Potential HRA deduction/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Potential HRA deduction/i),
+    ).not.toBeInTheDocument();
   });
 
   // --- Tax Optimizer Alert (Break-Even) ---
@@ -144,9 +150,15 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(screen.getByText(/You could save an additional ₹2,000/i)).toBeInTheDocument();
-    expect(screen.getByText(/if you invest ₹10,000 more in Section 80C./i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Quick-Fill/i })).toBeInTheDocument();
+    expect(
+      screen.getByText(/You could save an additional ₹2,000/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/if you invest ₹10,000 more in Section 80C./i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Quick-Fill/i }),
+    ).toBeInTheDocument();
   });
 
   it('calls onQuickFill when Quick-Fill button is clicked', () => {
@@ -177,7 +189,9 @@ describe('TaxSummary Component', () => {
       hraBreakdown: defaultHraBreakdown,
     });
     expect(screen.queryByText(/Tax Optimizer/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /Quick-Fill/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Quick-Fill/i }),
+    ).not.toBeInTheDocument();
   });
 
   // --- Tab Switching ---
@@ -190,9 +204,15 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent('Gross Income:₹10,00,000');
-    expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent('Deductions:- ₹5,00,000');
-    expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent('Taxable Income:₹5,00,000');
+    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
+      'Gross Income:₹10,00,000',
+    );
+    expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent(
+      'Deductions:- ₹5,00,000',
+    );
+    expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent(
+      'Taxable Income:₹5,00,000',
+    );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
     expect(screen.getByText('₹12,500')).toBeInTheDocument();
   });
@@ -207,9 +227,15 @@ describe('TaxSummary Component', () => {
       hraBreakdown: defaultHraBreakdown,
     });
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
-    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent('Gross Income:₹10,00,000');
-    expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent('Deductions:- ₹50,000');
-    expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent('Taxable Income:₹9,50,000');
+    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
+      'Gross Income:₹10,00,000',
+    );
+    expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent(
+      'Deductions:- ₹50,000',
+    );
+    expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent(
+      'Taxable Income:₹9,50,000',
+    );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
     expect(screen.getByText('₹62,400')).toBeInTheDocument();
   });
@@ -270,7 +296,7 @@ describe('TaxSummary Component', () => {
     expect(taxReportGenerator.generateTaxReportPDF).toHaveBeenCalledWith(
       defaultTaxComparison,
       defaultBreakEven,
-      defaultCalculatedSalary
+      defaultCalculatedSalary,
     );
   });
 
@@ -291,10 +317,14 @@ describe('TaxSummary Component', () => {
             hraBreakdown={defaultHraBreakdown}
           />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
-    expect(screen.getByText(/Saves \$49,900 in liabilities./i)).toBeInTheDocument();
-    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent('Gross Income:$1,000,000');
+    expect(
+      screen.getByText(/Saves \$49,900 in liabilities./i),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
+      'Gross Income:$1,000,000',
+    );
   });
 
   // --- Mobile Responsiveness ---
@@ -308,7 +338,9 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(screen.getByText('System Output').closest('div')).toHaveStyle('position: sticky');
+    expect(screen.getByText('System Output').closest('div')).toHaveStyle(
+      'position: sticky',
+    );
   });
 
   it('applies static positioning on mobile', () => {
@@ -321,6 +353,8 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(screen.getByText('System Output').closest('div')).toHaveStyle('position: static');
+    expect(screen.getByText('System Output').closest('div')).toHaveStyle(
+      'position: static',
+    );
   });
 });

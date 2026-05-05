@@ -1,14 +1,9 @@
-import React, { useEffect, useCallback } from "react";
-import {
-  Box,
-  Typography,
-  useTheme,
-  Stack,
-} from "@mui/material";
-import { SettingsInputComponent as SettingsIcon } from "@mui/icons-material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
-import InvestmentSlider from "../../../components/common/InvestmentSlider";
+import React, { useEffect, useCallback } from 'react';
+import { Box, Typography, useTheme, Stack } from '@mui/material';
+import { SettingsInputComponent as SettingsIcon } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
+import InvestmentSlider from '../../../components/common/InvestmentSlider';
 
 const SipCalculatorForm = ({
   onCalculate,
@@ -16,7 +11,7 @@ const SipCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
-  const currency = useSelector(selectCurrency) || "₹";
+  const currency = useSelector(selectCurrency) || '₹';
 
   const { monthlyInvestment, expectedReturnRate, timePeriod } = sharedState;
 
@@ -74,7 +69,7 @@ const SipCalculatorForm = ({
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
         <SettingsIcon
           sx={{
-            fontSize: "1rem",
+            fontSize: '1rem',
             color: theme.palette.primary.main,
             opacity: 0.8,
           }}
@@ -83,8 +78,8 @@ const SipCalculatorForm = ({
           variant="caption"
           sx={{
             fontWeight: 900,
-            color: "text.primary",
-            textTransform: "uppercase",
+            color: 'text.primary',
+            textTransform: 'uppercase',
           }}
         >
           SIP Parameters
@@ -97,7 +92,7 @@ const SipCalculatorForm = ({
         min={500}
         max={100000}
         step={500}
-        onChange={(val) => onSharedStateChange("monthlyInvestment", val)}
+        onChange={(val) => onSharedStateChange('monthlyInvestment', val)}
         color="primary"
         adornment={currency}
         adornmentPosition="start"
@@ -109,7 +104,7 @@ const SipCalculatorForm = ({
         min={1}
         max={30}
         step={0.1}
-        onChange={(val) => onSharedStateChange("expectedReturnRate", val)}
+        onChange={(val) => onSharedStateChange('expectedReturnRate', val)}
         color="success"
         adornment="%"
         adornmentPosition="end"
@@ -121,7 +116,7 @@ const SipCalculatorForm = ({
         min={1}
         max={40}
         step={1}
-        onChange={(val) => onSharedStateChange("timePeriod", val)}
+        onChange={(val) => onSharedStateChange('timePeriod', val)}
         color="info"
         adornment="Yr"
         adornmentPosition="end"

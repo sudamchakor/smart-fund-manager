@@ -19,7 +19,7 @@ describe.skip('GoalCoverage', () => {
     render(
       <Provider store={store}>
         <GoalCoverage />
-      </Provider>
+      </Provider>,
     );
     expect(screen.getByText(/Goal Coverage/i)).toBeInTheDocument(); // Placeholder
   });

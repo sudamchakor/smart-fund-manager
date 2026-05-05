@@ -1,4 +1,4 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -13,8 +13,8 @@ import {
   Divider,
   useTheme,
   alpha,
-} from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+} from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   addIncome,
   addExpense,
@@ -25,18 +25,22 @@ import {
   setCareerGrowthRate,
   setGeneralInflationRate,
   selectEducationInflationRate,
-} from "../../../store/profileSlice";
+} from '../../../store/profileSlice';
 
-const SystemParameters = lazy(() => import("./OnboardingSteps/SystemParameters"));
-const IncomeStreams = lazy(() => import("./OnboardingSteps/IncomeStreams"));
-const FixedLiabilities = lazy(() => import("./OnboardingSteps/FixedLiabilities"));
-const CapitalGoals = lazy(() => import("./OnboardingSteps/CapitalGoals"));
+const SystemParameters = lazy(
+  () => import('./OnboardingSteps/SystemParameters'),
+);
+const IncomeStreams = lazy(() => import('./OnboardingSteps/IncomeStreams'));
+const FixedLiabilities = lazy(
+  () => import('./OnboardingSteps/FixedLiabilities'),
+);
+const CapitalGoals = lazy(() => import('./OnboardingSteps/CapitalGoals'));
 
 const steps = [
-  "System Parameters",
-  "Income Streams",
-  "Fixed Liabilities",
-  "Capital Goals",
+  'System Parameters',
+  'Income Streams',
+  'Fixed Liabilities',
+  'Capital Goals',
 ];
 
 export default function OnboardingModal({ open, onClose }) {
@@ -48,29 +52,29 @@ export default function OnboardingModal({ open, onClose }) {
   const currentYear = new Date().getFullYear();
 
   const [basicInfo, setBasicInfoState] = useState({
-    name: "",
+    name: '',
     age: 30,
-    occupation: "",
-    riskTolerance: "medium",
+    occupation: '',
+    riskTolerance: 'medium',
     retirementAge: 60,
     careerGrowthRate: 0.08,
     generalInflationRate: 0.06,
   });
 
   const [income, setIncome] = useState({
-    name: "",
+    name: '',
     amount: 0,
-    frequency: "monthly",
+    frequency: 'monthly',
     startYear: currentYear,
     endYear: currentYear + 10,
   });
   const [incomesList, setIncomesList] = useState([]);
 
   const [expense, setExpense] = useState({
-    name: "",
+    name: '',
     amount: 0,
-    category: "basic",
-    frequency: "monthly",
+    category: 'basic',
+    frequency: 'monthly',
     startYear: currentYear,
     endYear: currentYear + 10,
   });
@@ -79,10 +83,10 @@ export default function OnboardingModal({ open, onClose }) {
   const [goalsList, setGoalsList] = useState([]);
   const [showCustomGoalForm, setShowCustomGoalForm] = useState(false);
   const [customGoalData, setCustomGoalData] = useState({
-    name: "",
+    name: '',
     targetAmount: 0,
     targetYear: currentYear + 5,
-    category: "general",
+    category: 'general',
     investmentPlans: [],
   });
 
@@ -96,7 +100,7 @@ export default function OnboardingModal({ open, onClose }) {
         age: basicInfo.age,
         occupation: basicInfo.occupation,
         riskTolerance: basicInfo.riskTolerance,
-      })
+      }),
     );
     dispatch(setCurrentAge(basicInfo.age));
     dispatch(setRetirementAge(basicInfo.retirementAge));
@@ -104,15 +108,15 @@ export default function OnboardingModal({ open, onClose }) {
     dispatch(setGeneralInflationRate(basicInfo.generalInflationRate));
 
     incomesList.forEach((inc) =>
-      dispatch(addIncome({ ...inc, id: Date.now() + Math.random() }))
+      dispatch(addIncome({ ...inc, id: Date.now() + Math.random() })),
     );
     expensesList.forEach((exp) =>
-      dispatch(addExpense({ ...exp, id: Date.now() + Math.random() }))
+      dispatch(addExpense({ ...exp, id: Date.now() + Math.random() })),
     );
     goalsList.forEach((goal) => {
       dispatch(addGoal({ ...goal, id: Date.now() + Math.random() }));
     });
-    localStorage.setItem("isProfileCreated", "true");
+    localStorage.setItem('isProfileCreated', 'true');
     onClose();
   };
 
@@ -123,9 +127,9 @@ export default function OnboardingModal({ open, onClose }) {
         { ...income, amount: Number(income.amount) },
       ]);
       setIncome({
-        name: "",
+        name: '',
         amount: 0,
-        frequency: "monthly",
+        frequency: 'monthly',
         startYear: currentYear,
         endYear: currentYear + 10,
       });
@@ -139,10 +143,10 @@ export default function OnboardingModal({ open, onClose }) {
         { ...expense, amount: Number(expense.amount) },
       ]);
       setExpense({
-        name: "",
+        name: '',
         amount: 0,
-        category: "basic",
-        frequency: "monthly",
+        category: 'basic',
+        frequency: 'monthly',
         startYear: currentYear,
         endYear: currentYear + 10,
       });
@@ -152,7 +156,7 @@ export default function OnboardingModal({ open, onClose }) {
   const applyRetirementGoal = () => {
     const yearsToRetirement = basicInfo.retirementAge - basicInfo.age;
     const monthlyBasicExpenses = expensesList
-      .filter((e) => e.category === "basic")
+      .filter((e) => e.category === 'basic')
       .reduce((sum, e) => sum + e.amount, 0);
     let yearlyExpenses = monthlyBasicExpenses * 12;
     let targetAmount = Math.round(yearlyExpenses / 0.04);
@@ -164,11 +168,11 @@ export default function OnboardingModal({ open, onClose }) {
     setGoalsList([
       ...goalsList,
       {
-        name: "Retirement Phase",
+        name: 'Retirement Phase',
         targetAmount: targetAmount,
         targetYear:
           currentYear + (yearsToRetirement > 0 ? yearsToRetirement : 1),
-        category: "retirement",
+        category: 'retirement',
         investmentPlans: [],
       },
     ]);
@@ -184,10 +188,10 @@ export default function OnboardingModal({ open, onClose }) {
     setGoalsList([
       ...goalsList,
       {
-        name: "Higher Education Core",
+        name: 'Higher Education Core',
         targetAmount: Math.round(targetAmount),
         targetYear: currentYear + (yearsToCollege > 0 ? yearsToCollege : 1),
-        category: "education",
+        category: 'education',
         investmentPlans: [],
       },
     ]);
@@ -196,16 +200,16 @@ export default function OnboardingModal({ open, onClose }) {
   const applyEmergencyFundGoal = () => {
     const totalMonthlyOutflow = expensesList.reduce(
       (sum, e) => sum + e.amount,
-      0
+      0,
     );
     const targetAmount = Math.round(totalMonthlyOutflow * 6);
     setGoalsList([
       ...goalsList,
       {
-        name: "Emergency Reserve",
+        name: 'Emergency Reserve',
         targetAmount: targetAmount > 0 ? targetAmount : 500000, // Fallback if no expenses
         targetYear: currentYear + 1,
-        category: "safety",
+        category: 'safety',
         investmentPlans: [],
       },
     ]);
@@ -215,10 +219,10 @@ export default function OnboardingModal({ open, onClose }) {
     setGoalsList([...goalsList, { ...goalData, isCustom: true }]);
     setShowCustomGoalForm(false);
     setCustomGoalData({
-      name: "",
+      name: '',
       targetAmount: 0,
       targetYear: currentYear + 5,
-      category: "general",
+      category: 'general',
       investmentPlans: [],
     });
   };
@@ -282,10 +286,10 @@ export default function OnboardingModal({ open, onClose }) {
         sx: {
           borderRadius: 3,
           boxShadow: `0 24px 64px ${alpha(
-            theme.palette.common.black || "#000",
-            0.2
+            theme.palette.common.black || '#000',
+            0.2,
           )}`,
-          backgroundImage: "none",
+          backgroundImage: 'none',
         },
       }}
     >
@@ -299,7 +303,7 @@ export default function OnboardingModal({ open, onClose }) {
         </Typography>
         <Typography
           variant="caption"
-          sx={{ fontWeight: 600, color: "text.secondary" }}
+          sx={{ fontWeight: 600, color: 'text.secondary' }}
         >
           Configure base system parameters to unlock predictive wealth mapping.
         </Typography>
@@ -313,12 +317,12 @@ export default function OnboardingModal({ open, onClose }) {
           alternativeLabel
           sx={{
             mb: 4,
-            "& .MuiStepLabel-label": { fontWeight: 700, fontSize: "0.75rem" },
-            "& .MuiStepIcon-root": {
+            '& .MuiStepLabel-label': { fontWeight: 700, fontSize: '0.75rem' },
+            '& .MuiStepIcon-root': {
               color: alpha(theme.palette.primary.main, 0.2),
             },
-            "& .MuiStepIcon-root.Mui-active": { color: "primary.main" },
-            "& .MuiStepIcon-root.Mui-completed": { color: "success.main" },
+            '& .MuiStepIcon-root.Mui-active': { color: 'primary.main' },
+            '& .MuiStepIcon-root.Mui-completed': { color: 'success.main' },
           }}
         >
           {steps.map((label) => (
@@ -340,11 +344,11 @@ export default function OnboardingModal({ open, onClose }) {
           >
             <Button
               onClick={onClose}
-              sx={{ color: "text.secondary", fontWeight: 700 }}
+              sx={{ color: 'text.secondary', fontWeight: 700 }}
             >
               Bypass Initialization
             </Button>
-            <Box sx={{ flex: "1 1 auto" }} />
+            <Box sx={{ flex: '1 1 auto' }} />
             {activeStep > 0 && (
               <Button onClick={handleBack} sx={{ fontWeight: 700, mr: 1 }}>
                 Previous Step

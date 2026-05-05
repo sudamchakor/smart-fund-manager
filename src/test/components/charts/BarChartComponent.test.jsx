@@ -10,16 +10,33 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 
 // Mock Recharts components to avoid actual chart rendering in tests
 jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }) => <div data-testid="recharts-responsive-container">{children}</div>,
-  ComposedChart: ({ children, data }) => <div data-testid="recharts-composed-chart" data-chart-data={JSON.stringify(data)}>{children}</div>,
-  Line: (props) => <div data-testid={`recharts-line-${props.dataKey}`} {...props}></div>,
-  Bar: (props) => <div data-testid={`recharts-bar-${props.dataKey}`} {...props}></div>,
+  ResponsiveContainer: ({ children }) => (
+    <div data-testid="recharts-responsive-container">{children}</div>
+  ),
+  ComposedChart: ({ children, data }) => (
+    <div
+      data-testid="recharts-composed-chart"
+      data-chart-data={JSON.stringify(data)}
+    >
+      {children}
+    </div>
+  ),
+  Line: (props) => (
+    <div data-testid={`recharts-line-${props.dataKey}`} {...props}></div>
+  ),
+  Bar: (props) => (
+    <div data-testid={`recharts-bar-${props.dataKey}`} {...props}></div>
+  ),
   XAxis: (props) => <div data-testid="recharts-xaxis" {...props}></div>,
   YAxis: (props) => <div data-testid="recharts-yaxis" {...props}></div>,
-  CartesianGrid: (props) => <div data-testid="recharts-cartesiangrid" {...props}></div>,
+  CartesianGrid: (props) => (
+    <div data-testid="recharts-cartesiangrid" {...props}></div>
+  ),
   Tooltip: ({ content: Content, active, payload, label }) => (
     <div data-testid="recharts-tooltip">
-      {Content ? <Content active={active} payload={payload} label={label} /> : null}
+      {Content ? (
+        <Content active={active} payload={payload} label={label} />
+      ) : null}
     </div>
   ),
   Legend: (props) => <div data-testid="recharts-legend" {...props}></div>,
@@ -32,10 +49,12 @@ jest.mock('react-redux', () => ({
 const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing
-jest.spyOn(formatting, 'formatCurrency').mockImplementation((value, currency) => {
-  if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
-  return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
-});
+jest
+  .spyOn(formatting, 'formatCurrency')
+  .mockImplementation((value, currency) => {
+    if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
+    return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+  });
 
 const mockStore = configureStore([]);
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -55,7 +74,10 @@ describe('BarChartComponent', () => {
     })),
   };
 
-  const renderComponent = (calculatedValues = mockCalculatedValues, currency = '₹') => {
+  const renderComponent = (
+    calculatedValues = mockCalculatedValues,
+    currency = '₹',
+  ) => {
     mockUseSelector.mockImplementation((selector) => {
       if (selector.name === 'selectCalculatedValues') return calculatedValues;
       if (selector.name === 'selectCurrency') return currency;
@@ -66,7 +88,7 @@ describe('BarChartComponent', () => {
         <ThemeProvider theme={theme}>
           <BarChartComponent />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -94,18 +116,25 @@ describe('BarChartComponent', () => {
   it('renders the chart when schedule data is present', () => {
     renderComponent();
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByTestId('recharts-responsive-container')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('recharts-responsive-container'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('recharts-composed-chart')).toBeInTheDocument();
   });
 
   // --- Data Transformation (useMemo) ---
   it('transforms schedule data into grouped data for the chart (desktop)', () => {
     renderComponent();
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 24 months, maxBars=15 (desktop), chunkSize = ceil(24/15) = 2
     expect(chartData.length).toBe(12); // 24 months / 2 = 12 chunks
     expect(chartData[0].label).toBe('Month 1 - Month 2');
-    expect(chartData[0].principal).toBe(mockCalculatedValues.schedule[0].principal + mockCalculatedValues.schedule[1].principal);
+    expect(chartData[0].principal).toBe(
+      mockCalculatedValues.schedule[0].principal +
+        mockCalculatedValues.schedule[1].principal,
+    );
     expect(chartData[chartData.length - 1].label).toBe('Month 23 - Month 24');
   });
 
@@ -115,7 +144,9 @@ describe('BarChartComponent', () => {
       date: `Month ${i + 1}`,
     }));
     renderComponent({ schedule: longSchedule });
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 36 months, maxBars=15 (desktop), chunkSize = ceil(36/15) = 3.
     // Since 3 is not > 12, it remains 3.
     expect(chartData.length).toBe(12); // 36 months / 3 = 12 chunks
@@ -128,7 +159,9 @@ describe('BarChartComponent', () => {
       date: `Month ${i + 1}`,
     }));
     renderComponent({ schedule: veryLongSchedule });
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 150 months, maxBars=15 (desktop), chunkSize = ceil(150/15) = 10.
     // Since 10 is not > 12, it remains 10.
     expect(chartData.length).toBe(15); // 150 months / 10 = 15 chunks
@@ -141,7 +174,9 @@ describe('BarChartComponent', () => {
       date: `Month ${i + 1}`,
     }));
     renderComponent({ schedule: veryLongSchedule });
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 200 months, maxBars=15 (desktop), chunkSize = ceil(200/15) = 14.
     // Since 14 > 12, it becomes ceil(14/12)*12 = 2*12 = 24.
     expect(chartData.length).toBe(Math.ceil(200 / 24)); // 200 months / 24 = 9 chunks
@@ -149,29 +184,49 @@ describe('BarChartComponent', () => {
   });
 
   it('handles single month schedule data', () => {
-    const singleMonthSchedule = [{
-      month: 1, date: 'Jan 2023', principal: 1000, interest: 500, prepayment: 0, taxes: 0, homeInsurance: 0, maintenance: 0, balance: 99000
-    }];
+    const singleMonthSchedule = [
+      {
+        month: 1,
+        date: 'Jan 2023',
+        principal: 1000,
+        interest: 500,
+        prepayment: 0,
+        taxes: 0,
+        homeInsurance: 0,
+        maintenance: 0,
+        balance: 99000,
+      },
+    ];
     renderComponent({ schedule: singleMonthSchedule });
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     expect(chartData.length).toBe(1);
     expect(chartData[0].label).toBe('Jan 2023');
   });
 
   // --- Responsiveness (useMediaQuery) ---
   it('adjusts maxBars for mobile view', () => {
-    useMediaQuery.mockImplementation((query) => query.includes('sm') ? true : false); // Simulate mobile
+    useMediaQuery.mockImplementation((query) =>
+      query.includes('sm') ? true : false,
+    ); // Simulate mobile
     renderComponent();
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 24 months, maxBars=6 (mobile), chunkSize = ceil(24/6) = 4
     expect(chartData.length).toBe(6); // 24 months / 4 = 6 chunks
     expect(chartData[0].label).toBe('Month 1 - Month 4');
   });
 
   it('adjusts maxBars for tablet view', () => {
-    useMediaQuery.mockImplementation((query) => query.includes('md') ? true : false); // Simulate tablet
+    useMediaQuery.mockImplementation((query) =>
+      query.includes('md') ? true : false,
+    ); // Simulate tablet
     renderComponent();
-    const chartData = JSON.parse(screen.getByTestId('recharts-composed-chart').dataset.chartData);
+    const chartData = JSON.parse(
+      screen.getByTestId('recharts-composed-chart').dataset.chartData,
+    );
     // 24 months, maxBars=10 (tablet), chunkSize = ceil(24/10) = 3
     expect(chartData.length).toBe(8); // 24 months / 3 = 8 chunks
     expect(chartData[0].label).toBe('Month 1 - Month 3');
@@ -230,7 +285,7 @@ describe('BarChartComponent', () => {
           // Pass props that CustomTooltip expects
           CustomTooltip={{ active: true, payload, label }}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     // This approach is tricky because CustomTooltip is rendered by Recharts internally.
@@ -242,7 +297,7 @@ describe('BarChartComponent', () => {
     const { rerender } = render(
       <ThemeProvider theme={theme}>
         <CustomTooltipComponent active={true} payload={payload} label={label} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText(label)).toBeInTheDocument();
@@ -261,7 +316,7 @@ describe('BarChartComponent', () => {
     const { rerender } = render(
       <ThemeProvider theme={theme}>
         <CustomTooltipComponent active={true} payload={[]} label={label} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
 
     expect(screen.getByText(label)).toBeInTheDocument();
@@ -275,7 +330,9 @@ describe('BarChartComponent', () => {
     expect(screen.getByTestId('recharts-bar-interest')).toBeInTheDocument();
     expect(screen.getByTestId('recharts-bar-prepayment')).toBeInTheDocument();
     expect(screen.getByTestId('recharts-bar-taxes')).toBeInTheDocument();
-    expect(screen.getByTestId('recharts-bar-homeInsurance')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('recharts-bar-homeInsurance'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('recharts-bar-maintenance')).toBeInTheDocument();
     expect(screen.getByTestId('recharts-line-balance')).toBeInTheDocument();
   });

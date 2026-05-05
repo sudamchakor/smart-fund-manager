@@ -4,16 +4,18 @@ import HomeLoanForm from '../../../../../src/features/emiCalculator/components/H
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn(selector => selector({
-    emiCalculator: {
-      loanAmount: 100000,
-      interestRate: 10,
-      loanTenure: 120,
-    },
-    emi: {
-      currency: '₹',
-    },
-  })),
+  useSelector: jest.fn((selector) =>
+    selector({
+      emiCalculator: {
+        loanAmount: 100000,
+        interestRate: 10,
+        loanTenure: 120,
+      },
+      emi: {
+        currency: '₹',
+      },
+    }),
+  ),
   useDispatch: () => jest.fn(),
 }));
 

@@ -7,12 +7,31 @@ import Calculator from '../../pages/Calculator';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../features/emiCalculator/components/HomeLoanForm', () => () => <div data-testid="home-loan-form">HomeLoanForm</div>);
-jest.mock('../../features/emiCalculator/components/PrepaymentsForm', () => () => <div data-testid="prepayments-form">PrepaymentsForm</div>);
-jest.mock('../../features/emiCalculator/components/PaymentScheduleTable', () => () => <div data-testid="payment-schedule-table">PaymentScheduleTable</div>);
-jest.mock('../../features/emiCalculator/components/TotalMonthlyPayment', () => () => <div data-testid="total-monthly-payment">TotalMonthlyPayment</div>);
-jest.mock('../../components/charts/PieChartComponent', () => () => <div data-testid="pie-chart-component">PieChartComponent</div>);
-jest.mock('../../components/charts/BarChartComponent', () => () => <div data-testid="bar-chart-component">BarChartComponent</div>);
+jest.mock('../../features/emiCalculator/components/HomeLoanForm', () => () => (
+  <div data-testid="home-loan-form">HomeLoanForm</div>
+));
+jest.mock(
+  '../../features/emiCalculator/components/PrepaymentsForm',
+  () => () => <div data-testid="prepayments-form">PrepaymentsForm</div>,
+);
+jest.mock(
+  '../../features/emiCalculator/components/PaymentScheduleTable',
+  () => () => (
+    <div data-testid="payment-schedule-table">PaymentScheduleTable</div>
+  ),
+);
+jest.mock(
+  '../../features/emiCalculator/components/TotalMonthlyPayment',
+  () => () => (
+    <div data-testid="total-monthly-payment">TotalMonthlyPayment</div>
+  ),
+);
+jest.mock('../../components/charts/PieChartComponent', () => () => (
+  <div data-testid="pie-chart-component">PieChartComponent</div>
+));
+jest.mock('../../components/charts/BarChartComponent', () => () => (
+  <div data-testid="bar-chart-component">BarChartComponent</div>
+));
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
@@ -55,7 +74,7 @@ describe('Calculator Page', () => {
         <ThemeProvider theme={theme}>
           <Calculator />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -87,12 +106,16 @@ describe('Calculator Page', () => {
     expect(screen.getByText('Payment Breakdown')).toBeInTheDocument();
     expect(screen.getByText('Monthly Commitment')).toBeInTheDocument();
     expect(screen.getByText('Loan Progression')).toBeInTheDocument();
-    expect(screen.getByText('Amortization Schedule (Jan 2023 - Dec 2032)')).toBeInTheDocument();
+    expect(
+      screen.getByText('Amortization Schedule (Jan 2023 - Dec 2032)'),
+    ).toBeInTheDocument();
   });
 
   it('displays correct start and end month/year in Amortization Schedule header', () => {
     renderComponent();
-    expect(screen.getByText('Amortization Schedule (Jan 2023 - Dec 2032)')).toBeInTheDocument();
+    expect(
+      screen.getByText('Amortization Schedule (Jan 2023 - Dec 2032)'),
+    ).toBeInTheDocument();
   });
 
   it('handles empty schedule for Amortization Schedule header', () => {
@@ -112,6 +135,8 @@ describe('Calculator Page', () => {
   it('applies background gradient styling to the main Box', () => {
     renderComponent();
     const mainBox = screen.getByText('Home Loan').closest('.MuiBox-root');
-    expect(mainBox).toHaveStyle(`background: linear-gradient(180deg, ${theme.palette.primary.main}1a 0%, ${theme.palette.background.default} 100%)`);
+    expect(mainBox).toHaveStyle(
+      `background: linear-gradient(180deg, ${theme.palette.primary.main}1a 0%, ${theme.palette.background.default} 100%)`,
+    );
   });
 });

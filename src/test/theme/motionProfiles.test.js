@@ -11,7 +11,9 @@ describe.skip('Motion Profiles', () => {
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
     expect(result.hidden).toHaveProperty('y');
-    expect(result.hidden.y).toBe(direction === 'up' ? 100 : direction === 'down' ? -100 : 0);
+    expect(result.hidden.y).toBe(
+      direction === 'up' ? 100 : direction === 'down' ? -100 : 0,
+    );
     expect(result.show.transition.type).toBe(type);
     expect(result.show.transition.delay).toBe(delay);
     expect(result.show.transition.duration).toBe(duration);
@@ -27,7 +29,9 @@ describe.skip('Motion Profiles', () => {
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
     expect(result.hidden).toHaveProperty('x');
-    expect(result.hidden.x).toBe(direction === 'left' ? '-100%' : direction === 'right' ? '100%' : 0);
+    expect(result.hidden.x).toBe(
+      direction === 'left' ? '-100%' : direction === 'right' ? '100%' : 0,
+    );
     expect(result.show.transition.type).toBe(type);
     expect(result.show.transition.delay).toBe(delay);
     expect(result.show.transition.duration).toBe(duration);
@@ -36,7 +40,10 @@ describe.skip('Motion Profiles', () => {
   it('staggerContainer should return correct animation properties', () => {
     const staggerChildren = 0.1;
     const delayChildren = 0.2;
-    const result = motionProfiles.staggerContainer(staggerChildren, delayChildren);
+    const result = motionProfiles.staggerContainer(
+      staggerChildren,
+      delayChildren,
+    );
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');

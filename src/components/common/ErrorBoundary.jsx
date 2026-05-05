@@ -39,7 +39,10 @@ class ErrorBoundary extends React.Component {
           }}
         >
           <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-            <ReportProblemOutlinedIcon color="error" sx={{ fontSize: 60, mb: 2 }} />
+            <ReportProblemOutlinedIcon
+              color="error"
+              sx={{ fontSize: 60, mb: 2 }}
+            />
             <Typography variant="h5" component="h1" gutterBottom>
               Something went wrong
             </Typography>

@@ -20,7 +20,7 @@ describe('SuspenseFallback Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <SuspenseFallback {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -32,13 +32,17 @@ describe('SuspenseFallback Component', () => {
 
   it('renders the default message', () => {
     renderComponent();
-    expect(screen.getByText('Calculating wealth projections...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Calculating wealth projections...'),
+    ).toBeInTheDocument();
   });
 
   it('renders a custom message when provided', () => {
     renderComponent({ message: 'Loading custom data...' });
     expect(screen.getByText('Loading custom data...')).toBeInTheDocument();
-    expect(screen.queryByText('Calculating wealth projections...')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Calculating wealth projections...'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders the four calculator key symbols', () => {
@@ -52,7 +56,9 @@ describe('SuspenseFallback Component', () => {
   it('applies correct styling to the calculator keys', () => {
     renderComponent();
     const plusKey = screen.getByText('+').closest('.MuiBox-root');
-    expect(plusKey).toHaveStyle(`background-color: ${theme.palette.primary.main}`);
+    expect(plusKey).toHaveStyle(
+      `background-color: ${theme.palette.primary.main}`,
+    );
     expect(plusKey).toHaveStyle('color: #fff');
     expect(plusKey).toHaveStyle('font-size: 1.4rem');
     expect(plusKey).toHaveStyle('font-weight: 700');
@@ -69,6 +75,8 @@ describe('SuspenseFallback Component', () => {
 
   it('renders without crashing when no message prop is provided', () => {
     renderComponent({});
-    expect(screen.getByText('Calculating wealth projections...')).toBeInTheDocument();
+    expect(
+      screen.getByText('Calculating wealth projections...'),
+    ).toBeInTheDocument();
   });
 });

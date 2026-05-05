@@ -1,4 +1,7 @@
-import { calculateSipFutureValue, calculateLumpsumFutureValue } from '../../../features/profile/components/investmentCalculations';
+import {
+  calculateSipFutureValue,
+  calculateLumpsumFutureValue,
+} from '../../../features/profile/components/investmentCalculations';
 
 describe.skip('investmentCalculations', () => {
   it('calculateSipFutureValue should correctly calculate future value of SIP', () => {
@@ -7,17 +10,25 @@ describe.skip('investmentCalculations', () => {
     const years = 10;
     const expectedFutureValue = 230038.69; // Calculated using an online SIP calculator
 
-    const result = calculateSipFutureValue(monthlyInvestment, annualReturnRate, years);
+    const result = calculateSipFutureValue(
+      monthlyInvestment,
+      annualReturnRate,
+      years,
+    );
     expect(result).toBeCloseTo(expectedFutureValue, 0); // Allow for small floating point differences
   });
 
   it('calculateLumpsumFutureValue should correctly calculate future value of Lumpsum', () => {
     const initialInvestment = 100000;
-    const annualReturnRate = 0.10; // 10% annual return
+    const annualReturnRate = 0.1; // 10% annual return
     const years = 5;
     const expectedFutureValue = 161051; // 100000 * (1 + 0.10)^5
 
-    const result = calculateLumpsumFutureValue(initialInvestment, annualReturnRate, years);
+    const result = calculateLumpsumFutureValue(
+      initialInvestment,
+      annualReturnRate,
+      years,
+    );
     expect(result).toBeCloseTo(expectedFutureValue, 0);
   });
 
@@ -27,7 +38,7 @@ describe.skip('investmentCalculations', () => {
   });
 
   it('calculateLumpsumFutureValue should return 0 for 0 initial investment', () => {
-    const result = calculateLumpsumFutureValue(0, 0.10, 5);
+    const result = calculateLumpsumFutureValue(0, 0.1, 5);
     expect(result).toBe(0);
   });
 
@@ -36,7 +47,11 @@ describe.skip('investmentCalculations', () => {
     const annualReturnRate = 0;
     const years = 10;
     const expectedFutureValue = 1000 * 12 * 10; // Simple sum
-    const result = calculateSipFutureValue(monthlyInvestment, annualReturnRate, years);
+    const result = calculateSipFutureValue(
+      monthlyInvestment,
+      annualReturnRate,
+      years,
+    );
     expect(result).toBeCloseTo(expectedFutureValue);
   });
 
@@ -45,7 +60,11 @@ describe.skip('investmentCalculations', () => {
     const annualReturnRate = 0;
     const years = 5;
     const expectedFutureValue = 100000;
-    const result = calculateLumpsumFutureValue(initialInvestment, annualReturnRate, years);
+    const result = calculateLumpsumFutureValue(
+      initialInvestment,
+      annualReturnRate,
+      years,
+    );
     expect(result).toBeCloseTo(expectedFutureValue);
   });
 });

@@ -1,11 +1,11 @@
-import React from "react";
-import { Box, Typography, Grid, alpha, useTheme } from "@mui/material";
+import React from 'react';
+import { Box, Typography, Grid, alpha, useTheme } from '@mui/material';
 import {
   ErrorOutline as WarningIcon,
   CheckCircleOutline as SuccessIcon,
-} from "@mui/icons-material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
+} from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
 
 const DataPoint = ({ label, value, color, isLast }) => {
   const theme = useTheme();
@@ -16,17 +16,17 @@ const DataPoint = ({ label, value, color, isLast }) => {
       sm={6}
       md={3}
       sx={{
-        display: "flex",
-        flexDirection: { xs: "row", sm: "column" },
-        justifyContent: { xs: "space-between", sm: "center" },
-        alignItems: { xs: "center", sm: "center" },
+        display: 'flex',
+        flexDirection: { xs: 'row', sm: 'column' },
+        justifyContent: { xs: 'space-between', sm: 'center' },
+        alignItems: { xs: 'center', sm: 'center' },
         py: { xs: 1, sm: 0 },
         // Zebra striping for mobile view
         borderBottom: {
           xs: isLast
-            ? "none"
+            ? 'none'
             : `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-          sm: "none",
+          sm: 'none',
         },
         px: 2,
       }}
@@ -35,10 +35,10 @@ const DataPoint = ({ label, value, color, isLast }) => {
         variant="caption"
         sx={{
           fontWeight: 700,
-          color: "text.disabled",
-          textTransform: "uppercase",
+          color: 'text.disabled',
+          textTransform: 'uppercase',
           letterSpacing: 0.5,
-          fontSize: "0.65rem",
+          fontSize: '0.65rem',
         }}
       >
         {label}
@@ -46,8 +46,8 @@ const DataPoint = ({ label, value, color, isLast }) => {
       <Typography
         sx={{
           fontWeight: 900,
-          fontSize: "1rem",
-          color: color || "text.primary",
+          fontSize: '1rem',
+          color: color || 'text.primary',
           letterSpacing: -0.2,
         }}
       >
@@ -59,7 +59,7 @@ const DataPoint = ({ label, value, color, isLast }) => {
 
 const InvestmentSummary = ({ plans, targetAmount }) => {
   const theme = useTheme();
-  const currency = useSelector(selectCurrency) || "₹";
+  const currency = useSelector(selectCurrency) || '₹';
 
   const totalInvested = plans.reduce(
     (sum, p) => sum + (p.investedAmount || 0),
@@ -76,22 +76,22 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
   const isShort = totalValue < (targetAmount || 0);
 
   const formatAmount = (amount) =>
-    `${currency} ${(amount || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+    `${currency} ${(amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   return (
     <Box
       sx={{
         mt: 2,
         borderRadius: 3,
-        overflow: "hidden",
-        border: "1px solid",
+        overflow: 'hidden',
+        border: '1px solid',
         borderColor: isShort
           ? alpha(theme.palette.error.main, 0.3)
           : alpha(theme.palette.divider, 0.1),
         bgcolor: isShort
           ? alpha(theme.palette.error.main, 0.02)
           : alpha(theme.palette.background.paper, 0.5),
-        transition: "all 0.3s ease",
+        transition: 'all 0.3s ease',
       }}
     >
       {/* 1. Technical Alert Header */}
@@ -99,13 +99,13 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
         sx={{
           px: 2,
           py: 1,
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 1,
           bgcolor: isShort
             ? alpha(theme.palette.error.main, 0.05)
             : alpha(theme.palette.success.main, 0.05),
-          borderBottom: "1px solid",
+          borderBottom: '1px solid',
           borderColor: isShort
             ? alpha(theme.palette.error.main, 0.1)
             : alpha(theme.palette.success.main, 0.1),
@@ -113,18 +113,18 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
       >
         {isShort ? (
           <WarningIcon
-            sx={{ fontSize: "1rem", color: theme.palette.error.main }}
+            sx={{ fontSize: '1rem', color: theme.palette.error.main }}
           />
         ) : (
           <SuccessIcon
-            sx={{ fontSize: "1rem", color: theme.palette.success.main }}
+            sx={{ fontSize: '1rem', color: theme.palette.success.main }}
           />
         )}
         <Typography
           variant="caption"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
+            textTransform: 'uppercase',
             letterSpacing: 1,
             color: isShort
               ? theme.palette.error.dark
@@ -133,7 +133,7 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
         >
           {isShort
             ? `Funding Gap: ${formatAmount(targetAmount - totalValue)} remaining`
-            : "Strategy Fully Funded"}
+            : 'Strategy Fully Funded'}
         </Typography>
       </Box>
 
@@ -161,7 +161,7 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
       {isShort && (
         <Box
           sx={{
-            width: "100%",
+            width: '100%',
             height: 4,
             bgcolor: alpha(theme.palette.error.main, 0.1),
           }}
@@ -169,9 +169,9 @@ const InvestmentSummary = ({ plans, targetAmount }) => {
           <Box
             sx={{
               width: `${Math.min((totalValue / targetAmount) * 100, 100)}%`,
-              height: "100%",
+              height: '100%',
               bgcolor: theme.palette.error.main,
-              transition: "width 0.5s ease-out",
+              transition: 'width 0.5s ease-out',
             }}
           />
         </Box>

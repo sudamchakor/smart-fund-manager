@@ -12,8 +12,12 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock Material-UI Icons
-jest.mock('@mui/icons-material/WarningAmber', () => (props) => <svg data-testid="WarningAmberIcon" {...props} />);
-jest.mock('@mui/icons-material/Dashboard', () => (props) => <svg data-testid="DashboardIcon" {...props} />);
+jest.mock('@mui/icons-material/WarningAmber', () => (props) => (
+  <svg data-testid="WarningAmberIcon" {...props} />
+));
+jest.mock('@mui/icons-material/Dashboard', () => (props) => (
+  <svg data-testid="DashboardIcon" {...props} />
+));
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -23,7 +27,7 @@ describe('NotFoundPage Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <NotFoundPage />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -44,7 +48,11 @@ describe('NotFoundPage Component', () => {
 
   it('renders the descriptive error message', () => {
     renderComponent();
-    expect(screen.getByText(/The requested module or routing path could not be located/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /The requested module or routing path could not be located/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('renders the WarningAmber icon', () => {
@@ -54,12 +62,16 @@ describe('NotFoundPage Component', () => {
 
   it('renders the "Return to Command Center" button', () => {
     renderComponent();
-    expect(screen.getByRole('button', { name: 'Return to Command Center' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Return to Command Center' }),
+    ).toBeInTheDocument();
   });
 
   it('navigates to the home page when the button is clicked', () => {
     renderComponent();
-    fireEvent.click(screen.getByRole('button', { name: 'Return to Command Center' }));
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Return to Command Center' }),
+    );
     expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 
@@ -71,7 +83,11 @@ describe('NotFoundPage Component', () => {
   it('applies specific typography styles', () => {
     renderComponent();
     expect(screen.getByText('404')).toHaveStyle('font-weight: 900');
-    expect(screen.getByText('System Routing Error')).toHaveStyle('font-weight: 800');
-    expect(screen.getByText(/The requested module/i)).toHaveStyle('font-weight: 600');
+    expect(screen.getByText('System Routing Error')).toHaveStyle(
+      'font-weight: 800',
+    );
+    expect(screen.getByText(/The requested module/i)).toHaveStyle(
+      'font-weight: 600',
+    );
   });
 });

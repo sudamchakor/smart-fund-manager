@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Button,
-  Stack,
-  CircularProgress,
-} from '@mui/material';
+import { Box, Button, Stack, CircularProgress } from '@mui/material';
 import {
   CloudUpload as CloudUploadIcon,
   Save as SaveIcon,
@@ -22,20 +17,12 @@ const ArticleEditorActions = ({
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-      <Button
-        color="error"
-        startIcon={<DeleteSweepIcon />}
-        onClick={clearForm}
-      >
+      <Button color="error" startIcon={<DeleteSweepIcon />} onClick={clearForm}>
         Clear
       </Button>
 
       <Stack direction="row" spacing={2}>
-        <Button
-          variant="outlined"
-          color="inherit"
-          onClick={() => navigate(-1)}
-        >
+        <Button variant="outlined" color="inherit" onClick={() => navigate(-1)}>
           Cancel
         </Button>
         <Button

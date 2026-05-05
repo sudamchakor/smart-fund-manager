@@ -3,11 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import SingleArticle from '../../../../src/pages/articles/SingleArticle';
 import '@testing-library/jest-dom';
-import {
-  doc,
-  getDoc,
-  deleteDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 
 // Mock react-router-dom hooks
 const mockUseParams = jest.fn();
@@ -44,7 +40,9 @@ jest.mock('../../../../src/utils/articleCategories', () => ({
     Tech: () => <svg data-testid="TechIcon" />,
   },
 }));
-jest.mock('@mui/icons-material/Image', () => (props) => <svg data-testid="ImageIcon" {...props} />);
+jest.mock('@mui/icons-material/Image', () => (props) => (
+  <svg data-testid="ImageIcon" {...props} />
+));
 
 describe('SingleArticle Component', () => {
   const mockArticleData = {
@@ -59,13 +57,17 @@ describe('SingleArticle Component', () => {
     readTime: '7 min',
   };
 
-  const renderComponent = (authLoading = false, user = null, articleId = 'test-article-id') => {
+  const renderComponent = (
+    authLoading = false,
+    user = null,
+    articleId = 'test-article-id',
+  ) => {
     mockUseParams.mockReturnValue({ id: articleId });
     mockUseAuth.mockReturnValue({ user, loading: authLoading });
     return render(
       <Router>
         <SingleArticle />
-      </Router>
+      </Router>,
     );
   };
 
@@ -98,7 +100,9 @@ describe('SingleArticle Component', () => {
     renderComponent();
     await waitFor(() => {
       expect(screen.getByText('Article Not Found')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Back to Articles' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Back to Articles' }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -131,8 +135,12 @@ describe('SingleArticle Component', () => {
   it('renders article content paragraphs', async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByText('This is the first paragraph.')).toBeInTheDocument();
-      expect(screen.getByText('This is the second paragraph.')).toBeInTheDocument();
+      expect(
+        screen.getByText('This is the first paragraph.'),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText('This is the second paragraph.'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -154,7 +162,9 @@ describe('SingleArticle Component', () => {
     renderComponent();
     await waitFor(() => {
       expect(screen.getByTestId('FinanceIcon')).toBeInTheDocument();
-      expect(screen.queryByAltText('Test Article Title')).not.toBeInTheDocument();
+      expect(
+        screen.queryByAltText('Test Article Title'),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -184,15 +194,21 @@ describe('SingleArticle Component', () => {
     renderComponent(false, { uid: 'some-user-id' }); // Any logged-in user
     await waitFor(() => {
       expect(screen.getByRole('link', { name: 'Edit' })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Delete' }),
+      ).toBeInTheDocument();
     });
   });
 
   it('does not render Edit and Delete buttons for logged-out users', async () => {
     renderComponent(false, null);
     await waitFor(() => {
-      expect(screen.queryByRole('link', { name: 'Edit' })).not.toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Delete' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete' }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -200,7 +216,9 @@ describe('SingleArticle Component', () => {
     renderComponent(false, { uid: 'some-user-id' });
     await waitFor(() => {
       fireEvent.click(screen.getByRole('link', { name: 'Edit' }));
-      expect(mockNavigate).toHaveBeenCalledWith('/admin/articles/edit/test-article-id');
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/admin/articles/edit/test-article-id',
+      );
     });
   });
 
@@ -208,9 +226,17 @@ describe('SingleArticle Component', () => {
     renderComponent(false, { uid: 'some-user-id' });
     await waitFor(() => {
       fireEvent.click(screen.getByRole('button', { name: 'Delete' }));
-      expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete this article? This action cannot be undone.');
-      expect(deleteDoc).toHaveBeenCalledWith(expect.any(Object), 'articles', 'test-article-id');
-      expect(window.alert).toHaveBeenCalledWith('Article deleted successfully!');
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete this article? This action cannot be undone.',
+      );
+      expect(deleteDoc).toHaveBeenCalledWith(
+        expect.any(Object),
+        'articles',
+        'test-article-id',
+      );
+      expect(window.alert).toHaveBeenCalledWith(
+        'Article deleted successfully!',
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/articles');
     });
   });

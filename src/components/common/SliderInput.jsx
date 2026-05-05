@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Slider,
@@ -8,12 +8,12 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   InfoOutlined as InfoIcon,
   WarningAmber as WarningIcon,
-} from "@mui/icons-material";
-import { labelStyle, getWellInputStyle } from "../../styles/formStyles";
+} from '@mui/icons-material';
+import { labelStyle, getWellInputStyle } from '../../styles/formStyles';
 
 export const SliderInput = ({
   label,
@@ -24,10 +24,10 @@ export const SliderInput = ({
   step = 1,
   marks = false,
   warningThreshold = null,
-  warningText = "",
-  tooltipText = "",
+  warningText = '',
+  tooltipText = '',
   showInput = true,
-  color = "primary",
+  color = 'primary',
   isInline = true,
   warning = false,
 }) => {
@@ -43,14 +43,14 @@ export const SliderInput = ({
     (warningThreshold !== null && numValue > warningThreshold) || warning;
 
   // Dynamically map the color token to ensure the Data Well and Slider match
-  const activeColorToken = isWarning ? "error" : color;
+  const activeColorToken = isWarning ? 'error' : color;
 
   const handleInputChange = (e) => {
     const val = e.target.value;
-    let sanitizedVal = val.replace(/^0+(?=\d)/, "");
-    let newVal = sanitizedVal === "" ? "" : Number(sanitizedVal);
+    let sanitizedVal = val.replace(/^0+(?=\d)/, '');
+    let newVal = sanitizedVal === '' ? '' : Number(sanitizedVal);
 
-    if (newVal !== "" && newVal > max) {
+    if (newVal !== '' && newVal > max) {
       newVal = max;
     }
     setInternalValue(newVal);
@@ -78,9 +78,9 @@ export const SliderInput = ({
         variant="caption"
         sx={{
           ...labelStyle,
-          whiteSpace: "normal",
+          whiteSpace: 'normal',
           mb: 0,
-          display: "inline-block",
+          display: 'inline-block',
         }}
         id={`${label}-slider-label`}
       >
@@ -90,9 +90,9 @@ export const SliderInput = ({
         <Tooltip title={tooltipText} arrow placement="top">
           <InfoIcon
             sx={{
-              fontSize: "1rem",
-              color: isWarning ? "error.main" : "text.disabled",
-              cursor: "help",
+              fontSize: '1rem',
+              color: isWarning ? 'error.main' : 'text.disabled',
+              cursor: 'help',
             }}
           />
         </Tooltip>
@@ -114,9 +114,9 @@ export const SliderInput = ({
       sx={{
         flexGrow: 1,
         py: 1,
-        "& .MuiSlider-thumb": { width: 14, height: 14 },
-        "& .MuiSlider-track": { height: 4 },
-        "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+        '& .MuiSlider-thumb': { width: 14, height: 14 },
+        '& .MuiSlider-track': { height: 4 },
+        '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
       }}
     />
   );
@@ -129,7 +129,7 @@ export const SliderInput = ({
         value={internalValue}
         onChange={handleInputChange}
         onKeyDown={(e) => {
-          if (["e", "E", "+", "-"].includes(e.key)) {
+          if (['e', 'E', '+', '-'].includes(e.key)) {
             e.preventDefault();
           }
         }}
@@ -144,12 +144,12 @@ export const SliderInput = ({
           },
           sx: {
             ...getWellInputStyle(theme, activeColorToken),
-            textAlign: "right",
+            textAlign: 'right',
             minWidth: 100,
-            "& input": { textAlign: "right", p: 0 },
-            "& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button":
-              { display: "none" },
-            MozAppearance: "textfield",
+            '& input': { textAlign: 'right', p: 0 },
+            '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button':
+              { display: 'none' },
+            MozAppearance: 'textfield',
           },
         }}
       />
@@ -165,25 +165,25 @@ export const SliderInput = ({
           borderRadius: 2,
           bgcolor: alpha(theme.palette.error.main, 0.05),
           border: `1px dashed ${alpha(theme.palette.error.main, 0.3)}`,
-          display: "flex",
-          alignItems: "flex-start",
+          display: 'flex',
+          alignItems: 'flex-start',
           gap: 1,
           ...(isInline && {
-            position: "absolute",
-            width: "calc(100% - 32px)",
+            position: 'absolute',
+            width: 'calc(100% - 32px)',
             left: 16,
-            top: "100%",
+            top: '100%',
             zIndex: 1,
-            boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || "#000", 0.05)}`,
+            boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || '#000', 0.05)}`,
           }),
         }}
       >
         <WarningIcon
-          sx={{ color: "error.main", fontSize: "1.2rem", mt: 0.2 }}
+          sx={{ color: 'error.main', fontSize: '1.2rem', mt: 0.2 }}
         />
         <Typography
           variant="caption"
-          sx={{ color: "error.dark", fontWeight: 700, lineHeight: 1.5 }}
+          sx={{ color: 'error.dark', fontWeight: 700, lineHeight: 1.5 }}
         >
           {warningText}
         </Typography>
@@ -191,15 +191,15 @@ export const SliderInput = ({
     );
 
   return (
-    <Box sx={{ width: "100%", px: 2, position: "relative" }}>
+    <Box sx={{ width: '100%', px: 2, position: 'relative' }}>
       {isInline ? (
         <Box
           sx={{
-            display: "flex",
-            flexDirection: { xs: "column", sm: "row" },
-            alignItems: { xs: "flex-start", sm: "center" },
+            display: 'flex',
+            flexDirection: { xs: 'column', sm: 'row' },
+            alignItems: { xs: 'flex-start', sm: 'center' },
             gap: { xs: 1, sm: 2 },
-            width: "100%",
+            width: '100%',
           }}
         >
           {renderLabelComponent()}

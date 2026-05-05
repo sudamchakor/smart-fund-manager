@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -13,16 +13,16 @@ import {
   Collapse,
   Typography,
   useTheme,
-} from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import dayjs from "dayjs";
-import SliderInput from "./SliderInput";
+} from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs from 'dayjs';
+import SliderInput from './SliderInput';
 import {
   incomeTypes,
   expenseCategories,
   taxExpenseCategories,
-} from "../../utils/taxRules";
-import { labelStyle, getWellInputStyle } from "../../styles/formStyles";
+} from '../../utils/taxRules';
+import { labelStyle, getWellInputStyle } from '../../styles/formStyles';
 
 const currentYear = new Date().getFullYear();
 
@@ -31,19 +31,19 @@ export default function IncomeExpenseForm({
   isExpense = false,
   onSave,
   onCancel,
-  submitLabel = "Save",
+  submitLabel = 'Save',
 }) {
   const theme = useTheme();
   const [formData, setFormData] = useState({
-    name: "",
-    amount: "",
-    frequency: "monthly",
+    name: '',
+    amount: '',
+    frequency: 'monthly',
     startYear: currentYear,
     endYear: currentYear + 10,
-    category: "basic",
-    incomeType: "Salary",
+    category: 'basic',
+    incomeType: 'Salary',
     isTaxDeductible: false,
-    taxCategory: "",
+    taxCategory: '',
     ...initialData,
   });
 
@@ -60,7 +60,7 @@ export default function IncomeExpenseForm({
   const handleSubmit = () => {
     if (formData.name && formData.amount > 0) {
       let finalAmount = Number(formData.amount);
-      if (!isExpense && formData.incomeType === "Rental Income") {
+      if (!isExpense && formData.incomeType === 'Rental Income') {
         finalAmount *= 0.7; // Apply 30% standard deduction
       }
       onSave({ ...formData, amount: finalAmount });
@@ -70,20 +70,22 @@ export default function IncomeExpenseForm({
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         gap: 2,
-        width: "100%",
+        width: '100%',
       }}
     >
       <Grid container spacing={2}>
         {!isExpense && (
           <Grid item xs={12} sm={6}>
-            <Typography sx={labelStyle} id="income-type-label">Income Type</Typography>
+            <Typography sx={labelStyle} id="income-type-label">
+              Income Type
+            </Typography>
             <FormControl variant="standard" size="small" fullWidth>
               <Select
                 labelId="income-type-label"
-                value={formData.incomeType || "Salary"}
+                value={formData.incomeType || 'Salary'}
                 onChange={(e) =>
                   setFormData({ ...formData, incomeType: e.target.value })
                 }
@@ -101,7 +103,9 @@ export default function IncomeExpenseForm({
         )}
 
         <Grid item xs={12} sm={isExpense ? 12 : 6}>
-          <Typography sx={labelStyle} id="source-label">{isExpense ? "Expense Name" : "Source"}</Typography>
+          <Typography sx={labelStyle} id="source-label">
+            {isExpense ? 'Expense Name' : 'Source'}
+          </Typography>
           <TextField
             aria-labelledby="source-label"
             variant="standard"
@@ -109,7 +113,10 @@ export default function IncomeExpenseForm({
             size="small"
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
+            InputProps={{
+              disableUnderline: true,
+              sx: getWellInputStyle(theme),
+            }}
           />
         </Grid>
 
@@ -127,11 +134,13 @@ export default function IncomeExpenseForm({
           </Grid>
         ) : (
           <Grid item xs={12} sm={6}>
-            <Typography sx={labelStyle} id="frequency-label">Frequency</Typography>
+            <Typography sx={labelStyle} id="frequency-label">
+              Frequency
+            </Typography>
             <FormControl variant="standard" size="small" fullWidth>
               <Select
                 labelId="frequency-label"
-                value={formData.frequency || "monthly"}
+                value={formData.frequency || 'monthly'}
                 onChange={(e) =>
                   setFormData({ ...formData, frequency: e.target.value })
                 }
@@ -149,11 +158,13 @@ export default function IncomeExpenseForm({
         {isExpense ? (
           <>
             <Grid item xs={12} sm={6}>
-              <Typography sx={labelStyle} id="category-label">Category</Typography>
+              <Typography sx={labelStyle} id="category-label">
+                Category
+              </Typography>
               <FormControl variant="standard" size="small" fullWidth>
                 <Select
                   labelId="category-label"
-                  value={formData.category || "basic"}
+                  value={formData.category || 'basic'}
                   onChange={(e) =>
                     setFormData({ ...formData, category: e.target.value })
                   }
@@ -169,11 +180,13 @@ export default function IncomeExpenseForm({
               </FormControl>
             </Grid>
             <Grid item xs={12} sm={6}>
-              <Typography sx={labelStyle} id="expense-frequency-label">Frequency</Typography>
+              <Typography sx={labelStyle} id="expense-frequency-label">
+                Frequency
+              </Typography>
               <FormControl variant="standard" size="small" fullWidth>
                 <Select
                   labelId="expense-frequency-label"
-                  value={formData.frequency || "monthly"}
+                  value={formData.frequency || 'monthly'}
                   onChange={(e) =>
                     setFormData({ ...formData, frequency: e.target.value })
                   }
@@ -204,7 +217,9 @@ export default function IncomeExpenseForm({
             </Grid>
             <Grid item xs={12}>
               <Collapse in={formData.isTaxDeductible}>
-                <Typography sx={labelStyle} id="exemption-category-label">Exemption Category</Typography>
+                <Typography sx={labelStyle} id="exemption-category-label">
+                  Exemption Category
+                </Typography>
                 <FormControl variant="standard" fullWidth size="small">
                   <Select
                     labelId="exemption-category-label"
@@ -240,10 +255,12 @@ export default function IncomeExpenseForm({
         )}
 
         <Grid item xs={12} sm={6}>
-          <Typography sx={labelStyle} id="start-year-label">Start Year</Typography>
+          <Typography sx={labelStyle} id="start-year-label">
+            Start Year
+          </Typography>
           <DatePicker
             label="Start Year"
-            views={["year", "month"]}
+            views={['year', 'month']}
             openTo="month"
             open={startYearOpen}
             onOpen={() => setStartYearOpen(true)}
@@ -257,14 +274,15 @@ export default function IncomeExpenseForm({
             }
             slotProps={{
               textField: {
-                variant: "standard",
-                size: "small",
+                variant: 'standard',
+                size: 'small',
                 fullWidth: true,
                 onClick: () => setStartYearOpen(true),
-                "aria-labelledby": "start-year-label",
+                'aria-labelledby': 'start-year-label',
                 InputProps: {
-                  disableUnderline: true, sx: getWellInputStyle(theme)
-                }
+                  disableUnderline: true,
+                  sx: getWellInputStyle(theme),
+                },
               },
             }}
             minDate={dayjs(`${currentYear - 50}-01-01`)}
@@ -272,10 +290,12 @@ export default function IncomeExpenseForm({
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-          <Typography sx={labelStyle} id="end-year-label">End Year</Typography>
+          <Typography sx={labelStyle} id="end-year-label">
+            End Year
+          </Typography>
           <DatePicker
             label="End Year"
-            views={["year", "month"]}
+            views={['year', 'month']}
             openTo="month"
             open={endYearOpen}
             onOpen={() => setEndYearOpen(true)}
@@ -291,14 +311,15 @@ export default function IncomeExpenseForm({
             }
             slotProps={{
               textField: {
-                variant: "standard",
-                size: "small",
+                variant: 'standard',
+                size: 'small',
                 fullWidth: true,
                 onClick: () => setEndYearOpen(true),
-                "aria-labelledby": "end-year-label",
+                'aria-labelledby': 'end-year-label',
                 InputProps: {
-                  disableUnderline: true, sx: getWellInputStyle(theme)
-                }
+                  disableUnderline: true,
+                  sx: getWellInputStyle(theme),
+                },
               },
             }}
             minDate={dayjs(

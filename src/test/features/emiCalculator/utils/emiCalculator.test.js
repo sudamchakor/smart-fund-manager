@@ -7,7 +7,11 @@ describe.skip('emiCalculator utils', () => {
       const annualInterestRate = 10; // 10%
       const loanTenureMonths = 120; // 10 years
 
-      const emi = emiCalculator.calculateEMI(loanAmount, annualInterestRate, loanTenureMonths);
+      const emi = emiCalculator.calculateEMI(
+        loanAmount,
+        annualInterestRate,
+        loanTenureMonths,
+      );
       expect(emi).toBeCloseTo(1321.51, 2); // Expected EMI for these values
     });
 
@@ -32,9 +36,19 @@ describe.skip('emiCalculator utils', () => {
       const loanAmount = 100000;
       const annualInterestRate = 10;
       const loanTenureMonths = 12; // 1 year
-      const emi = emiCalculator.calculateEMI(loanAmount, annualInterestRate, loanTenureMonths);
+      const emi = emiCalculator.calculateEMI(
+        loanAmount,
+        annualInterestRate,
+        loanTenureMonths,
+      );
 
-      const schedule = emiCalculator.generatePaymentSchedule(loanAmount, annualInterestRate, loanTenureMonths, emi, []);
+      const schedule = emiCalculator.generatePaymentSchedule(
+        loanAmount,
+        annualInterestRate,
+        loanTenureMonths,
+        emi,
+        [],
+      );
 
       expect(schedule).toHaveLength(loanTenureMonths);
 
@@ -52,10 +66,20 @@ describe.skip('emiCalculator utils', () => {
       const loanAmount = 100000;
       const annualInterestRate = 10;
       const loanTenureMonths = 12;
-      const emi = emiCalculator.calculateEMI(loanAmount, annualInterestRate, loanTenureMonths);
+      const emi = emiCalculator.calculateEMI(
+        loanAmount,
+        annualInterestRate,
+        loanTenureMonths,
+      );
       const prepayments = [{ month: 3, amount: 10000 }];
 
-      const schedule = emiCalculator.generatePaymentSchedule(loanAmount, annualInterestRate, loanTenureMonths, emi, prepayments);
+      const schedule = emiCalculator.generatePaymentSchedule(
+        loanAmount,
+        annualInterestRate,
+        loanTenureMonths,
+        emi,
+        prepayments,
+      );
 
       // After 3rd month prepayment, balance should be lower, and subsequent EMIs might adjust or tenure reduce
       expect(schedule.length).toBeLessThanOrEqual(loanTenureMonths); // Tenure should reduce

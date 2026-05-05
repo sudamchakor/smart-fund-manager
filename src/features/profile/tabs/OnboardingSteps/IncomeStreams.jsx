@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -15,13 +15,13 @@ import {
   Stack,
   useTheme,
   alpha,
-} from "@mui/material";
+} from '@mui/material';
 import {
   DeleteOutline as DeleteIcon,
   AccountBalanceWallet as IncomeIcon,
-} from "@mui/icons-material";
-import SliderInput from "../../../../components/common/SliderInput";
-import { labelStyle, getWellInputStyle } from "../../../../styles/formStyles";
+} from '@mui/icons-material';
+import SliderInput from '../../../../components/common/SliderInput';
+import { labelStyle, getWellInputStyle } from '../../../../styles/formStyles';
 
 export default function IncomeStreams({
   income,
@@ -35,13 +35,13 @@ export default function IncomeStreams({
   return (
     <Box sx={{ mt: 3 }}>
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 3 }}>
-        <IncomeIcon sx={{ fontSize: "1.2rem", color: "success.main" }} />
+        <IncomeIcon sx={{ fontSize: '1.2rem', color: 'success.main' }} />
         <Typography
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "success.main",
+            textTransform: 'uppercase',
+            color: 'success.main',
           }}
         >
           Primary Capital Inflows
@@ -66,7 +66,7 @@ export default function IncomeStreams({
               onChange={(e) => setIncome({ ...income, name: e.target.value })}
               InputProps={{
                 disableUnderline: true,
-                sx: getWellInputStyle(theme, "success"),
+                sx: getWellInputStyle(theme, 'success'),
               }}
             />
           </Grid>
@@ -92,7 +92,7 @@ export default function IncomeStreams({
                   setIncome({ ...income, frequency: e.target.value })
                 }
                 disableUnderline
-                sx={getWellInputStyle(theme, "success")}
+                sx={getWellInputStyle(theme, 'success')}
               >
                 <MenuItem value="monthly" sx={{ fontWeight: 700 }}>
                   Monthly
@@ -135,7 +135,7 @@ export default function IncomeStreams({
           <Grid
             item
             xs={12}
-            sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}
+            sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}
           >
             <Button
               variant="contained"
@@ -158,7 +158,7 @@ export default function IncomeStreams({
             border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
             borderRadius: 2,
             maxHeight: 200,
-            overflow: "auto",
+            overflow: 'auto',
           }}
         >
           {incomesList.map((inc, index) => (

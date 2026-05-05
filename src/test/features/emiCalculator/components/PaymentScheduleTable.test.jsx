@@ -11,7 +11,7 @@ jest.mock('react-redux', () => ({
 
 describe('PaymentScheduleTable', () => {
   beforeEach(() => {
-    useSelector.mockImplementation(selector => {
+    useSelector.mockImplementation((selector) => {
       const state = {
         emiCalculator: {
           schedule: [
@@ -21,16 +21,16 @@ describe('PaymentScheduleTable', () => {
           loanDetails: {
             homeValue: 5000000,
             marginAmount: 1000000,
-            marginUnit: "Rs",
+            marginUnit: 'Rs',
             loanInsurance: 0,
             interestRate: 8.5,
             loanTenure: 20,
-            tenureUnit: "years",
+            tenureUnit: 'years',
             loanFees: 10000,
-            feesUnit: "Rs",
+            feesUnit: 'Rs',
             startDate: new Date().toISOString(),
             yearlyPaymentIncreaseAmount: 0,
-            yearlyPaymentIncreaseUnit: "%",
+            yearlyPaymentIncreaseUnit: '%',
           },
           expenses: [],
           prepayments: {
@@ -45,7 +45,7 @@ describe('PaymentScheduleTable', () => {
           loanDetails: {
             homeValue: 5000000,
             marginAmount: 1000000,
-            marginUnit: "Rs",
+            marginUnit: 'Rs',
             interestRate: 8.5,
             loanTenure: 20,
           },

@@ -20,15 +20,17 @@ describe.skip('useGoalForm', () => {
 
   beforeEach(() => {
     useDispatch.mockReturnValue(mockDispatch);
-    useSelector.mockImplementation(selector => selector({
-      profile: {
-        goals: [],
-        currentAge: 30,
-      },
-      emi: {
-        currency: '₹',
-      }
-    }));
+    useSelector.mockImplementation((selector) =>
+      selector({
+        profile: {
+          goals: [],
+          currentAge: 30,
+        },
+        emi: {
+          currency: '₹',
+        },
+      }),
+    );
     jest.clearAllMocks();
   });
 
@@ -56,15 +58,17 @@ describe.skip('useGoalForm', () => {
       priority: 'high',
       investmentPlans: [{ type: 'sip', monthlyContribution: 5000 }],
     };
-    useSelector.mockImplementation(selector => selector({
-      profile: {
-        goals: [existingGoal],
-        currentAge: 30,
-      },
-      emi: {
-        currency: '₹',
-      }
-    }));
+    useSelector.mockImplementation((selector) =>
+      selector({
+        profile: {
+          goals: [existingGoal],
+          currentAge: 30,
+        },
+        emi: {
+          currency: '₹',
+        },
+      }),
+    );
 
     const { result } = renderHook(() => useGoalForm(existingGoal.id));
 
@@ -76,12 +80,16 @@ describe.skip('useGoalForm', () => {
     const { result } = renderHook(() => useGoalForm());
 
     act(() => {
-      result.current.handleChange({ target: { name: 'name', value: 'New Goal' } });
+      result.current.handleChange({
+        target: { name: 'name', value: 'New Goal' },
+      });
     });
     expect(result.current.goal.name).toBe('New Goal');
 
     act(() => {
-      result.current.handleChange({ target: { name: 'targetAmount', value: '50000' } });
+      result.current.handleChange({
+        target: { name: 'targetAmount', value: '50000' },
+      });
     });
     expect(result.current.goal.targetAmount).toBe(50000);
   });
@@ -93,7 +101,12 @@ describe.skip('useGoalForm', () => {
       result.current.addInvestmentPlan();
     });
     expect(result.current.goal.investmentPlans).toHaveLength(1);
-    expect(result.current.goal.investmentPlans[0]).toEqual({ type: 'sip', monthlyContribution: 0, expectedReturnRate: 0, timeHorizon: 0 });
+    expect(result.current.goal.investmentPlans[0]).toEqual({
+      type: 'sip',
+      monthlyContribution: 0,
+      expectedReturnRate: 0,
+      timeHorizon: 0,
+    });
   });
 
   it('removes an investment plan', () => {
@@ -111,20 +124,34 @@ describe.skip('useGoalForm', () => {
 
     act(() => {
       result.current.addInvestmentPlan();
-      result.current.handleInvestmentPlanChange(0, { target: { name: 'monthlyContribution', value: '1000' } });
+      result.current.handleInvestmentPlanChange(0, {
+        target: { name: 'monthlyContribution', value: '1000' },
+      });
     });
-    expect(result.current.goal.investmentPlans[0].monthlyContribution).toBe(1000);
+    expect(result.current.goal.investmentPlans[0].monthlyContribution).toBe(
+      1000,
+    );
   });
 
   it('dispatches addGoal for new goal submission', () => {
     const { result } = renderHook(() => useGoalForm());
 
     act(() => {
-      result.current.handleChange({ target: { name: 'name', value: 'New Goal' } });
-      result.current.handleChange({ target: { name: 'targetAmount', value: '100000' } });
-      result.current.handleChange({ target: { name: 'targetYear', value: '2030' } });
-      result.current.handleChange({ target: { name: 'category', value: 'other' } });
-      result.current.handleChange({ target: { name: 'priority', value: 'medium' } });
+      result.current.handleChange({
+        target: { name: 'name', value: 'New Goal' },
+      });
+      result.current.handleChange({
+        target: { name: 'targetAmount', value: '100000' },
+      });
+      result.current.handleChange({
+        target: { name: 'targetYear', value: '2030' },
+      });
+      result.current.handleChange({
+        target: { name: 'category', value: 'other' },
+      });
+      result.current.handleChange({
+        target: { name: 'priority', value: 'medium' },
+      });
       result.current.handleSubmit({ preventDefault: jest.fn() });
     });
 
@@ -141,20 +168,24 @@ describe.skip('useGoalForm', () => {
       priority: 'high',
       investmentPlans: [],
     };
-    useSelector.mockImplementation(selector => selector({
-      profile: {
-        goals: [existingGoal],
-        currentAge: 30,
-      },
-      emi: {
-        currency: '₹',
-      }
-    }));
+    useSelector.mockImplementation((selector) =>
+      selector({
+        profile: {
+          goals: [existingGoal],
+          currentAge: 30,
+        },
+        emi: {
+          currency: '₹',
+        },
+      }),
+    );
 
     const { result } = renderHook(() => useGoalForm(existingGoal.id));
 
     act(() => {
-      result.current.handleChange({ target: { name: 'name', value: 'Updated Goal' } });
+      result.current.handleChange({
+        target: { name: 'name', value: 'Updated Goal' },
+      });
       result.current.handleSubmit({ preventDefault: jest.fn() });
     });
 
@@ -169,6 +200,8 @@ describe.skip('useGoalForm', () => {
     });
 
     expect(result.current.errors.name).toBe('Goal Name is required');
-    expect(result.current.errors.targetAmount).toBe('Target Amount is required');
+    expect(result.current.errors.targetAmount).toBe(
+      'Target Amount is required',
+    );
   });
 });

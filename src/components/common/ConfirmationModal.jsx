@@ -15,7 +15,15 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const ConfirmationModal = ({ open, onClose, onConfirm, title, description, confirmText = 'Delete', cancelText = 'Cancel' }) => {
+const ConfirmationModal = ({
+  open,
+  onClose,
+  onConfirm,
+  title,
+  description,
+  confirmText = 'Delete',
+  cancelText = 'Cancel',
+}) => {
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 

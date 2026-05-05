@@ -84,16 +84,16 @@ export const calculateFd = (
 ) => {
   let n;
   switch (compoundingFrequency) {
-    case "annually":
+    case 'annually':
       n = 1;
       break;
-    case "semi-annually":
+    case 'semi-annually':
       n = 2;
       break;
-    case "quarterly":
+    case 'quarterly':
       n = 4;
       break;
-    case "monthly":
+    case 'monthly':
       n = 12;
       break;
     default:

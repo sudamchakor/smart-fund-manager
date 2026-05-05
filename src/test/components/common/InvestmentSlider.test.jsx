@@ -23,7 +23,7 @@ describe('InvestmentSlider Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <InvestmentSlider {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -122,6 +122,8 @@ describe('InvestmentSlider Component', () => {
 
     const textField = screen.getByRole('textbox');
     const inputAdornment = textField.previousSibling; // Assuming start adornment
-    expect(inputAdornment).toHaveStyle(`color: ${theme.palette.secondary.main}`);
+    expect(inputAdornment).toHaveStyle(
+      `color: ${theme.palette.secondary.main}`,
+    );
   });
 });

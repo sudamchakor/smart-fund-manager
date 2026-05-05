@@ -22,7 +22,7 @@ describe('Footer Component', () => {
         <Router>
           <Footer />
         </Router>
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -34,15 +34,27 @@ describe('Footer Component', () => {
   it('renders the copyright text with current year', () => {
     renderComponent();
     const currentYear = new Date().getFullYear();
-    expect(screen.getByText(new RegExp(`©\\s*${currentYear}`, 'i'), { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/SmartFund Manager/i, { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(`©\\s*${currentYear}`, 'i'), {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/SmartFund Manager/i, { exact: false }),
+    ).toBeInTheDocument();
   });
 
   it('renders all footer links', () => {
     renderComponent();
-    expect(screen.getByText(/Privacy Policy/i, { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/Terms of Service/i, { exact: false })).toBeInTheDocument();
-    expect(screen.getByText(/Contact Us/i, { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Privacy Policy/i, { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Terms of Service/i, { exact: false }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Contact Us/i, { exact: false }),
+    ).toBeInTheDocument();
   });
 
   it('calls navigate with "/" when "SmartFund Manager" link is clicked', () => {
@@ -71,7 +83,11 @@ describe('Footer Component', () => {
 
   it('renders the tagline "Built for precision. Managed with intelligence."', () => {
     renderComponent();
-    expect(screen.getByText(/Built for precision\. Managed with intelligence\./i, { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText(/Built for precision\. Managed with intelligence\./i, {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
   });
 
   // --- Styling and Responsiveness (visual checks, but can test presence of props) ---
@@ -85,14 +101,19 @@ describe('Footer Component', () => {
   it('applies dynamic background and border styles', () => {
     renderComponent();
     const footer = screen.getByRole('contentinfo');
-    expect(footer).toHaveStyle(`background-color: ${alpha(theme.palette.background.paper, 0.9)}`);
+    expect(footer).toHaveStyle(
+      `background-color: ${alpha(theme.palette.background.paper, 0.9)}`,
+    );
   });
 
   it('adjusts stack direction for small screens', () => {
     // This is a CSS media query, hard to test directly with JSDOM.
     // We can only assert that the `sx` prop contains the responsive styles.
     renderComponent();
-    const stack = screen.getByText(/SmartFund Manager/i, { exact: false }).closest('.MuiStack-root') || screen.getByRole('contentinfo');
+    const stack =
+      screen
+        .getByText(/SmartFund Manager/i, { exact: false })
+        .closest('.MuiStack-root') || screen.getByRole('contentinfo');
     expect(stack).toBeInTheDocument();
     // For sm, it should be row, but JSDOM doesn't simulate viewport width.
   });
@@ -101,7 +122,10 @@ describe('Footer Component', () => {
     // Similar to above, this is a CSS media query.
     // We can assert the presence of the element, and its style prop.
     renderComponent();
-    const tagline = screen.getByText(/Built for precision\. Managed with intelligence\./i, { exact: false });
+    const tagline = screen.getByText(
+      /Built for precision\. Managed with intelligence\./i,
+      { exact: false },
+    );
     expect(tagline).toBeInTheDocument();
   });
 });

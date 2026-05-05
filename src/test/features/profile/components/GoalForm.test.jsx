@@ -4,11 +4,13 @@ import GoalForm from '../../../features/profile/components/GoalForm';
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn(selector => selector({
-    emi: {
-      currency: '₹',
-    },
-  })),
+  useSelector: jest.fn((selector) =>
+    selector({
+      emi: {
+        currency: '₹',
+      },
+    }),
+  ),
   useDispatch: () => jest.fn(),
 }));
 

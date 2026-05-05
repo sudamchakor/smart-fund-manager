@@ -28,31 +28,31 @@ describe('TotalMonthlyPayment', () => {
       loanDetails: {
         homeValue: 5000000,
         marginAmount: 1000000,
-        marginUnit: "Rs",
+        marginUnit: 'Rs',
         loanInsurance: 0,
         interestRate: 8.5,
         loanTenure: 20,
-        tenureUnit: "years",
+        tenureUnit: 'years',
         loanFees: 10000,
-        feesUnit: "Rs",
+        feesUnit: 'Rs',
         startDate: new Date().toISOString(),
         yearlyPaymentIncreaseAmount: 0,
-        yearlyPaymentIncreaseUnit: "%",
+        yearlyPaymentIncreaseUnit: '%',
       },
       expenses: {
         oneTimeExpenses: 0,
-        oneTimeUnit: "Rs",
+        oneTimeUnit: 'Rs',
         propertyTaxes: 0,
-        taxesUnit: "Rs",
+        taxesUnit: 'Rs',
         homeInsurance: 0,
-        homeInsUnit: "Rs",
+        homeInsUnit: 'Rs',
         maintenance: 0,
       },
     },
   };
 
   beforeEach(() => {
-    useSelector.mockImplementation(selector => selector(defaultState));
+    useSelector.mockImplementation((selector) => selector(defaultState));
   });
 
   const renderComponent = () => {
@@ -61,7 +61,7 @@ describe('TotalMonthlyPayment', () => {
         <ThemeProvider theme={theme}>
           <TotalMonthlyPayment />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 

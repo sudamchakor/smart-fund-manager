@@ -15,12 +15,20 @@ jest.mock('@mui/material/SpeedDial', () => ({ children, icon, ...props }) => (
 jest.mock('@mui/material/SpeedDialIcon', () => (props) => (
   <svg data-testid="mock-speed-dial-main-icon" {...props} />
 ));
-jest.mock('@mui/material/SpeedDialAction', () => ({ icon, tooltipTitle, onClick, ...props }) => (
-  <button data-testid={`mock-speed-dial-action-${tooltipTitle}`} onClick={onClick} {...props}>
-    {icon}
-    <span>{tooltipTitle}</span>
-  </button>
-));
+jest.mock(
+  '@mui/material/SpeedDialAction',
+  () =>
+    ({ icon, tooltipTitle, onClick, ...props }) => (
+      <button
+        data-testid={`mock-speed-dial-action-${tooltipTitle}`}
+        onClick={onClick}
+        {...props}
+      >
+        {icon}
+        <span>{tooltipTitle}</span>
+      </button>
+    ),
+);
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -29,15 +37,25 @@ describe('ActionSpeedDial Component', () => {
   const mockAction2Handler = jest.fn();
 
   const defaultActions = [
-    { icon: <EditIcon data-testid="edit-icon" />, name: 'Edit', handler: mockAction1Handler, tooltipOpen: true },
-    { icon: <DeleteIcon data-testid="delete-icon" />, name: 'Delete', handler: mockAction2Handler, tooltipOpen: false },
+    {
+      icon: <EditIcon data-testid="edit-icon" />,
+      name: 'Edit',
+      handler: mockAction1Handler,
+      tooltipOpen: true,
+    },
+    {
+      icon: <DeleteIcon data-testid="delete-icon" />,
+      name: 'Delete',
+      handler: mockAction2Handler,
+      tooltipOpen: false,
+    },
   ];
 
   const renderComponent = (props = {}) => {
     return render(
       <ThemeProvider theme={theme}>
         <ActionSpeedDial actions={defaultActions} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -54,11 +72,15 @@ describe('ActionSpeedDial Component', () => {
 
   it('renders SpeedDialActions for each action in the array', () => {
     renderComponent();
-    expect(screen.getByTestId('mock-speed-dial-action-Edit')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-speed-dial-action-Edit'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Edit')).toBeInTheDocument();
     expect(screen.getByTestId('edit-icon')).toBeInTheDocument();
 
-    expect(screen.getByTestId('mock-speed-dial-action-Delete')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-speed-dial-action-Delete'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Delete')).toBeInTheDocument();
     expect(screen.getByTestId('delete-icon')).toBeInTheDocument();
   });
@@ -99,18 +121,26 @@ describe('ActionSpeedDial Component', () => {
   it('renders correctly when the actions array is empty', () => {
     renderComponent({ actions: [] });
     expect(screen.getByTestId('mock-speed-dial')).toBeInTheDocument();
-    expect(screen.queryByTestId('mock-speed-dial-action-Edit')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('mock-speed-dial-action-Delete')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mock-speed-dial-action-Edit'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mock-speed-dial-action-Delete'),
+    ).not.toBeInTheDocument();
   });
 
   it('renders correctly when actions prop is undefined or null', () => {
     renderComponent({ actions: undefined });
     expect(screen.getByTestId('mock-speed-dial')).toBeInTheDocument();
-    expect(screen.queryByTestId('mock-speed-dial-action-Edit')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mock-speed-dial-action-Edit'),
+    ).not.toBeInTheDocument();
 
     renderComponent({ actions: null });
     expect(screen.getByTestId('mock-speed-dial')).toBeInTheDocument();
-    expect(screen.queryByTestId('mock-speed-dial-action-Edit')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('mock-speed-dial-action-Edit'),
+    ).not.toBeInTheDocument();
   });
 
   it('does not call handler if action is disabled (not directly supported by SpeedDialAction, but good to check)', () => {

@@ -5,13 +5,17 @@ import TermsOfService from '../../pages/TermsOfService';
 import '@testing-library/jest-dom';
 
 // Mock child components
-jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
-  <div data-testid="mock-page-header">
-    <h1>{title}</h1>
-    <p>{subtitle}</p>
-    {Icon && <Icon data-testid="mock-header-icon" />}
-  </div>
-));
+jest.mock(
+  '../../components/common/PageHeader',
+  () =>
+    ({ title, subtitle, icon: Icon }) => (
+      <div data-testid="mock-page-header">
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+        {Icon && <Icon data-testid="mock-header-icon" />}
+      </div>
+    ),
+);
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -21,7 +25,7 @@ describe('TermsOfService Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <TermsOfService />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -34,7 +38,11 @@ describe('TermsOfService Component', () => {
     renderComponent();
     expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
     expect(screen.getByText('Terms of Service')).toBeInTheDocument();
-    expect(screen.getByText('Operational guidelines and legal agreements for system usage.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Operational guidelines and legal agreements for system usage.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // GavelIcon
   });
 
@@ -42,62 +50,100 @@ describe('TermsOfService Component', () => {
   it('renders "1. System Introduction" section', () => {
     renderComponent();
     expect(screen.getByText('1. System Introduction')).toBeInTheDocument();
-    expect(screen.getByText(/Welcome to SmartFund Manager\./i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Welcome to SmartFund Manager\./i),
+    ).toBeInTheDocument();
   });
 
   // --- Section 2: Permitted System Usage ---
   it('renders "2. Permitted System Usage" section', () => {
     renderComponent();
     expect(screen.getByText('2. Permitted System Usage')).toBeInTheDocument();
-    expect(screen.getByText(/SmartFund Manager provides precision algorithms/i)).toBeInTheDocument();
-    expect(screen.getByText(/does not constitute certified financial advice/i)).toBeInTheDocument();
-    expect(screen.getByText(/You agree not to use the platform for any unlawful purpose/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/SmartFund Manager provides precision algorithms/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/does not constitute certified financial advice/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /You agree not to use the platform for any unlawful purpose/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   // --- Section 3: Mathematical Accuracy & Liability ---
   it('renders "3. Mathematical Accuracy & Liability" section', () => {
     renderComponent();
-    expect(screen.getByText('3. Mathematical Accuracy & Liability')).toBeInTheDocument();
-    expect(screen.getByText(/While our calculation engines are designed to provide accurate/i)).toBeInTheDocument();
+    expect(
+      screen.getByText('3. Mathematical Accuracy & Liability'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /While our calculation engines are designed to provide accurate/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   // --- Section 4: Intellectual Property ---
   it('renders "4. Intellectual Property" section', () => {
     renderComponent();
     expect(screen.getByText('4. Intellectual Property')).toBeInTheDocument();
-    expect(screen.getByText(/All algorithms, codebase, UI\/UX designs, trademarks/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/All algorithms, codebase, UI\/UX designs, trademarks/i),
+    ).toBeInTheDocument();
   });
 
   // --- Section 5: Limitation of Liability ---
   it('renders "5. Limitation of Liability" section', () => {
     renderComponent();
     expect(screen.getByText('5. Limitation of Liability')).toBeInTheDocument();
-    expect(screen.getByText(/To the fullest extent permitted by applicable law/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/To the fullest extent permitted by applicable law/i),
+    ).toBeInTheDocument();
   });
 
   // --- Section 6: Protocol Revisions ---
   it('renders "6. Protocol Revisions" section', () => {
     renderComponent();
     expect(screen.getByText('6. Protocol Revisions')).toBeInTheDocument();
-    expect(screen.getByText(/We reserve the right to modify or replace these Terms/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /We reserve the right to modify or replace these Terms/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   // --- Section 7: Governing Law ---
   it('renders "7. Governing Law" section', () => {
     renderComponent();
     expect(screen.getByText('7. Governing Law')).toBeInTheDocument();
-    expect(screen.getByText(/These Terms shall be governed and construed in accordance/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /These Terms shall be governed and construed in accordance/i,
+      ),
+    ).toBeInTheDocument();
   });
 
   // --- Section 8: Contact & Support ---
   it('renders "8. Contact & Support" section', () => {
     renderComponent();
     expect(screen.getByText('8. Contact & Support')).toBeInTheDocument();
-    expect(screen.getByText(/If you have any questions regarding this security protocol/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /If you have any questions regarding this security protocol/i,
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByText('By email:')).toBeInTheDocument();
-    expect(screen.getByText('support@smartfundmanager.com')).toBeInTheDocument();
-    expect(screen.getByText('By visiting this page on our website:')).toBeInTheDocument();
-    const contactLink = screen.getByRole('link', { name: 'https://yourwebsite.com/contact' });
+    expect(
+      screen.getByText('support@smartfundmanager.com'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('By visiting this page on our website:'),
+    ).toBeInTheDocument();
+    const contactLink = screen.getByRole('link', {
+      name: 'https://yourwebsite.com/contact',
+    });
     expect(contactLink).toBeInTheDocument();
     expect(contactLink).toHaveAttribute('href', '#'); // Mocked to '#'
   });
@@ -105,7 +151,9 @@ describe('TermsOfService Component', () => {
   // --- Styling (indirectly) ---
   it('applies main container styling', () => {
     renderComponent();
-    const container = screen.getByText('Terms of Service').closest('.MuiBox-root');
+    const container = screen
+      .getByText('Terms of Service')
+      .closest('.MuiBox-root');
     expect(container).toHaveStyle(`padding: ${theme.spacing(3)}`); // p: { xs: 3, md: 5 }
     expect(container).toHaveStyle(`border-radius: ${theme.spacing(3)}`); // borderRadius: 3
   });

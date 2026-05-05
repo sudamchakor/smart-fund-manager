@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -8,10 +8,15 @@ import {
   alpha,
   Stack,
   Divider,
-} from "@mui/material";
-import { Security as SecurityIcon } from "@mui/icons-material";
-import PageHeader from "../components/common/PageHeader";
-import { getSectionHeaderStyle, subHeaderStyle, bodyStyle, listStyle } from "../styles/legalStyles";
+} from '@mui/material';
+import { Security as SecurityIcon } from '@mui/icons-material';
+import PageHeader from '../components/common/PageHeader';
+import {
+  getSectionHeaderStyle,
+  subHeaderStyle,
+  bodyStyle,
+  listStyle,
+} from '../styles/legalStyles';
 
 const PrivacyPolicy = () => {
   const theme = useTheme();
@@ -23,10 +28,10 @@ const PrivacyPolicy = () => {
         sx={{
           p: { xs: 3, md: 5 },
           borderRadius: 3,
-          border: "1px solid",
+          border: '1px solid',
           borderColor: alpha(theme.palette.divider, 0.1),
           bgcolor: theme.palette.background.paper,
-          boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+          boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
         }}
       >
         <PageHeader
@@ -104,8 +109,8 @@ const PrivacyPolicy = () => {
           </li>
           <li>
             <strong>Website</strong> refers to SmartFund Manager, accessible
-            from{" "}
-            <Link href="#" sx={{ color: "primary.main", fontWeight: 600 }}>
+            from{' '}
+            <Link href="#" sx={{ color: 'primary.main', fontWeight: 600 }}>
               https://yourwebsite.com/
             </Link>
           </li>
@@ -126,7 +131,7 @@ const PrivacyPolicy = () => {
 
         <Typography
           variant="h4"
-          sx={{ ...subHeaderStyle, fontSize: "0.95rem" }}
+          sx={{ ...subHeaderStyle, fontSize: '0.95rem' }}
         >
           Personal Data
         </Typography>
@@ -146,7 +151,7 @@ const PrivacyPolicy = () => {
 
         <Typography
           variant="h4"
-          sx={{ ...subHeaderStyle, fontSize: "0.95rem" }}
+          sx={{ ...subHeaderStyle, fontSize: '0.95rem' }}
         >
           Usage Data
         </Typography>
@@ -163,7 +168,7 @@ const PrivacyPolicy = () => {
 
         <Typography
           variant="h4"
-          sx={{ ...subHeaderStyle, fontSize: "0.95rem" }}
+          sx={{ ...subHeaderStyle, fontSize: '0.95rem' }}
         >
           Tracking Technologies and Cookies
         </Typography>
@@ -241,8 +246,8 @@ const PrivacyPolicy = () => {
             By email: <strong>support@yourwebsite.com</strong>
           </li>
           <li>
-            By visiting this page on our website:{" "}
-            <Link href="#" sx={{ color: "primary.main", fontWeight: 600 }}>
+            By visiting this page on our website:{' '}
+            <Link href="#" sx={{ color: 'primary.main', fontWeight: 600 }}>
               https://yourwebsite.com/contact
             </Link>
           </li>

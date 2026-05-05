@@ -13,7 +13,7 @@ describe('DataCard Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <DataCard {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -38,7 +38,9 @@ describe('DataCard Component', () => {
 
     expect(screen.getByTestId('test-icon')).toBeInTheDocument();
     const iconWrapper = screen.getByTestId('test-icon').closest('div');
-    expect(iconWrapper).toHaveStyle(`background-color: ${alpha(customColor, 0.1)}`);
+    expect(iconWrapper).toHaveStyle(
+      `background-color: ${alpha(customColor, 0.1)}`,
+    );
     expect(iconWrapper).toHaveStyle(`color: ${customColor}`);
   });
 
@@ -50,7 +52,9 @@ describe('DataCard Component', () => {
     });
 
     const iconWrapper = screen.getByTestId('test-icon').closest('div');
-    expect(iconWrapper).toHaveStyle(`background-color: ${alpha(theme.palette.primary.main, 0.1)}`);
+    expect(iconWrapper).toHaveStyle(
+      `background-color: ${alpha(theme.palette.primary.main, 0.1)}`,
+    );
     expect(iconWrapper).toHaveStyle(`color: ${theme.palette.primary.main}`);
   });
 
@@ -63,7 +67,9 @@ describe('DataCard Component', () => {
     });
 
     const iconWrapper = screen.getByTestId('test-icon').closest('div');
-    expect(iconWrapper).toHaveStyle(`background-color: ${alpha(theme.palette.primary.main, 0.1)}`);
+    expect(iconWrapper).toHaveStyle(
+      `background-color: ${alpha(theme.palette.primary.main, 0.1)}`,
+    );
     expect(iconWrapper).toHaveStyle(`color: ${theme.palette.primary.main}`);
   });
 
@@ -82,7 +88,9 @@ describe('DataCard Component', () => {
   // --- Negative Scenarios / Edge Cases ---
   it('renders correctly when no title is provided', () => {
     renderComponent({
-      children: <div data-testid="child-content">Some content without title</div>,
+      children: (
+        <div data-testid="child-content">Some content without title</div>
+      ),
     });
     expect(screen.queryByRole('heading')).not.toBeInTheDocument(); // No title heading
     expect(screen.getByTestId('child-content')).toBeInTheDocument();

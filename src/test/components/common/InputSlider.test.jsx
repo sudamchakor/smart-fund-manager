@@ -23,7 +23,7 @@ describe('InputSlider Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <InputSlider {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 

@@ -38,7 +38,11 @@ const ArticleCard = ({ article }) => {
       <CardContent sx={{ flexGrow: 1, pt: 3 }}>
         <Typography
           variant="overline"
-          sx={{ color: theme.palette.info.main, fontWeight: 800, letterSpacing: 1.2 }} // Using a generic color here, as palette is internal to CategoryIconDisplay
+          sx={{
+            color: theme.palette.info.main,
+            fontWeight: 800,
+            letterSpacing: 1.2,
+          }} // Using a generic color here, as palette is internal to CategoryIconDisplay
         >
           {article.category || 'Resources'}
         </Typography>

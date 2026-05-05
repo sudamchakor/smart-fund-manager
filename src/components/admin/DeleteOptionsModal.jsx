@@ -72,8 +72,7 @@ const DeleteOptionsModal = ({
               variant="outlined"
               sx={{
                 p: 1,
-                borderColor:
-                  deletionType === 'full' ? 'error.main' : 'divider',
+                borderColor: deletionType === 'full' ? 'error.main' : 'divider',
               }}
             >
               <FormControlLabel

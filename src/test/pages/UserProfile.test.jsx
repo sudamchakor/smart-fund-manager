@@ -25,10 +25,15 @@ jest.mock('../../features/profile/tabs/FutureGoalsTab', () => {
   );
   return MockFutureGoalsTab;
 });
-jest.mock('../../features/profile/tabs/WealthTab', () => () => <div data-testid="wealth-tab">Wealth Tab</div>);
+jest.mock('../../features/profile/tabs/WealthTab', () => () => (
+  <div data-testid="wealth-tab">Wealth Tab</div>
+));
 jest.mock('../../features/profile/tabs/OnboardingModal', () => {
   const MockOnboardingModal = ({ open, onClose }) => (
-    <div data-testid="onboarding-modal" style={{ display: open ? 'block' : 'none' }}>
+    <div
+      data-testid="onboarding-modal"
+      style={{ display: open ? 'block' : 'none' }}
+    >
       Onboarding Modal
       <button onClick={onClose}>Close Onboarding</button>
     </div>
@@ -37,28 +42,43 @@ jest.mock('../../features/profile/tabs/OnboardingModal', () => {
 });
 jest.mock('../../features/profile/components/FinancialModal', () => {
   const MockFinancialModal = ({ open, onClose, type }) => (
-    <div data-testid="financial-modal" style={{ display: open ? 'block' : 'none' }}>
+    <div
+      data-testid="financial-modal"
+      style={{ display: open ? 'block' : 'none' }}
+    >
       Financial Modal - {type}
       <button onClick={onClose}>Close Financial Modal</button>
     </div>
   );
   return MockFinancialModal;
 });
-jest.mock('../../components/CustomTabPanel', () => ({ children, value, index }) => (
-  value === index ? <div data-testid={`custom-tab-panel-${index}`}>{children}</div> : null
-));
+jest.mock(
+  '../../components/CustomTabPanel',
+  () =>
+    ({ children, value, index }) =>
+      value === index ? (
+        <div data-testid={`custom-tab-panel-${index}`}>{children}</div>
+      ) : null,
+);
 jest.mock('../../components/PreviewBanner', () => ({ onOpenOnboarding }) => (
   <div data-testid="preview-banner">
     Preview Banner
     <button onClick={onOpenOnboarding}>Create Profile</button>
   </div>
 ));
-jest.mock('../../components/FloatingStatusIsland', () => ({ investableSurplus, debtFreeCountdown, currency }) => (
-  <div data-testid="floating-status-island">
-    Surplus: {currency}{investableSurplus}, Debt: {debtFreeCountdown}
-  </div>
+jest.mock(
+  '../../components/FloatingStatusIsland',
+  () =>
+    ({ investableSurplus, debtFreeCountdown, currency }) => (
+      <div data-testid="floating-status-island">
+        Surplus: {currency}
+        {investableSurplus}, Debt: {debtFreeCountdown}
+      </div>
+    ),
+);
+jest.mock('../../components/common/SuspenseFallback', () => () => (
+  <div data-testid="suspense-fallback">Loading...</div>
 ));
-jest.mock('../../components/common/SuspenseFallback', () => () => <div data-testid="suspense-fallback">Loading...</div>);
 
 // Mock react-router-dom hooks
 const mockUseNavigate = jest.fn();
@@ -77,30 +97,49 @@ const initialState = {
     retirementAge: 60,
     considerInflation: false,
     generalInflationRate: 0.06,
-    educationInflationRate: 0.10,
+    educationInflationRate: 0.1,
     careerGrowthRate: 0.05,
     totalDebt: 0,
-    incomes: [{ id: 1, name: "Salary", amount: 100000, type: 'monthly' }],
+    incomes: [{ id: 1, name: 'Salary', amount: 100000, type: 'monthly' }],
     expenses: [
-      { id: 1, name: "Basic Needs", amount: 30000, type: 'monthly', category: 'basic', frequency: 'monthly' },
-      { id: 2, name: "Discretionary", amount: 20000, type: 'monthly', category: 'discretionary', frequency: 'monthly' },
+      {
+        id: 1,
+        name: 'Basic Needs',
+        amount: 30000,
+        type: 'monthly',
+        category: 'basic',
+        frequency: 'monthly',
+      },
+      {
+        id: 2,
+        name: 'Discretionary',
+        amount: 20000,
+        type: 'monthly',
+        category: 'discretionary',
+        frequency: 'monthly',
+      },
     ],
     goals: [],
   },
   emi: {
     currency: '₹',
-  }
+  },
 };
 
 describe('UserProfile Page', () => {
   let store;
 
-  const renderComponent = (initialPath = '/profile', profileState = initialState.profile) => {
+  const renderComponent = (
+    initialPath = '/profile',
+    profileState = initialState.profile,
+  ) => {
     store = mockStore({
       ...initialState,
       profile: profileState,
     });
-    mockUseLocation.mockReturnValue({ search: new URL(window.location.origin + initialPath).search });
+    mockUseLocation.mockReturnValue({
+      search: new URL(window.location.origin + initialPath).search,
+    });
     window.history.pushState({}, 'Test page', initialPath); // Set actual URL for useLocation to pick up
 
     return render(
@@ -108,7 +147,7 @@ describe('UserProfile Page', () => {
         <Router>
           <UserProfile />
         </Router>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -122,8 +161,12 @@ describe('UserProfile Page', () => {
   it('renders without crashing and displays tabs', () => {
     renderComponent();
     expect(screen.getByRole('tab', { name: 'My Profile' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Financial Goals' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Wealth Dashboard' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: 'Financial Goals' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('tab', { name: 'Wealth Dashboard' }),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('personal-profile-tab')).toBeInTheDocument();
   });
 
@@ -131,57 +174,69 @@ describe('UserProfile Page', () => {
     renderComponent();
     fireEvent.click(screen.getByRole('tab', { name: 'Financial Goals' }));
     expect(mockUseNavigate).toHaveBeenCalledWith('/profile?tab=goals');
-    expect(screen.getByRole('tab', { name: 'Financial Goals' })).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('tab', { name: 'Financial Goals' }),
+    ).toHaveAttribute('aria-selected', 'true');
   });
 
   it('switches to Wealth Dashboard tab when "Wealth Dashboard" tab is clicked', () => {
     renderComponent();
     fireEvent.click(screen.getByRole('tab', { name: 'Wealth Dashboard' }));
     expect(mockUseNavigate).toHaveBeenCalledWith('/profile?tab=wealth');
-    expect(screen.getByRole('tab', { name: 'Wealth Dashboard' })).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('tab', { name: 'Wealth Dashboard' }),
+    ).toHaveAttribute('aria-selected', 'true');
   });
 
   it('selects tab based on URL parameter on initial load', () => {
     renderComponent('/profile?tab=goals');
-    expect(screen.getByRole('tab', { name: 'Financial Goals' })).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('tab', { name: 'Financial Goals' }),
+    ).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByTestId('future-goals-tab')).toBeInTheDocument();
-    expect(screen.queryByTestId('personal-profile-tab')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('personal-profile-tab'),
+    ).not.toBeInTheDocument();
 
     renderComponent('/profile?tab=wealth');
-    expect(screen.getByRole('tab', { name: 'Wealth Dashboard' })).toHaveAttribute('aria-selected', 'true');
+    expect(
+      screen.getByRole('tab', { name: 'Wealth Dashboard' }),
+    ).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByTestId('wealth-tab')).toBeInTheDocument();
-    expect(screen.queryByTestId('personal-profile-tab')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('personal-profile-tab'),
+    ).not.toBeInTheDocument();
   });
 
   // --- Preview Banner and Onboarding Modal ---
   it('shows PreviewBanner and OnboardingModal if isProfileCreated is false', () => {
-    localStorage.setItem("isProfileCreated", "false");
+    localStorage.setItem('isProfileCreated', 'false');
     renderComponent();
     expect(screen.getByTestId('preview-banner')).toBeInTheDocument();
     expect(screen.queryByTestId('onboarding-modal')).not.toBeVisible(); // Modal is initially closed
   });
 
   it('opens OnboardingModal when "Create Profile" button in PreviewBanner is clicked', () => {
-    localStorage.setItem("isProfileCreated", "false");
+    localStorage.setItem('isProfileCreated', 'false');
     renderComponent();
     fireEvent.click(screen.getByRole('button', { name: 'Create Profile' }));
     expect(screen.getByTestId('onboarding-modal')).toBeVisible();
   });
 
   it('closes OnboardingModal and updates isProfileCreated status', () => {
-    localStorage.setItem("isProfileCreated", "false");
+    localStorage.setItem('isProfileCreated', 'false');
     renderComponent();
     fireEvent.click(screen.getByRole('button', { name: 'Create Profile' }));
     expect(screen.getByTestId('onboarding-modal')).toBeVisible();
 
-    localStorage.setItem("isProfileCreated", "true"); // Simulate onboarding completion
+    localStorage.setItem('isProfileCreated', 'true'); // Simulate onboarding completion
     fireEvent.click(screen.getByText('Close Onboarding'));
     expect(screen.getByTestId('onboarding-modal')).not.toBeVisible();
     expect(screen.queryByTestId('preview-banner')).not.toBeInTheDocument();
   });
 
   it('does not show PreviewBanner if isProfileCreated is true', () => {
-    localStorage.setItem("isProfileCreated", "true");
+    localStorage.setItem('isProfileCreated', 'true');
     renderComponent();
     expect(screen.queryByTestId('preview-banner')).not.toBeInTheDocument();
   });
@@ -206,7 +261,9 @@ describe('UserProfile Page', () => {
   it('renders FloatingStatusIsland with correct data', () => {
     renderComponent();
     expect(screen.getByTestId('floating-status-island')).toBeInTheDocument();
-    expect(screen.getByText('Surplus: ₹50,000, Debt: Debt-Free!')).toBeInTheDocument();
+    expect(
+      screen.getByText('Surplus: ₹50,000, Debt: Debt-Free!'),
+    ).toBeInTheDocument();
   });
 
   // --- handleEditGoal functionality ---
@@ -214,25 +271,34 @@ describe('UserProfile Page', () => {
     renderComponent();
     fireEvent.click(screen.getByText('Edit Goal')); // Button from mocked PersonalProfileTab
     expect(mockUseNavigate).toHaveBeenCalledWith('/profile?tab=goals');
-    expect(screen.getByTestId('future-goals-tab')).toHaveTextContent('Future Goals Tab (Editing Goal: 123)');
+    expect(screen.getByTestId('future-goals-tab')).toHaveTextContent(
+      'Future Goals Tab (Editing Goal: 123)',
+    );
   });
 
   it('clears goalToEditId when switching tabs manually', () => {
     renderComponent();
     fireEvent.click(screen.getByText('Edit Goal')); // Set goalToEditId
-    expect(screen.getByTestId('future-goals-tab')).toHaveTextContent('Future Goals Tab (Editing Goal: 123)');
+    expect(screen.getByTestId('future-goals-tab')).toHaveTextContent(
+      'Future Goals Tab (Editing Goal: 123)',
+    );
 
     fireEvent.click(screen.getByRole('tab', { name: 'My Profile' })); // Switch back to personal
     expect(mockUseNavigate).toHaveBeenCalledWith('/profile?tab=personal');
 
     renderComponent('/profile?tab=goals', initialState.profile); // Re-render to simulate navigation
-    expect(screen.getByTestId('future-goals-tab')).not.toHaveTextContent('(Editing Goal: 123)');
+    expect(screen.getByTestId('future-goals-tab')).not.toHaveTextContent(
+      '(Editing Goal: 123)',
+    );
   });
 
   // --- Edge Cases / Negative Scenarios ---
   it('handles unknown tab parameter by defaulting to My Profile', () => {
     renderComponent('/profile?tab=unknown');
-    expect(screen.getByRole('tab', { name: 'My Profile' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'My Profile' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
     expect(screen.getByTestId('personal-profile-tab')).toBeInTheDocument();
   });
 

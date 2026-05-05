@@ -76,31 +76,63 @@ describe.skip('generateTaxReport', () => {
     taxReportGenerator.generateTaxReport(mockTaxData, mockUserDetails);
 
     expect(jsPDF.mockSetFontSize).toHaveBeenCalledWith(18);
-    expect(jsPDF.mockText).toHaveBeenCalledWith('Tax Report', 105, 20, { align: 'center' });
+    expect(jsPDF.mockText).toHaveBeenCalledWith('Tax Report', 105, 20, {
+      align: 'center',
+    });
     expect(jsPDF.mockSetFontSize).toHaveBeenCalledWith(12);
-    expect(jsPDF.mockText).toHaveBeenCalledWith(`Name: ${mockUserDetails.name}`, 20, 40);
-    expect(jsPDF.mockText).toHaveBeenCalledWith(`PAN: ${mockUserDetails.pan}`, 20, 47);
-    expect(jsPDF.mockText).toHaveBeenCalledWith(`Assessment Year: ${mockUserDetails.assessmentYear}`, 20, 54);
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      `Name: ${mockUserDetails.name}`,
+      20,
+      40,
+    );
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      `PAN: ${mockUserDetails.pan}`,
+      20,
+      47,
+    );
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      `Assessment Year: ${mockUserDetails.assessmentYear}`,
+      20,
+      54,
+    );
   });
 
   it('should generate tables for Old and New Regimes', () => {
     taxReportGenerator.generateTaxReport(mockTaxData, mockUserDetails);
 
     expect(jsPDF.mockAutoTable).toHaveBeenCalledTimes(2); // One for each regime
-    expect(jsPDF.mockText).toHaveBeenCalledWith('Old Tax Regime Summary', 20, 70);
-    expect(jsPDF.mockText).toHaveBeenCalledWith('New Tax Regime Summary', 20, 130);
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      'Old Tax Regime Summary',
+      20,
+      70,
+    );
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      'New Tax Regime Summary',
+      20,
+      130,
+    );
   });
 
   it('should include optimal regime and savings in the report', () => {
     taxReportGenerator.generateTaxReport(mockTaxData, mockUserDetails);
 
-    expect(jsPDF.mockText).toHaveBeenCalledWith(`Optimal Regime: ${mockTaxData.optimal}`, 20, 190);
-    expect(jsPDF.mockText).toHaveBeenCalledWith(`Tax Savings: ₹${mockTaxData.savings.toLocaleString('en-IN')}`, 20, 197);
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      `Optimal Regime: ${mockTaxData.optimal}`,
+      20,
+      190,
+    );
+    expect(jsPDF.mockText).toHaveBeenCalledWith(
+      `Tax Savings: ₹${mockTaxData.savings.toLocaleString('en-IN')}`,
+      20,
+      197,
+    );
   });
 
   it('should save the PDF with a specific filename', () => {
     taxReportGenerator.generateTaxReport(mockTaxData, mockUserDetails);
-    expect(jsPDF.mockSave).toHaveBeenCalledWith('Tax_Report_John_Doe_2023-24.pdf');
+    expect(jsPDF.mockSave).toHaveBeenCalledWith(
+      'Tax_Report_John_Doe_2023-24.pdf',
+    );
   });
 
   it('should handle missing user details gracefully', () => {

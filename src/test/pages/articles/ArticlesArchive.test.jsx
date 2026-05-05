@@ -3,12 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import ArticlesArchive from '../../../../src/pages/articles/ArticlesArchive';
 import '@testing-library/jest-dom';
-import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-} from 'firebase/firestore';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 // Mock react-router-dom's Link
 jest.mock('react-router-dom', () => ({
@@ -36,16 +31,24 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 // Mock child components
-jest.mock('../../../../src/components/articles/ArticleCard', () => ({ article }) => (
-  <div data-testid={`article-card-${article.id}`}>{article.title}</div>
-));
-jest.mock('../../../../src/components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
-  <div data-testid="mock-page-header">
-    <h1>{title}</h1>
-    <p>{subtitle}</p>
-    {Icon && <Icon data-testid="mock-header-icon" />}
-  </div>
-));
+jest.mock(
+  '../../../../src/components/articles/ArticleCard',
+  () =>
+    ({ article }) => (
+      <div data-testid={`article-card-${article.id}`}>{article.title}</div>
+    ),
+);
+jest.mock(
+  '../../../../src/components/common/PageHeader',
+  () =>
+    ({ title, subtitle, icon: Icon }) => (
+      <div data-testid="mock-page-header">
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+        {Icon && <Icon data-testid="mock-header-icon" />}
+      </div>
+    ),
+);
 
 describe('ArticlesArchive Component', () => {
   const mockArticlesData = [
@@ -77,7 +80,7 @@ describe('ArticlesArchive Component', () => {
     return render(
       <Router>
         <ArticlesArchive />
-      </Router>
+      </Router>,
     );
   };
 
@@ -114,7 +117,9 @@ describe('ArticlesArchive Component', () => {
     getDocs.mockRejectedValueOnce(new Error('Failed to fetch'));
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByText('No articles found matching your criteria.')).toBeInTheDocument();
+      expect(
+        screen.getByText('No articles found matching your criteria.'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -123,23 +128,31 @@ describe('ArticlesArchive Component', () => {
     renderComponent();
     expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
     expect(screen.getByText('Finance Articles')).toBeInTheDocument();
-    expect(screen.getByText('Stay informed with our latest insights and guides.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Stay informed with our latest insights and guides.'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // ArticleIcon
   });
 
   // --- Search and Filter ---
   it('filters articles by search term', async () => {
     renderComponent();
-    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
+    );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), { target: { value: 'future' } });
+    fireEvent.change(screen.getByLabelText('Search Articles'), {
+      target: { value: 'future' },
+    });
     expect(screen.getByText('The Future of Finance')).toBeInTheDocument();
     expect(screen.queryByText('AI in Investing')).not.toBeInTheDocument();
   });
 
   it('filters articles by category', async () => {
     renderComponent();
-    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
+    );
 
     fireEvent.mouseDown(screen.getByLabelText('Category'));
     fireEvent.click(screen.getByText('Technology'));
@@ -151,9 +164,13 @@ describe('ArticlesArchive Component', () => {
 
   it('filters articles by search term and category combined', async () => {
     renderComponent();
-    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
+    );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), { target: { value: 'tax' } });
+    fireEvent.change(screen.getByLabelText('Search Articles'), {
+      target: { value: 'tax' },
+    });
     fireEvent.mouseDown(screen.getByLabelText('Category'));
     fireEvent.click(screen.getByText('Finance'));
 
@@ -164,7 +181,9 @@ describe('ArticlesArchive Component', () => {
 
   it('resets filters when "All" category is selected', async () => {
     renderComponent();
-    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
+    );
 
     fireEvent.mouseDown(screen.getByLabelText('Category'));
     fireEvent.click(screen.getByText('Technology'));
@@ -179,10 +198,16 @@ describe('ArticlesArchive Component', () => {
 
   it('displays "No articles found" message when filters yield no results', async () => {
     renderComponent();
-    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
+    );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), { target: { value: 'nonexistent' } });
-    expect(screen.getByText('No articles found matching your criteria.')).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText('Search Articles'), {
+      target: { value: 'nonexistent' },
+    });
+    expect(
+      screen.getByText('No articles found matching your criteria.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('The Future of Finance')).not.toBeInTheDocument();
   });
 
@@ -190,14 +215,18 @@ describe('ArticlesArchive Component', () => {
   it('renders "Add Article" button if user is authenticated', async () => {
     renderComponent(true); // isAuthenticated = true
     await waitFor(() => {
-      expect(screen.getByRole('link', { name: 'Add Article' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Add Article' }),
+      ).toBeInTheDocument();
     });
   });
 
   it('does not render "Add Article" button if user is not authenticated', async () => {
     renderComponent(false); // isAuthenticated = false
     await waitFor(() => {
-      expect(screen.queryByRole('link', { name: 'Add Article' })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('link', { name: 'Add Article' }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -214,7 +243,9 @@ describe('ArticlesArchive Component', () => {
     getDocs.mockResolvedValueOnce({ docs: [] });
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByText('No articles found matching your criteria.')).toBeInTheDocument();
+      expect(
+        screen.getByText('No articles found matching your criteria.'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -223,7 +254,11 @@ describe('ArticlesArchive Component', () => {
     await waitFor(() => {
       fireEvent.mouseDown(screen.getByLabelText('Category'));
       const options = screen.getAllByRole('option');
-      expect(options.map(opt => opt.textContent)).toEqual(['All', 'Finance', 'Technology']);
+      expect(options.map((opt) => opt.textContent)).toEqual([
+        'All',
+        'Finance',
+        'Technology',
+      ]);
     });
   });
 });

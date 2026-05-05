@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy } from "react";
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import {
   Grid,
   Box,
@@ -8,7 +8,7 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
   AccountBalanceWallet as AccountBalanceWalletIcon,
@@ -16,24 +16,36 @@ import {
   Savings as SavingsIcon,
   AccountBalance as AccountBalanceIcon,
   Analytics as AnalyticsIcon,
-} from "@mui/icons-material";
-import { useLocation, useNavigate } from "react-router-dom";
-import SuspenseFallback from "../components/common/SuspenseFallback";
+} from '@mui/icons-material';
+import { useLocation, useNavigate } from 'react-router-dom';
+import SuspenseFallback from '../components/common/SuspenseFallback';
 
 // Import the individual components
-const SipCalculatorForm = lazy(() => import("../features/investment/tabs/SipCalculatorForm"));
-const LumpsumCalculatorForm = lazy(() => import("../features/investment/tabs/LumpsumCalculatorForm"));
-const StepUpSipCalculatorForm = lazy(() => import("../features/investment/tabs/StepUpSipCalculatorForm"));
-const SwpCalculatorForm = lazy(() => import("../features/investment/tabs/SwpCalculatorForm"));
-const FdCalculatorForm = lazy(() => import("../features/investment/tabs/FdCalculatorForm"));
-const InvestmentChart = lazy(() => import("../features/investment/components/InvestmentChart"));
+const SipCalculatorForm = lazy(
+  () => import('../features/investment/tabs/SipCalculatorForm'),
+);
+const LumpsumCalculatorForm = lazy(
+  () => import('../features/investment/tabs/LumpsumCalculatorForm'),
+);
+const StepUpSipCalculatorForm = lazy(
+  () => import('../features/investment/tabs/StepUpSipCalculatorForm'),
+);
+const SwpCalculatorForm = lazy(
+  () => import('../features/investment/tabs/SwpCalculatorForm'),
+);
+const FdCalculatorForm = lazy(
+  () => import('../features/investment/tabs/FdCalculatorForm'),
+);
+const InvestmentChart = lazy(
+  () => import('../features/investment/components/InvestmentChart'),
+);
 
 const TAB_ROUTES = [
-  "/investment",
-  "/investment/lumpsum",
-  "/investment/step-up-sip",
-  "/investment/swp",
-  "/investment/fd",
+  '/investment',
+  '/investment/lumpsum',
+  '/investment/step-up-sip',
+  '/investment/swp',
+  '/investment/fd',
 ];
 
 export default function InvestmentCalculator() {
@@ -62,7 +74,7 @@ export default function InvestmentCalculator() {
     withdrawalPerMonth: 10000,
     principalAmount: 100000,
     interestRate: 7,
-    compoundingFrequency: "annually",
+    compoundingFrequency: 'annually',
   });
 
   const handleSharedStateChange = (field, value) => {
@@ -90,19 +102,19 @@ export default function InvestmentCalculator() {
         borderRadius: 2,
         bgcolor: alpha(colorToken, 0.05),
         border: `1px solid ${alpha(colorToken, 0.1)}`,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100%",
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
       }}
     >
       <Typography
         variant="caption"
         sx={{
           fontWeight: 800,
-          textTransform: "uppercase",
-          color: "text.secondary",
+          textTransform: 'uppercase',
+          color: 'text.secondary',
           letterSpacing: 0.5,
           mb: 0.5,
         }}
@@ -126,22 +138,22 @@ export default function InvestmentCalculator() {
   return (
     <Box
       sx={{
-        width: "100%",
+        width: '100%',
         p: { xs: 2, md: 4 },
-        display: "flex",
-        justifyContent: "center",
+        display: 'flex',
+        justifyContent: 'center',
       }}
     >
-      <Box sx={{ width: "100%", maxWidth: 1200 }}>
+      <Box sx={{ width: '100%', maxWidth: 1200 }}>
         {/* Technical Header */}
         <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 4 }}>
           <Box
             sx={{
-              display: "flex",
+              display: 'flex',
               p: 1.5,
               borderRadius: 2,
               bgcolor: alpha(theme.palette.primary.main, 0.1),
-              color: "primary.main",
+              color: 'primary.main',
             }}
           >
             <AnalyticsIcon fontSize="medium" />
@@ -151,7 +163,7 @@ export default function InvestmentCalculator() {
               variant="h5"
               sx={{
                 fontWeight: 900,
-                color: "text.primary",
+                color: 'text.primary',
                 letterSpacing: -0.5,
               }}
             >
@@ -159,7 +171,7 @@ export default function InvestmentCalculator() {
             </Typography>
             <Typography
               variant="caption"
-              sx={{ fontWeight: 600, color: "text.secondary" }}
+              sx={{ fontWeight: 600, color: 'text.secondary' }}
             >
               Project long-term wealth accumulation across various asset classes
               and contribution methods.
@@ -171,11 +183,11 @@ export default function InvestmentCalculator() {
         <Box
           sx={{
             borderRadius: 3,
-            border: "1px solid",
+            border: '1px solid',
             borderColor: alpha(theme.palette.divider, 0.1),
             bgcolor: theme.palette.background.paper,
-            boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
-            overflow: "hidden", // Keeps the tabs flush with the container corners
+            boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
+            overflow: 'hidden', // Keeps the tabs flush with the container corners
           }}
         >
           {/* Navigation Tabs */}
@@ -193,18 +205,18 @@ export default function InvestmentCalculator() {
               allowScrollButtonsMobile
               sx={{
                 minHeight: 56,
-                "& .MuiTab-root": {
-                  textTransform: "none",
+                '& .MuiTab-root': {
+                  textTransform: 'none',
                   fontWeight: 700,
-                  fontSize: "0.9rem",
-                  color: "text.secondary",
+                  fontSize: '0.9rem',
+                  color: 'text.secondary',
                   minHeight: 56,
                 },
-                "& .Mui-selected": {
-                  color: "primary.main",
+                '& .Mui-selected': {
+                  color: 'primary.main',
                   fontWeight: 900,
                 },
-                "& .MuiTabs-indicator": {
+                '& .MuiTabs-indicator': {
                   height: 3,
                   borderTopLeftRadius: 3,
                   borderTopRightRadius: 3,
@@ -241,7 +253,7 @@ export default function InvestmentCalculator() {
                     borderRight: {
                       md: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
                     },
-                    height: "100%",
+                    height: '100%',
                   }}
                 >
                   <Suspense fallback={<SuspenseFallback />}>
@@ -288,17 +300,17 @@ export default function InvestmentCalculator() {
               <Grid item xs={12} md={7}>
                 <Box
                   sx={{
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
                   }}
                 >
                   <Typography
                     variant="subtitle2"
                     sx={{
                       fontWeight: 800,
-                      textTransform: "uppercase",
-                      color: "text.secondary",
+                      textTransform: 'uppercase',
+                      color: 'text.secondary',
                       letterSpacing: 1,
                       mb: 3,
                     }}
@@ -313,8 +325,8 @@ export default function InvestmentCalculator() {
                     <Box
                       sx={{
                         flexGrow: 1,
-                        display: "flex",
-                        flexDirection: "column",
+                        display: 'flex',
+                        flexDirection: 'column',
                       }}
                     >
                       {/* Data Wells */}
@@ -323,10 +335,10 @@ export default function InvestmentCalculator() {
                           <SummaryWell
                             label={
                               tabIndex === 3
-                                ? "Invested Amount"
-                                : "Total Investment"
+                                ? 'Invested Amount'
+                                : 'Total Investment'
                             }
-                            value={`₹${investmentData.investedAmount.toLocaleString("en-IN")}`}
+                            value={`₹${investmentData.investedAmount.toLocaleString('en-IN')}`}
                             colorToken={theme.palette.text.primary}
                           />
                         </Grid>
@@ -335,7 +347,7 @@ export default function InvestmentCalculator() {
                           <Grid item xs={12} sm={4}>
                             <SummaryWell
                               label="Total Withdrawn"
-                              value={`₹${investmentData.totalWithdrawn ? investmentData.totalWithdrawn.toLocaleString("en-IN") : 0}`}
+                              value={`₹${investmentData.totalWithdrawn ? investmentData.totalWithdrawn.toLocaleString('en-IN') : 0}`}
                               colorToken={theme.palette.warning.main}
                             />
                           </Grid>
@@ -343,7 +355,7 @@ export default function InvestmentCalculator() {
                           <Grid item xs={12} sm={4}>
                             <SummaryWell
                               label="Est. Returns"
-                              value={`₹${investmentData.estimatedReturns.toLocaleString("en-IN")}`}
+                              value={`₹${investmentData.estimatedReturns.toLocaleString('en-IN')}`}
                               colorToken={theme.palette.success.main}
                             />
                           </Grid>
@@ -352,9 +364,9 @@ export default function InvestmentCalculator() {
                         <Grid item xs={12} sm={4}>
                           <SummaryWell
                             label={
-                              tabIndex === 3 ? "Final Balance" : "Total Value"
+                              tabIndex === 3 ? 'Final Balance' : 'Total Value'
                             }
-                            value={`₹${investmentData.totalValue.toLocaleString("en-IN")}`}
+                            value={`₹${investmentData.totalValue.toLocaleString('en-IN')}`}
                             colorToken={theme.palette.primary.main}
                           />
                         </Grid>
@@ -372,9 +384,9 @@ export default function InvestmentCalculator() {
                       /* Uninitialized Terminal State */
                       sx={{
                         flexGrow: 1,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
                         minHeight: 300,
                         borderRadius: 3,
                         border: `1px dashed ${alpha(theme.palette.divider, 0.2)}`,
@@ -385,8 +397,8 @@ export default function InvestmentCalculator() {
                         variant="caption"
                         sx={{
                           fontWeight: 700,
-                          color: "text.disabled",
-                          textTransform: "uppercase",
+                          color: 'text.disabled',
+                          textTransform: 'uppercase',
                           letterSpacing: 1,
                         }}
                       >

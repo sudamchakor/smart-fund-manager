@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo } from 'react';
 import {
   ComposedChart,
   Line,
@@ -9,10 +9,10 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-} from "recharts";
-import { useSelector } from "react-redux";
-import { selectCalculatedValues } from "../../features/emiCalculator/utils/emiCalculator";
-import { selectCurrency } from "../../store/emiSlice";
+} from 'recharts';
+import { useSelector } from 'react-redux';
+import { selectCalculatedValues } from '../../features/emiCalculator/utils/emiCalculator';
+import { selectCurrency } from '../../store/emiSlice';
 import {
   Box,
   Typography,
@@ -21,16 +21,16 @@ import {
   alpha,
   Stack,
   useTheme,
-} from "@mui/material";
-import { formatCurrency } from "../../utils/formatting";
+} from '@mui/material';
+import { formatCurrency } from '../../utils/formatting';
 
 const BarChartComponent = () => {
   const theme = useTheme();
   const calculatedValues = useSelector(selectCalculatedValues);
   const currency = useSelector(selectCurrency);
 
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   /**
    * THEME-STRICT COLOR MAPPING
@@ -94,9 +94,9 @@ const BarChartComponent = () => {
             p: 2,
             borderRadius: 3,
             boxShadow: theme.shadows[10],
-            border: "1px solid",
-            borderColor: "divider",
-            backdropFilter: "blur(8px)",
+            border: '1px solid',
+            borderColor: 'divider',
+            backdropFilter: 'blur(8px)',
             minWidth: 220,
           }}
         >
@@ -105,9 +105,9 @@ const BarChartComponent = () => {
             sx={{
               mb: 1,
               fontWeight: 900,
-              color: "text.primary",
-              fontSize: "0.75rem",
-              textTransform: "uppercase",
+              color: 'text.primary',
+              fontSize: '0.75rem',
+              textTransform: 'uppercase',
             }}
           >
             {label}
@@ -117,9 +117,9 @@ const BarChartComponent = () => {
               <Box
                 key={index}
                 sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
                 }}
               >
                 <Stack direction="row" spacing={1} alignItems="center">
@@ -127,20 +127,20 @@ const BarChartComponent = () => {
                     sx={{
                       width: 8,
                       height: 8,
-                      borderRadius: "50%",
+                      borderRadius: '50%',
                       bgcolor: entry.color,
                     }}
                   />
                   <Typography
                     variant="caption"
-                    sx={{ fontWeight: 600, color: "text.secondary" }}
+                    sx={{ fontWeight: 600, color: 'text.secondary' }}
                   >
                     {entry.name}
                   </Typography>
                 </Stack>
                 <Typography
                   variant="caption"
-                  sx={{ fontWeight: 800, color: "text.primary" }}
+                  sx={{ fontWeight: 800, color: 'text.primary' }}
                 >
                   {formatCurrency(entry.value, currency)}
                 </Typography>
@@ -165,7 +165,7 @@ const BarChartComponent = () => {
   }
 
   return (
-    <Box sx={{ width: "100%", height: { xs: 350, md: 400 }, mt: 1 }}>
+    <Box sx={{ width: '100%', height: { xs: 350, md: 400 }, mt: 1 }}>
       <ResponsiveContainer width="100%" height="100%">
         <ComposedChart
           data={data}
@@ -222,7 +222,7 @@ const BarChartComponent = () => {
               paddingBottom: 25,
               fontSize: 10,
               fontWeight: 700,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
             }}
           />
 

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -9,19 +9,19 @@ import {
   Stack,
   Avatar,
   useTheme,
-} from "@mui/material";
-import ShieldIcon from "@mui/icons-material/Shield";
+} from '@mui/material';
+import ShieldIcon from '@mui/icons-material/Shield';
 
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
-import GraphicEqIcon from "@mui/icons-material/GraphicEq";
-import { useSelector } from "react-redux";
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import GraphicEqIcon from '@mui/icons-material/GraphicEq';
+import { useSelector } from 'react-redux';
 import {
   selectName,
   selectOccupation,
   selectRiskTolerance,
   selectCareerGrowthRate,
   selectGeneralInflationRate,
-} from "../../../store/profileSlice";
+} from '../../../store/profileSlice';
 
 const RetirementTimeline = ({ currentAge, retirementAge }) => {
   const careerStartAge = 25;
@@ -32,7 +32,7 @@ const RetirementTimeline = ({ currentAge, retirementAge }) => {
 
   return (
     <Box sx={{ my: 4 }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
         <Typography variant="body2" color="text.secondary">
           Current Age: <strong>{currentAge}</strong>
         </Typography>
@@ -54,7 +54,7 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
 
   const name = useSelector(selectName);
   const occupation = useSelector(selectOccupation);
-  const riskTolerance = useSelector(selectRiskTolerance) || "low";
+  const riskTolerance = useSelector(selectRiskTolerance) || 'low';
   const careerGrowthRate = useSelector(selectCareerGrowthRate) || 0;
   const generalInflationRate = useSelector(selectGeneralInflationRate) || 0;
 
@@ -68,42 +68,42 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
     <Stack
       spacing={0}
       sx={{
-        height: "100%",
+        height: '100%',
         py: 0.5,
-        justifyContent: "space-between",
-        overflow: "hidden",
+        justifyContent: 'space-between',
+        overflow: 'hidden',
       }}
     >
       {/* 1. Profile Header */}
-      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 1 }}>
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1 }}>
         <Avatar
           sx={{
-            bgcolor: "primary.main",
+            bgcolor: 'primary.main',
             width: 46,
             height: 46,
-            fontSize: "1.1rem",
-            fontWeight: "bold",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+            fontSize: '1.1rem',
+            fontWeight: 'bold',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
           }}
         >
           {name
-            .split(" ")
+            .split(' ')
             .map((n) => n[0])
-            .join("")}
+            .join('')}
         </Avatar>
         <Box>
           <Typography
             variant="subtitle1"
-            sx={{ fontWeight: 800, lineHeight: 1.2, color: "text.primary" }}
+            sx={{ fontWeight: 800, lineHeight: 1.2, color: 'text.primary' }}
           >
             {name}
           </Typography>
           <Typography
             variant="caption"
             sx={{
-              color: "text.secondary",
+              color: 'text.secondary',
               fontWeight: 700,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
               letterSpacing: 0.5,
             }}
           >
@@ -115,9 +115,9 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
       <Box
         sx={{
           flexGrow: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
           py: 2,
         }}
       >
@@ -129,7 +129,7 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
         >
           <Typography
             variant="caption"
-            sx={{ fontWeight: 800, color: "text.secondary", letterSpacing: 1 }}
+            sx={{ fontWeight: 800, color: 'text.secondary', letterSpacing: 1 }}
           >
             RETIREMENT JOURNEY
           </Typography>
@@ -137,7 +137,7 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
             label={`${completion}% Complete`}
             size="small"
             color="primary"
-            sx={{ fontWeight: 700, fontSize: "0.65rem", height: 20 }}
+            sx={{ fontWeight: 700, fontSize: '0.65rem', height: 20 }}
           />
         </Stack>
 
@@ -146,12 +146,12 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
           retirementAge={retirementAge}
         />
 
-        <Box sx={{ textAlign: "center", mt: 3 }}>
+        <Box sx={{ textAlign: 'center', mt: 3 }}>
           <Typography
             variant="h3"
             sx={{
               fontWeight: 900,
-              color: "primary.main",
+              color: 'primary.main',
               letterSpacing: -1.5,
               lineHeight: 1,
             }}
@@ -162,10 +162,10 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
             variant="caption"
             sx={{
               fontWeight: 700,
-              color: "text.secondary",
-              textTransform: "uppercase",
+              color: 'text.secondary',
+              textTransform: 'uppercase',
               mt: 0.5,
-              display: "block",
+              display: 'block',
             }}
           >
             Until Retirement Goal
@@ -173,25 +173,28 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
         </Box>
       </Box>
 
-      <Divider sx={{ my: 2, borderStyle: "dashed", opacity: 0.5 }} />
+      <Divider sx={{ my: 2, borderStyle: 'dashed', opacity: 0.5 }} />
 
       {/* 3. Metrics Row - Modern Left-Border Accent Tiles */}
       <Grid container spacing={1.5}>
         {[
           {
-            label: "Risk",
+            label: 'Risk',
             val: riskTolerance,
             icon: <ShieldIcon sx={{ fontSize: 16 }} />,
-            col: riskTolerance.toLowerCase() === "low" ? theme.palette.success.main : theme.palette.warning.main,
+            col:
+              riskTolerance.toLowerCase() === 'low'
+                ? theme.palette.success.main
+                : theme.palette.warning.main,
           },
           {
-            label: "Growth",
+            label: 'Growth',
             val: `${(careerGrowthRate * 100).toFixed(1)}%`,
             icon: <TrendingUpIcon sx={{ fontSize: 16 }} />,
             col: theme.palette.info.main,
           },
           {
-            label: "Inflation",
+            label: 'Inflation',
             val: `${(generalInflationRate * 100).toFixed(1)}%`,
             icon: <GraphicEqIcon sx={{ fontSize: 16 }} />,
             col: theme.palette.secondary.main,
@@ -202,16 +205,16 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
               sx={{
                 p: 1.5,
                 borderRadius: 2,
-                bgcolor: "background.paper",
-                border: "1px solid",
-                borderColor: "divider",
+                bgcolor: 'background.paper',
+                border: '1px solid',
+                borderColor: 'divider',
                 borderLeft: `4px solid ${item.col}`,
                 boxShadow: `0 2px 4px rgba(0,0,0,0.02)`,
-                textAlign: "left",
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
+                textAlign: 'left',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
               }}
             >
               <Stack
@@ -224,9 +227,9 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
                 <Typography
                   variant="caption"
                   sx={{
-                    fontSize: "0.6rem",
+                    fontSize: '0.6rem',
                     fontWeight: 800,
-                    color: "text.secondary",
+                    color: 'text.secondary',
                   }}
                 >
                   {item.label.toUpperCase()}
@@ -236,8 +239,8 @@ export default function BasicInfoDisplay({ currentAge, retirementAge }) {
                 variant="body2"
                 sx={{
                   fontWeight: 800,
-                  color: "text.primary",
-                  textTransform: "capitalize",
+                  color: 'text.primary',
+                  textTransform: 'capitalize',
                 }}
               >
                 {item.val}

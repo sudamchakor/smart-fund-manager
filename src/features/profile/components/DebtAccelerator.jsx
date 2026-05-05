@@ -3,8 +3,8 @@ import React, {
   useMemo,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { useSelector } from "react-redux";
+} from 'react';
+import { useSelector } from 'react-redux';
 import {
   Typography,
   Box,
@@ -14,17 +14,17 @@ import {
   useTheme,
   alpha,
   Stack,
-} from "@mui/material";
+} from '@mui/material';
 import {
   TrendingUp as TrendingUpIcon,
   MoneyOff as MoneyOffIcon,
   Speed as SpeedIcon,
-} from "@mui/icons-material";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
-import { selectExpectedReturnRate } from "../../../store/profileSlice";
-import { selectCurrency } from "../../../store/emiSlice";
-import { formatCurrency as utilFormatCurrency } from "../../../utils/formatting";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '@mui/icons-material';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
+import { selectExpectedReturnRate } from '../../../store/profileSlice';
+import { selectCurrency } from '../../../store/emiSlice';
+import { formatCurrency as utilFormatCurrency } from '../../../utils/formatting';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const DebtAccelerator = forwardRef((props, ref) => {
   const theme = useTheme();
@@ -127,10 +127,10 @@ const DebtAccelerator = forwardRef((props, ref) => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+        boxShadow: `0 2px 12px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
       }}
     >
       <SectionHeader
@@ -152,8 +152,8 @@ const DebtAccelerator = forwardRef((props, ref) => {
             variant="caption"
             sx={{
               fontWeight: 800,
-              textTransform: "uppercase",
-              color: "text.secondary",
+              textTransform: 'uppercase',
+              color: 'text.secondary',
               letterSpacing: 0.5,
             }}
           >
@@ -161,7 +161,7 @@ const DebtAccelerator = forwardRef((props, ref) => {
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontWeight: 900, color: "secondary.main" }}
+            sx={{ fontWeight: 900, color: 'secondary.main' }}
           >
             {formatCurrency(extraPayment)}
           </Typography>
@@ -175,9 +175,9 @@ const DebtAccelerator = forwardRef((props, ref) => {
           color="secondary"
           sx={{
             py: 1,
-            "& .MuiSlider-thumb": { width: 14, height: 14 },
-            "& .MuiSlider-track": { height: 4 },
-            "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+            '& .MuiSlider-thumb': { width: 14, height: 14 },
+            '& .MuiSlider-track': { height: 4 },
+            '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
           }}
         />
       </Box>
@@ -189,7 +189,7 @@ const DebtAccelerator = forwardRef((props, ref) => {
           <Box
             sx={{
               p: 2,
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
               bgcolor: alpha(theme.palette.success.main, 0.03),
               border: `1px solid ${alpha(theme.palette.success.main, 0.15)}`,
@@ -202,14 +202,14 @@ const DebtAccelerator = forwardRef((props, ref) => {
               sx={{ mb: 1.5 }}
             >
               <TrendingUpIcon
-                sx={{ color: "success.main", fontSize: "1.2rem" }}
+                sx={{ color: 'success.main', fontSize: '1.2rem' }}
               />
               <Typography
                 variant="subtitle2"
                 sx={{
                   fontWeight: 800,
-                  color: "success.dark",
-                  textTransform: "uppercase",
+                  color: 'success.dark',
+                  textTransform: 'uppercase',
                   letterSpacing: 0.5,
                 }}
               >
@@ -220,13 +220,13 @@ const DebtAccelerator = forwardRef((props, ref) => {
               variant="caption"
               sx={{
                 fontWeight: 600,
-                color: "text.secondary",
-                display: "block",
+                color: 'text.secondary',
+                display: 'block',
                 mb: 2,
                 lineHeight: 1.5,
               }}
             >
-              Investing {formatCurrency(extraPayment)} monthly at an expected{" "}
+              Investing {formatCurrency(extraPayment)} monthly at an expected{' '}
               {Math.round(expectedReturnRate * 100)}% annualized return.
             </Typography>
             <Divider
@@ -239,8 +239,8 @@ const DebtAccelerator = forwardRef((props, ref) => {
               variant="caption"
               sx={{
                 fontWeight: 800,
-                color: "text.disabled",
-                textTransform: "uppercase",
+                color: 'text.disabled',
+                textTransform: 'uppercase',
               }}
             >
               Total Estimated Gains
@@ -249,7 +249,7 @@ const DebtAccelerator = forwardRef((props, ref) => {
               variant="h5"
               sx={{
                 fontWeight: 900,
-                color: "success.main",
+                color: 'success.main',
                 letterSpacing: -0.5,
                 mt: 0.5,
               }}
@@ -264,11 +264,11 @@ const DebtAccelerator = forwardRef((props, ref) => {
           <Box
             sx={{
               p: 2,
-              height: "100%",
+              height: '100%',
               borderRadius: 2,
               bgcolor: alpha(theme.palette.info.main, 0.03),
               border: `1px solid ${alpha(theme.palette.info.main, 0.15)}`,
-              position: "relative",
+              position: 'relative',
             }}
           >
             <Stack
@@ -277,13 +277,13 @@ const DebtAccelerator = forwardRef((props, ref) => {
               alignItems="center"
               sx={{ mb: 1.5 }}
             >
-              <MoneyOffIcon sx={{ color: "info.main", fontSize: "1.2rem" }} />
+              <MoneyOffIcon sx={{ color: 'info.main', fontSize: '1.2rem' }} />
               <Typography
                 variant="subtitle2"
                 sx={{
                   fontWeight: 800,
-                  color: "info.dark",
-                  textTransform: "uppercase",
+                  color: 'info.dark',
+                  textTransform: 'uppercase',
                   letterSpacing: 0.5,
                 }}
               >
@@ -294,8 +294,8 @@ const DebtAccelerator = forwardRef((props, ref) => {
               variant="caption"
               sx={{
                 fontWeight: 600,
-                color: "text.secondary",
-                display: "block",
+                color: 'text.secondary',
+                display: 'block',
                 mb: 2,
                 lineHeight: 1.5,
               }}
@@ -316,8 +316,8 @@ const DebtAccelerator = forwardRef((props, ref) => {
                   variant="caption"
                   sx={{
                     fontWeight: 800,
-                    color: "text.disabled",
-                    textTransform: "uppercase",
+                    color: 'text.disabled',
+                    textTransform: 'uppercase',
                   }}
                 >
                   Total Interest Saved
@@ -326,7 +326,7 @@ const DebtAccelerator = forwardRef((props, ref) => {
                   variant="h5"
                   sx={{
                     fontWeight: 900,
-                    color: "info.main",
+                    color: 'info.main',
                     letterSpacing: -0.5,
                     mt: 0.5,
                   }}
@@ -345,7 +345,7 @@ const DebtAccelerator = forwardRef((props, ref) => {
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontWeight: 900, color: "info.dark" }}
+                    sx={{ fontWeight: 900, color: 'info.dark' }}
                   >
                     {impactData.yearsSaved} YRS SOONER
                   </Typography>
@@ -363,10 +363,10 @@ const DebtAccelerator = forwardRef((props, ref) => {
           p: 2,
           borderRadius: 2,
           bgcolor: alpha(verdictData.colorToken.main, 0.05),
-          border: "1px dashed",
+          border: '1px dashed',
           borderColor: alpha(verdictData.colorToken.main, 0.3),
-          display: "flex",
-          alignItems: "center",
+          display: 'flex',
+          alignItems: 'center',
           gap: 1.5,
         }}
       >
@@ -394,17 +394,17 @@ const DebtAccelerator = forwardRef((props, ref) => {
             variant="caption"
             sx={{
               fontWeight: 800,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
               color: verdictData.colorToken.dark,
               letterSpacing: 0.5,
-              display: "block",
+              display: 'block',
             }}
           >
             System Verdict
           </Typography>
           <Typography
             variant="subtitle2"
-            sx={{ fontWeight: 700, color: "text.primary" }}
+            sx={{ fontWeight: 700, color: 'text.primary' }}
           >
             {verdictData.text}
           </Typography>

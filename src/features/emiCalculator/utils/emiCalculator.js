@@ -1,36 +1,40 @@
-import { createSelector } from "@reduxjs/toolkit";
-import dayjs from "dayjs";
+import { createSelector } from '@reduxjs/toolkit';
+import dayjs from 'dayjs';
 
 // This selector will take the raw loanDetails, expenses, and prepayments
 // and compute all derived values.
 export const selectCalculatedValues = createSelector(
-  [(state) => state.emi.loanDetails, (state) => state.emi.expenses, (state) => state.emi.prepayments],
+  [
+    (state) => state.emi.loanDetails,
+    (state) => state.emi.expenses,
+    (state) => state.emi.prepayments,
+  ],
   (loanDetails, expenses, prepayments) => {
     const marginInRs =
-      loanDetails.marginUnit === "%"
+      loanDetails.marginUnit === '%'
         ? (loanDetails.homeValue * loanDetails.marginAmount) / 100
         : loanDetails.marginAmount;
     const loanAmount =
       loanDetails.homeValue + loanDetails.loanInsurance - marginInRs;
     const feesInRs =
-      loanDetails.feesUnit === "%"
+      loanDetails.feesUnit === '%'
         ? (loanAmount * loanDetails.loanFees) / 100
         : loanDetails.loanFees;
     const tenureInMonths =
-      loanDetails.tenureUnit === "years"
+      loanDetails.tenureUnit === 'years'
         ? loanDetails.loanTenure * 12
         : loanDetails.loanTenure;
 
     const oneTimeInRs =
-      expenses.oneTimeUnit === "%"
+      expenses.oneTimeUnit === '%'
         ? (loanDetails.homeValue * expenses.oneTimeExpenses) / 100
         : expenses.oneTimeExpenses;
     const taxesYearlyInRs =
-      expenses.taxesUnit === "%"
+      expenses.taxesUnit === '%'
         ? (loanDetails.homeValue * expenses.propertyTaxes) / 100
         : expenses.propertyTaxes;
     const homeInsYearlyInRs =
-      expenses.homeInsUnit === "%"
+      expenses.homeInsUnit === '%'
         ? (loanDetails.homeValue * expenses.homeInsurance) / 100
         : expenses.homeInsurance;
 
@@ -46,83 +50,91 @@ export const selectCalculatedValues = createSelector(
     } else if (tenureInMonths > 0) {
       emi = loanAmount / tenureInMonths;
     }
-    
+
     let yearlyIncreaseAmountRs = 0;
-    if (loanDetails.yearlyPaymentIncreaseUnit === "%") {
-       yearlyIncreaseAmountRs = (emi * (loanDetails.yearlyPaymentIncreaseAmount || 0)) / 100;
+    if (loanDetails.yearlyPaymentIncreaseUnit === '%') {
+      yearlyIncreaseAmountRs =
+        (emi * (loanDetails.yearlyPaymentIncreaseAmount || 0)) / 100;
     } else {
-       yearlyIncreaseAmountRs = loanDetails.yearlyPaymentIncreaseAmount || 0;
+      yearlyIncreaseAmountRs = loanDetails.yearlyPaymentIncreaseAmount || 0;
     }
 
-     let balance = loanAmount;
-     let totalInterest = 0;
-     let totalPrincipal = 0;
-     let totalPrepayments = 0;
-     let totalPayments = 0;
-     const schedule = [];
+    let balance = loanAmount;
+    let totalInterest = 0;
+    let totalPrincipal = 0;
+    let totalPrepayments = 0;
+    let totalPayments = 0;
+    const schedule = [];
 
-     const startDate = dayjs(loanDetails.startDate);
+    const startDate = dayjs(loanDetails.startDate);
 
-     const getMonthDate = (start, addMonths) => {
-       return start.add(addMonths, 'month');
-     };
+    const getMonthDate = (start, addMonths) => {
+      return start.add(addMonths, 'month');
+    };
 
-     for (let i = 1; i <= tenureInMonths && balance > 0; i++) {
-       const currentDate = getMonthDate(startDate, i - 1);
-       let interestForMonth = balance * monthlyInterestRate;
-       let prepayForMonth = 0;
+    for (let i = 1; i <= tenureInMonths && balance > 0; i++) {
+      const currentDate = getMonthDate(startDate, i - 1);
+      let interestForMonth = balance * monthlyInterestRate;
+      let prepayForMonth = 0;
 
-       const monthlyStart = dayjs(prepayments.monthly.startDate);
-       if (
-         prepayments.monthly.amount > 0 &&
-         !currentDate.isBefore(monthlyStart, 'month')
-       ) {
-         prepayForMonth += prepayments.monthly.amount;
-       }
+      const monthlyStart = dayjs(prepayments.monthly.startDate);
+      if (
+        prepayments.monthly.amount > 0 &&
+        !currentDate.isBefore(monthlyStart, 'month')
+      ) {
+        prepayForMonth += prepayments.monthly.amount;
+      }
 
-       const yearlyStart = dayjs(prepayments.yearly.startDate);
-       if (
-         prepayments.yearly.amount > 0 &&
-         !currentDate.isBefore(yearlyStart, 'month')
-       ) {
-         if (currentDate.month() === yearlyStart.month()) {
-           prepayForMonth += prepayments.yearly.amount;
-         }
-       }
+      const yearlyStart = dayjs(prepayments.yearly.startDate);
+      if (
+        prepayments.yearly.amount > 0 &&
+        !currentDate.isBefore(yearlyStart, 'month')
+      ) {
+        if (currentDate.month() === yearlyStart.month()) {
+          prepayForMonth += prepayments.yearly.amount;
+        }
+      }
 
-       const quarterlyStart = dayjs(prepayments.quarterly.startDate);
-       if (
-         prepayments.quarterly.amount > 0 &&
-         !currentDate.isBefore(quarterlyStart, 'month')
-       ) {
-         const monthsDiff = currentDate.diff(quarterlyStart, 'month');
-         if (monthsDiff >= 0 && monthsDiff % 3 === 0) {
-           prepayForMonth += prepayments.quarterly.amount;
-         }
-       }
+      const quarterlyStart = dayjs(prepayments.quarterly.startDate);
+      if (
+        prepayments.quarterly.amount > 0 &&
+        !currentDate.isBefore(quarterlyStart, 'month')
+      ) {
+        const monthsDiff = currentDate.diff(quarterlyStart, 'month');
+        if (monthsDiff >= 0 && monthsDiff % 3 === 0) {
+          prepayForMonth += prepayments.quarterly.amount;
+        }
+      }
 
-       const oneTimeDate = dayjs(prepayments.oneTime.date);
-       if (
-         prepayments.oneTime.amount > 0 &&
-         currentDate.isSame(oneTimeDate, 'month')
-       ) {
-         prepayForMonth += prepayments.oneTime.amount;
-       }
-       
+      const oneTimeDate = dayjs(prepayments.oneTime.date);
+      if (
+        prepayments.oneTime.amount > 0 &&
+        currentDate.isSame(oneTimeDate, 'month')
+      ) {
+        prepayForMonth += prepayments.oneTime.amount;
+      }
+
       let currentTotalPayment = emi;
       if (yearlyIncreaseAmountRs > 0) {
-        const yearsPassed = Math.floor(currentDate.diff(startDate, 'month') / 12);
+        const yearsPassed = Math.floor(
+          currentDate.diff(startDate, 'month') / 12,
+        );
         if (yearsPassed > 0) {
-          if (loanDetails.yearlyPaymentIncreaseUnit === "%") {
-              currentTotalPayment = emi * Math.pow(1 + (loanDetails.yearlyPaymentIncreaseAmount || 0) / 100, yearsPassed);
+          if (loanDetails.yearlyPaymentIncreaseUnit === '%') {
+            currentTotalPayment =
+              emi *
+              Math.pow(
+                1 + (loanDetails.yearlyPaymentIncreaseAmount || 0) / 100,
+                yearsPassed,
+              );
           } else {
-              currentTotalPayment = emi + (yearsPassed * yearlyIncreaseAmountRs);
+            currentTotalPayment = emi + yearsPassed * yearlyIncreaseAmountRs;
           }
         }
       }
 
       let principalForMonth = currentTotalPayment - interestForMonth; // Adjusted to use currentTotalPayment
-      
+
       // Ensure principal is not negative
       if (principalForMonth < 0) {
         principalForMonth = 0;
@@ -152,23 +164,26 @@ export const selectCalculatedValues = createSelector(
       const paidPercent =
         loanAmount > 0 ? ((loanAmount - balance) / loanAmount) * 100 : 0;
 
-       schedule.push({
-         month: i,
-         date: currentDate.format("MMM YYYY"),
-         principal: Math.round(principalForMonth),
-         interest: Math.round(interestForMonth),
-         prepayment: Math.round(prepayForMonth),
-         balance: Math.round(balance),
-         totalPayment: Math.round(monthlyPayment),
-         taxes: Math.round(taxesYearlyInRs / 12),
-         homeInsurance: Math.round(homeInsYearlyInRs / 12),
-         maintenance: Math.round(expenses.maintenance),
-         paidPercent: paidPercent.toFixed(2),
-       });
+      schedule.push({
+        month: i,
+        date: currentDate.format('MMM YYYY'),
+        principal: Math.round(principalForMonth),
+        interest: Math.round(interestForMonth),
+        prepayment: Math.round(prepayForMonth),
+        balance: Math.round(balance),
+        totalPayment: Math.round(monthlyPayment),
+        taxes: Math.round(taxesYearlyInRs / 12),
+        homeInsurance: Math.round(homeInsYearlyInRs / 12),
+        maintenance: Math.round(expenses.maintenance),
+        paidPercent: paidPercent.toFixed(2),
+      });
     }
 
     // Recalculate totalPayments based on the schedule
-    const totalScheduledPayments = schedule.reduce((sum, month) => sum + month.totalPayment, 0);
+    const totalScheduledPayments = schedule.reduce(
+      (sum, month) => sum + month.totalPayment,
+      0,
+    );
     const totalOtherExpenses =
       marginInRs +
       feesInRs +
@@ -177,7 +192,6 @@ export const selectCalculatedValues = createSelector(
       expenses.maintenance * schedule.length;
 
     totalPayments = totalScheduledPayments + totalOtherExpenses;
-
 
     return {
       marginInRs,
@@ -193,22 +207,16 @@ export const selectCalculatedValues = createSelector(
       totalPrepayments,
       schedule,
       totalPayments,
-      yearlyIncreaseAmountRs
+      yearlyIncreaseAmountRs,
     };
-  }
+  },
 );
 
 // Helper function to convert amount based on unit
-export const convertAmount = (
-  amount,
-  oldUnit,
-  newUnit,
-  baseValue,
-  emi = 0
-) => {
+export const convertAmount = (amount, oldUnit, newUnit, baseValue, emi = 0) => {
   if (oldUnit === newUnit) return amount;
 
-  if (newUnit === "%") {
+  if (newUnit === '%') {
     return baseValue ? (amount / baseValue) * 100 : 0;
   } else {
     // Converting from % to Rs
@@ -220,9 +228,9 @@ export const convertAmount = (
 export const convertTenure = (tenure, oldUnit, newUnit) => {
   if (oldUnit === newUnit) return tenure;
 
-  if (newUnit === "months" && oldUnit === "years") {
+  if (newUnit === 'months' && oldUnit === 'years') {
     return Math.round(tenure * 12);
-  } else if (newUnit === "years" && oldUnit === "months") {
+  } else if (newUnit === 'years' && oldUnit === 'months') {
     return parseFloat((tenure / 12).toFixed(2));
   }
   return tenure;
@@ -233,11 +241,11 @@ export const convertYearlyPaymentIncrease = (
   amount,
   oldUnit,
   newUnit,
-  baseEmi
+  baseEmi,
 ) => {
   if (oldUnit === newUnit) return amount;
 
-  if (newUnit === "%") {
+  if (newUnit === '%') {
     return baseEmi ? (amount / baseEmi) * 100 : 0;
   } else {
     // Converting from % to Rs

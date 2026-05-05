@@ -1,10 +1,17 @@
 import { createTheme, alpha } from '@mui/material/styles';
-import { getAppTheme, themePresets, themeColors } from '../../../src/theme/ThemeConfig';
+import {
+  getAppTheme,
+  themePresets,
+  themeColors,
+} from '../../../src/theme/ThemeConfig';
 
 // Mock getMotionProfile as it's an external dependency
 jest.mock('../../../src/theme/motionProfiles', () => ({
   getMotionProfile: jest.fn(() => ({
-    easing: { easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)', sharp: 'cubic-bezier(0.4, 0, 0.6, 1)' },
+    easing: {
+      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
+    },
     duration: { short: 200, standard: 300 },
   })),
 }));
@@ -17,8 +24,9 @@ describe('ThemeConfig - getAppTheme', () => {
   // --- Palette Mode and Colors ---
   it('should return a dark theme when themeMode is "dark"', () => {
     const theme = getAppTheme('dark', 'material', 'flat');
-    const selectedColors = themeColors.find(t => t.value === 'dark'); // Assuming 'dark' is a themeColor value
-    const [primary, secondary, background, textPrimary, textSecondary] = selectedColors.colors;
+    const selectedColors = themeColors.find((t) => t.value === 'dark'); // Assuming 'dark' is a themeColor value
+    const [primary, secondary, background, textPrimary, textSecondary] =
+      selectedColors.colors;
 
     expect(theme.palette.mode).toBe('dark');
     expect(theme.palette.primary.main).toBe(primary);
@@ -29,8 +37,9 @@ describe('ThemeConfig - getAppTheme', () => {
 
   it('should return a light theme when themeMode is "dodgerblue" (default light)', () => {
     const theme = getAppTheme('dodgerblue', 'material', 'flat');
-    const selectedColors = themeColors.find(t => t.value === 'dodgerblue');
-    const [primary, secondary, background, textPrimary, textSecondary] = selectedColors.colors;
+    const selectedColors = themeColors.find((t) => t.value === 'dodgerblue');
+    const [primary, secondary, background, textPrimary, textSecondary] =
+      selectedColors.colors;
 
     expect(theme.palette.mode).toBe('light');
     expect(theme.palette.primary.main).toBe(primary);
@@ -42,7 +51,8 @@ describe('ThemeConfig - getAppTheme', () => {
   it('should return a light theme for an unknown themeMode, defaulting to first themeColor', () => {
     const theme = getAppTheme('unknown', 'material', 'flat');
     const defaultColors = themeColors[0].colors; // DodgerBlue
-    const [primary, secondary, background, textPrimary, textSecondary] = defaultColors;
+    const [primary, secondary, background, textPrimary, textSecondary] =
+      defaultColors;
 
     expect(theme.palette.mode).toBe('light');
     expect(theme.palette.primary.main).toBe(primary);
@@ -66,7 +76,9 @@ describe('ThemeConfig - getAppTheme', () => {
   // --- Motion Profile Injection ---
   it('should inject motion profile easing and duration', () => {
     const theme = getAppTheme('light', 'material', 'flat');
-    expect(theme.transitions.easing.easeInOut).toBe('cubic-bezier(0.4, 0, 0.2, 1)');
+    expect(theme.transitions.easing.easeInOut).toBe(
+      'cubic-bezier(0.4, 0, 0.2, 1)',
+    );
     expect(theme.transitions.duration.standard).toBe(300);
   });
 
@@ -100,36 +112,54 @@ describe('ThemeConfig - getAppTheme', () => {
   // --- MuiPaper Component Overrides (visualStyle) ---
   it('should apply "glass" visualStyle to MuiPaper', () => {
     const theme = getAppTheme('light', 'material', 'glass');
-    const paperStyles = theme.components.MuiPaper.styleOverrides.root({ theme });
-    expect(paperStyles.backgroundColor).toBe(alpha(theme.palette.background.paper, 0.7));
+    const paperStyles = theme.components.MuiPaper.styleOverrides.root({
+      theme,
+    });
+    expect(paperStyles.backgroundColor).toBe(
+      alpha(theme.palette.background.paper, 0.7),
+    );
     expect(paperStyles.backdropFilter).toBe('blur(20px)');
-    expect(paperStyles.border).toBe(`1px solid ${alpha(theme.palette.common.white, 0.1)}`);
+    expect(paperStyles.border).toBe(
+      `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+    );
   });
 
   it('should apply "neumorphic" visualStyle to MuiPaper (light mode)', () => {
     const theme = getAppTheme('light', 'material', 'neumorphic');
-    const paperStyles = theme.components.MuiPaper.styleOverrides.root({ theme });
+    const paperStyles = theme.components.MuiPaper.styleOverrides.root({
+      theme,
+    });
     expect(paperStyles.backgroundColor).toBe(theme.palette.background.default);
-    expect(paperStyles.boxShadow).toBe("6px 6px 12px #d1d5db, -6px -6px 12px #ffffff");
+    expect(paperStyles.boxShadow).toBe(
+      '6px 6px 12px #d1d5db, -6px -6px 12px #ffffff',
+    );
   });
 
   it('should apply "neumorphic" visualStyle to MuiPaper (dark mode)', () => {
     const theme = getAppTheme('dark', 'material', 'neumorphic');
-    const paperStyles = theme.components.MuiPaper.styleOverrides.root({ theme });
+    const paperStyles = theme.components.MuiPaper.styleOverrides.root({
+      theme,
+    });
     expect(paperStyles.backgroundColor).toBe(theme.palette.background.default);
-    expect(paperStyles.boxShadow).toBe("5px 5px 10px #0b0b0b, -5px -5px 10px #252525");
+    expect(paperStyles.boxShadow).toBe(
+      '5px 5px 10px #0b0b0b, -5px -5px 10px #252525',
+    );
   });
 
   it('should apply "minimalist" visualStyle to MuiPaper', () => {
     const theme = getAppTheme('light', 'material', 'minimalist');
-    const paperStyles = theme.components.MuiPaper.styleOverrides.root({ theme });
+    const paperStyles = theme.components.MuiPaper.styleOverrides.root({
+      theme,
+    });
     expect(paperStyles.boxShadow).toBe('none');
     expect(paperStyles.border).toBe(`1px solid ${theme.palette.divider}`);
   });
 
   it('should apply "flat" visualStyle to MuiPaper (default)', () => {
     const theme = getAppTheme('light', 'material', 'flat');
-    const paperStyles = theme.components.MuiPaper.styleOverrides.root({ theme });
+    const paperStyles = theme.components.MuiPaper.styleOverrides.root({
+      theme,
+    });
     expect(paperStyles.boxShadow).toBe('0 2px 10px rgba(0,0,0,0.04)');
     expect(paperStyles.border).toBeUndefined(); // No custom border for flat
   });
@@ -166,7 +196,7 @@ describe('ThemeConfig - themeColors', () => {
   });
 
   it('each color entry should have expected properties', () => {
-    themeColors.forEach(colorEntry => {
+    themeColors.forEach((colorEntry) => {
       expect(colorEntry).toHaveProperty('name');
       expect(typeof colorEntry.name).toBe('string');
       expect(colorEntry).toHaveProperty('value');
@@ -174,7 +204,7 @@ describe('ThemeConfig - themeColors', () => {
       expect(colorEntry).toHaveProperty('colors');
       expect(Array.isArray(colorEntry.colors)).toBe(true);
       expect(colorEntry.colors.length).toBe(5); // Primary, Secondary, Background, TextPrimary, TextSecondary
-      expect(colorEntry.colors.every(c => typeof c === 'string')).toBe(true);
+      expect(colorEntry.colors.every((c) => typeof c === 'string')).toBe(true);
     });
   });
 });

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -19,8 +19,8 @@ import {
   Divider,
   alpha,
   useTheme,
-} from "@mui/material";
-import { labelStyle, getWellInputStyle } from "../../styles/formStyles";
+} from '@mui/material';
+import { labelStyle, getWellInputStyle } from '../../styles/formStyles';
 
 export const DynamicRowModal = ({
   open,
@@ -39,12 +39,12 @@ export const DynamicRowModal = ({
       PaperProps={{
         sx: {
           borderRadius: 3,
-          boxShadow: `0 24px 64px ${alpha(theme.palette.common.black || "#000", 0.2)}`,
+          boxShadow: `0 24px 64px ${alpha(theme.palette.common.black || '#000', 0.2)}`,
         },
       }}
     >
       <DialogTitle sx={{ fontWeight: 800 }}>
-        {mode === "add" ? "Inject Data Row" : "Modify Data Row"}
+        {mode === 'add' ? 'Inject Data Row' : 'Modify Data Row'}
       </DialogTitle>
       <DialogContent>
         <Typography sx={labelStyle}>Row Identifier</Typography>
@@ -58,14 +58,17 @@ export const DynamicRowModal = ({
             disableUnderline: true,
             sx: {
               ...getWellInputStyle(theme),
-              textAlign: "left",
-              "& input": { textAlign: "left" },
+              textAlign: 'left',
+              '& input': { textAlign: 'left' },
             },
           }}
         />
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} sx={{ fontWeight: 700, color: "text.secondary" }}>
+        <Button
+          onClick={onClose}
+          sx={{ fontWeight: 700, color: 'text.secondary' }}
+        >
           Cancel
         </Button>
         <Button
@@ -105,7 +108,7 @@ export const SettingsModal = ({
         sx: {
           borderRadius: 3,
           boxShadow: (theme) =>
-            `0 24px 64px ${alpha(theme.palette.common.black || "#000", 0.2)}`,
+            `0 24px 64px ${alpha(theme.palette.common.black || '#000', 0.2)}`,
         },
       }}
     >
@@ -120,7 +123,10 @@ export const SettingsModal = ({
               value={age}
               onChange={onAgeChange}
               fullWidth
-              InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
+              InputProps={{
+                disableUnderline: true,
+                sx: getWellInputStyle(theme),
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -128,7 +134,7 @@ export const SettingsModal = ({
             <FormControl fullWidth variant="standard">
               <Select
                 value={settings.isMetro}
-                onChange={(e) => onSettingChange("isMetro", e.target.value)}
+                onChange={(e) => onSettingChange('isMetro', e.target.value)}
                 disableUnderline
                 sx={getWellInputStyle(theme)}
               >
@@ -146,9 +152,12 @@ export const SettingsModal = ({
             <TextField
               variant="standard"
               value={settings.pfPercent}
-              onChange={(e) => onSettingChange("pfPercent", e.target.value)}
+              onChange={(e) => onSettingChange('pfPercent', e.target.value)}
               fullWidth
-              InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
+              InputProps={{
+                disableUnderline: true,
+                sx: getWellInputStyle(theme),
+              }}
             />
           </Grid>
           <Grid item xs={12} sm={6}>
@@ -156,9 +165,12 @@ export const SettingsModal = ({
             <TextField
               variant="standard"
               value={settings.vpfPercent}
-              onChange={(e) => onSettingChange("vpfPercent", e.target.value)}
+              onChange={(e) => onSettingChange('vpfPercent', e.target.value)}
               fullWidth
-              InputProps={{ disableUnderline: true, sx: getWellInputStyle(theme) }}
+              InputProps={{
+                disableUnderline: true,
+                sx: getWellInputStyle(theme),
+              }}
             />
           </Grid>
 
@@ -169,8 +181,8 @@ export const SettingsModal = ({
                 mt: 3,
                 mb: 1.5,
                 fontWeight: 800,
-                textTransform: "uppercase",
-                color: "primary.main",
+                textTransform: 'uppercase',
+                color: 'primary.main',
                 letterSpacing: 0.5,
               }}
             >
@@ -180,7 +192,7 @@ export const SettingsModal = ({
               sx={{
                 borderRadius: 2,
                 border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
-                overflow: "hidden",
+                overflow: 'hidden',
               }}
             >
               <Table size="small">
@@ -188,12 +200,12 @@ export const SettingsModal = ({
                   {earningsFixed.map((item) => (
                     <TableRow
                       key={item.includeField}
-                      sx={{ "&:last-child td": { borderBottom: 0 } }}
+                      sx={{ '&:last-child td': { borderBottom: 0 } }}
                     >
                       <TableCell
                         sx={{
                           fontWeight: 600,
-                          color: "text.secondary",
+                          color: 'text.secondary',
                           borderBottom: `1px solid ${alpha(
                             theme.palette.divider,
                             0.1,
@@ -214,7 +226,7 @@ export const SettingsModal = ({
                         <Select
                           variant="standard"
                           value={
-                            calculatedSalary.months[0][item.includeField] || "N"
+                            calculatedSalary.months[0][item.includeField] || 'N'
                           }
                           onChange={(e) =>
                             onInclusionChange(item.includeField, e.target.value)
@@ -224,7 +236,7 @@ export const SettingsModal = ({
                             ...getWellInputStyle(theme),
                             py: 0,
                             px: 1,
-                            "& .MuiSelect-select": { pr: 3 },
+                            '& .MuiSelect-select': { pr: 3 },
                           }}
                         >
                           <MenuItem value="Y" sx={{ fontWeight: 700 }}>
@@ -244,12 +256,12 @@ export const SettingsModal = ({
                     return (
                       <TableRow
                         key={fieldName}
-                        sx={{ "&:last-child td": { borderBottom: 0 } }}
+                        sx={{ '&:last-child td': { borderBottom: 0 } }}
                       >
                         <TableCell
                           sx={{
                             fontWeight: 600,
-                            color: "text.secondary",
+                            color: 'text.secondary',
                             borderBottom: `1px solid ${alpha(
                               theme.palette.divider,
                               0.1,
@@ -269,9 +281,7 @@ export const SettingsModal = ({
                         >
                           <Select
                             variant="standard"
-                            value={
-                              calculatedSalary.months[0][fieldName] || "N"
-                            }
+                            value={calculatedSalary.months[0][fieldName] || 'N'}
                             onChange={(e) =>
                               onInclusionChange(fieldName, e.target.value)
                             }
@@ -280,7 +290,7 @@ export const SettingsModal = ({
                               ...getWellInputStyle(theme),
                               py: 0,
                               px: 1,
-                              "& .MuiSelect-select": { pr: 3 },
+                              '& .MuiSelect-select': { pr: 3 },
                             }}
                           >
                             <MenuItem value="Y" sx={{ fontWeight: 700 }}>

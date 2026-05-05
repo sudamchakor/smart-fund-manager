@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Typography,
   Box,
@@ -8,12 +8,12 @@ import {
   alpha,
   Stack,
   Grid,
-} from "@mui/material";
+} from '@mui/material';
 import {
   AutoFixHigh as AutoFixIcon,
   CheckCircleOutline as SuccessIcon,
   WarningAmber as WarningIcon,
-} from "@mui/icons-material";
+} from '@mui/icons-material';
 
 import {
   selectCurrentSurplus,
@@ -21,10 +21,10 @@ import {
   selectStepUpPercentage,
   updateExpense,
   setStepUpPercentage,
-} from "../../../store/profileSlice";
-import { selectCurrency } from "../../../store/emiSlice";
-import { formatCurrency } from "../../../utils/formatting";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '../../../store/profileSlice';
+import { selectCurrency } from '../../../store/emiSlice';
+import { formatCurrency } from '../../../utils/formatting';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 const CorrectionEngine = () => {
   const theme = useTheme();
@@ -42,7 +42,7 @@ const CorrectionEngine = () => {
 
     const deficit = Math.abs(surplus);
     const discretionaryExpenses = expenses.filter(
-      (e) => e.category === "discretionary",
+      (e) => e.category === 'discretionary',
     );
     const totalDiscretionary = discretionaryExpenses.reduce(
       (sum, e) => sum + e.amount,
@@ -52,7 +52,7 @@ const CorrectionEngine = () => {
     if (totalDiscretionary === 0) {
       return {
         message:
-          "Deficit detected. No discretionary expenses available to reduce. Consider increasing income or using the Auto-Balancer for basic needs.",
+          'Deficit detected. No discretionary expenses available to reduce. Consider increasing income or using the Auto-Balancer for basic needs.',
         actionable: false,
       };
     }
@@ -60,7 +60,7 @@ const CorrectionEngine = () => {
     let reductionNeededRatio = deficit / totalDiscretionary;
     let reductionPercentage = 0;
     let newStepUp = currentStepUp;
-    let message = "";
+    let message = '';
 
     if (reductionNeededRatio <= 1) {
       reductionPercentage = Math.ceil(reductionNeededRatio * 100);
@@ -117,10 +117,10 @@ const CorrectionEngine = () => {
       sx={{
         p: 2.5,
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.warning.main, 0.3),
         bgcolor: alpha(theme.palette.warning.main, 0.02),
-        boxShadow: "0 2px 12px rgba(0,0,0,0.02)",
+        boxShadow: '0 2px 12px rgba(0,0,0,0.02)',
       }}
     >
       <SectionHeader
@@ -132,7 +132,7 @@ const CorrectionEngine = () => {
       {hasSucceeded ? (
         <Box
           sx={{
-            textAlign: "center",
+            textAlign: 'center',
             py: 3,
             bgcolor: alpha(theme.palette.success.main, 0.05),
             border: `1px dashed ${alpha(theme.palette.success.main, 0.3)}`,
@@ -147,14 +147,14 @@ const CorrectionEngine = () => {
             sx={{
               color: theme.palette.success.dark,
               fontWeight: 800,
-              textTransform: "uppercase",
+              textTransform: 'uppercase',
             }}
           >
             Correction Applied
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontWeight: 600, color: "text.secondary" }}
+            sx={{ fontWeight: 600, color: 'text.secondary' }}
           >
             Discretionary expenses have been successfully optimized.
           </Typography>
@@ -177,7 +177,7 @@ const CorrectionEngine = () => {
                 <WarningIcon sx={{ color: theme.palette.warning.dark }} />
                 <Typography
                   variant="body2"
-                  sx={{ fontWeight: 700, color: "warning.dark" }}
+                  sx={{ fontWeight: 700, color: 'warning.dark' }}
                 >
                   Current Deficit: {currency}
                   {formatCurrency(recommendation?.deficit || Math.abs(surplus))}
@@ -191,11 +191,11 @@ const CorrectionEngine = () => {
               <Typography
                 variant="caption"
                 sx={{
-                  display: "block",
+                  display: 'block',
                   mb: 2,
                   fontWeight: 600,
-                  color: "text.secondary",
-                  fontSize: "0.75rem",
+                  color: 'text.secondary',
+                  fontSize: '0.75rem',
                   lineHeight: 1.6,
                 }}
               >
@@ -212,11 +212,11 @@ const CorrectionEngine = () => {
                   startIcon={<AutoFixIcon />}
                   sx={{
                     fontWeight: 800,
-                    textTransform: "none",
+                    textTransform: 'none',
                     borderRadius: 1.5,
-                    transition: "transform 0.2s",
-                    "&:hover": {
-                      transform: "translateY(-1px)",
+                    transition: 'transform 0.2s',
+                    '&:hover': {
+                      transform: 'translateY(-1px)',
                       boxShadow: `0 4px 12px ${alpha(theme.palette.warning.main, 0.3)}`,
                     },
                   }}

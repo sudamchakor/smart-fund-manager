@@ -13,34 +13,63 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../components/common/PageHeader', () => ({ title, subtitle, icon: Icon }) => (
-  <div data-testid="mock-page-header">
-    <h1>{title}</h1>
-    <p>{subtitle}</p>
-    {Icon && <Icon data-testid="mock-header-icon" />}
-  </div>
-));
-jest.mock('../../components/common/InputSlider', () => ({ label, value, onChange, ...props }) => (
-  <div data-testid={`mock-input-slider-${label.replace(/\s/g, '-')}`}>
-    <label htmlFor={`input-${label}`}>{label}</label>
-    <input
-      id={`input-${label}`}
-      type="number"
-      value={value}
-      onChange={(e) => onChange(Number(e.target.value))}
-      data-testid={`input-field-${label.replace(/\s/g, '-')}`}
-    />
-  </div>
-));
-jest.mock('../../components/common/LoanSummaryTerminal', () => ({ monthlyEmi, totalInterest, totalPayable, currency, loading, children }) => (
-  <div data-testid="mock-loan-summary-terminal">
-    <span data-testid="monthly-emi">{currency}{monthlyEmi}</span>
-    <span data-testid="total-interest">{currency}{totalInterest}</span>
-    <span data-testid="total-payable">{currency}{totalPayable}</span>
-    {loading && <span data-testid="loading-indicator">Loading...</span>}
-    <div data-testid="loan-summary-terminal-children">{children}</div> {/* Added to capture children */}
-  </div>
-));
+jest.mock(
+  '../../components/common/PageHeader',
+  () =>
+    ({ title, subtitle, icon: Icon }) => (
+      <div data-testid="mock-page-header">
+        <h1>{title}</h1>
+        <p>{subtitle}</p>
+        {Icon && <Icon data-testid="mock-header-icon" />}
+      </div>
+    ),
+);
+jest.mock(
+  '../../components/common/InputSlider',
+  () =>
+    ({ label, value, onChange, ...props }) => (
+      <div data-testid={`mock-input-slider-${label.replace(/\s/g, '-')}`}>
+        <label htmlFor={`input-${label}`}>{label}</label>
+        <input
+          id={`input-${label}`}
+          type="number"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          data-testid={`input-field-${label.replace(/\s/g, '-')}`}
+        />
+      </div>
+    ),
+);
+jest.mock(
+  '../../components/common/LoanSummaryTerminal',
+  () =>
+    ({
+      monthlyEmi,
+      totalInterest,
+      totalPayable,
+      currency,
+      loading,
+      children,
+    }) => (
+      <div data-testid="mock-loan-summary-terminal">
+        <span data-testid="monthly-emi">
+          {currency}
+          {monthlyEmi}
+        </span>
+        <span data-testid="total-interest">
+          {currency}
+          {totalInterest}
+        </span>
+        <span data-testid="total-payable">
+          {currency}
+          {totalPayable}
+        </span>
+        {loading && <span data-testid="loading-indicator">Loading...</span>}
+        <div data-testid="loan-summary-terminal-children">{children}</div>{' '}
+        {/* Added to capture children */}
+      </div>
+    ),
+);
 
 const mockStore = configureStore([]);
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -59,7 +88,7 @@ describe('PersonalLoanCalculator Page', () => {
         <ThemeProvider theme={theme}>
           <PersonalLoanCalculator />
         </ThemeProvider>
-      </Provider>
+      </Provider>,
     );
   };
 
@@ -72,25 +101,39 @@ describe('PersonalLoanCalculator Page', () => {
     renderComponent();
     expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
     expect(screen.getByText('Personal Loan Details')).toBeInTheDocument();
-    expect(screen.getByText('Configure unsecured debt parameters to calculate monthly liabilities.')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Configure unsecured debt parameters to calculate monthly liabilities.',
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // LoanIcon
   });
 
   it('renders InputSliders for Loan Amount, Interest Rate, and Tenure', () => {
     renderComponent();
-    expect(screen.getByTestId('mock-input-slider-Loan-Amount')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-input-slider-Interest-Rate-(p.a)')).toBeInTheDocument();
-    expect(screen.getByTestId('mock-input-slider-Tenure-(Years)')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-input-slider-Loan-Amount'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-input-slider-Interest-Rate-(p.a)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-input-slider-Tenure-(Years)'),
+    ).toBeInTheDocument();
   });
 
   it('renders LoanSummaryTerminal', () => {
     renderComponent();
-    expect(screen.getByTestId('mock-loan-summary-terminal')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('mock-loan-summary-terminal'),
+    ).toBeInTheDocument();
   });
 
   it('renders children inside LoanSummaryTerminal', () => {
     renderComponent();
-    expect(screen.getByTestId('loan-summary-terminal-children')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('loan-summary-terminal-children'),
+    ).toBeInTheDocument();
     expect(screen.getByText('Chart Visualization Region')).toBeInTheDocument();
   });
 
@@ -109,7 +152,9 @@ describe('PersonalLoanCalculator Page', () => {
 
   it('updates interestRate state and recalculates EMI when Interest Rate slider changes', async () => {
     renderComponent();
-    const interestRateInput = screen.getByTestId('input-field-Interest-Rate-(p.a)');
+    const interestRateInput = screen.getByTestId(
+      'input-field-Interest-Rate-(p.a)',
+    );
     fireEvent.change(interestRateInput, { target: { value: '12' } });
 
     await waitFor(() => {
@@ -134,7 +179,9 @@ describe('PersonalLoanCalculator Page', () => {
   // --- Edge Cases / Negative Scenarios ---
   it('handles zero interest rate correctly', async () => {
     renderComponent();
-    const interestRateInput = screen.getByTestId('input-field-Interest-Rate-(p.a)');
+    const interestRateInput = screen.getByTestId(
+      'input-field-Interest-Rate-(p.a)',
+    );
     fireEvent.change(interestRateInput, { target: { value: '0' } });
 
     await waitFor(() => {

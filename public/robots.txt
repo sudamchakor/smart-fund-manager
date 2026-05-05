@@ -1,6 +1,3 @@
-# Allow all bots to crawl the educational content
 User-agent: *
 Allow: /
-
-# Use your actual GitHub Pages URL here
-Sitemap: https://sudamchakor.github.io/smart-fund-manager/sitemap.xml
+Sitemap: https://sudamchakor.github.io/smart-fund-manager/sitemap.txt

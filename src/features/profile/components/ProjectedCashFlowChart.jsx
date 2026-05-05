@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import {  Typography } from "@mui/material";
+import React, { useState } from 'react';
+import { Typography } from '@mui/material';
 import {
   ComposedChart,
   Area,
@@ -11,11 +11,11 @@ import {
   Tooltip as RechartsTooltip,
   Legend,
   ReferenceLine,
-} from "recharts";
-import { useTheme, alpha } from "@mui/material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
-import dayjs from "dayjs";
+} from 'recharts';
+import { useTheme, alpha } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
+import dayjs from 'dayjs';
 
 const currentYear = new Date().getFullYear();
 
@@ -46,10 +46,10 @@ const renderLegend = (props, hiddenLines, theme) => {
   return (
     <ul
       style={{
-        listStyle: "none",
+        listStyle: 'none',
         padding: 0,
-        display: "flex",
-        justifyContent: "center",
+        display: 'flex',
+        justifyContent: 'center',
         margin: 0,
       }}
     >
@@ -60,18 +60,20 @@ const renderLegend = (props, hiddenLines, theme) => {
             key={`item-${index}`}
             onClick={() => onClick(entry)}
             style={{
-              cursor: "pointer",
+              cursor: 'pointer',
               marginRight: 20,
-              display: "flex",
-              alignItems: "center",
-              color: isHidden ? theme.palette.text.disabled : theme.palette.text.primary,
-              textDecoration: isHidden ? "line-through" : "none",
+              display: 'flex',
+              alignItems: 'center',
+              color: isHidden
+                ? theme.palette.text.disabled
+                : theme.palette.text.primary,
+              textDecoration: isHidden ? 'line-through' : 'none',
               opacity: isHidden ? 0.5 : 1,
             }}
           >
             <span
               style={{
-                display: "inline-block",
+                display: 'inline-block',
                 width: 14,
                 height: 14,
                 backgroundColor: entry.color,
@@ -105,7 +107,7 @@ export default function ProjectedCashFlowChart({
   const [hiddenLines, setHiddenLines] = useState({});
 
   const formatCurrency = (val) =>
-    `${currency}${Number(val || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+    `${currency}${Number(val || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`;
 
   const handleLegendClick = (e) => {
     const { dataKey } = e;
@@ -128,7 +130,7 @@ export default function ProjectedCashFlowChart({
 
   if (emiState?.loanDetails) {
     loanTenureMonths =
-      emiState.loanDetails.tenureUnit === "years"
+      emiState.loanDetails.tenureUnit === 'years'
         ? Number(emiState.loanDetails.loanTenure) * 12
         : Number(emiState.loanDetails.loanTenure);
     const startDate = dayjs(emiState.loanDetails.startDate);
@@ -138,7 +140,7 @@ export default function ProjectedCashFlowChart({
     }
   } else if (emiState && emiState.tenure) {
     loanTenureMonths =
-      emiState.tenureType === "years"
+      emiState.tenureType === 'years'
         ? Number(emiState.tenure) * 12
         : Number(emiState.tenure);
   }
@@ -149,7 +151,6 @@ export default function ProjectedCashFlowChart({
   const projectionData = [];
   if (projectionYears > 0) {
     for (let year = currentYear; year <= endProjectionYear; year++) {
-
       let annualIncome = 0;
       let hasActiveIncome = false;
 
@@ -160,13 +161,13 @@ export default function ProjectedCashFlowChart({
           hasActiveIncome = true;
           let rawAmount = Number(inc.amount) || 0;
 
-          if (inc.frequency === "monthly") rawAmount *= 12;
-          else if (inc.frequency === "quarterly") rawAmount *= 4;
+          if (inc.frequency === 'monthly') rawAmount *= 12;
+          else if (inc.frequency === 'quarterly') rawAmount *= 4;
 
           let yearlyAmount = rawAmount;
           const activeYears = year - Math.max(start, currentYear);
           if (activeYears > 0) {
-            if (careerGrowthType === "percentage") {
+            if (careerGrowthType === 'percentage') {
               yearlyAmount *= Math.pow(1 + careerGrowthRate, activeYears);
             }
           }
@@ -174,7 +175,7 @@ export default function ProjectedCashFlowChart({
         }
       });
 
-      if (careerGrowthType === "fixed" && hasActiveIncome) {
+      if (careerGrowthType === 'fixed' && hasActiveIncome) {
         const activeYears = year - currentYear;
         if (activeYears > 0) {
           annualIncome += careerGrowthRate * activeYears;
@@ -189,8 +190,8 @@ export default function ProjectedCashFlowChart({
         const end = exp.endYear || currentYear + 10;
         if (year >= start && year <= end) {
           let rawAmount = Number(exp.amount) || 0;
-          if (exp.frequency === "monthly") rawAmount *= 12;
-          else if (exp.frequency === "quarterly") rawAmount *= 4;
+          if (exp.frequency === 'monthly') rawAmount *= 12;
+          else if (exp.frequency === 'quarterly') rawAmount *= 4;
 
           baseAnnualExpense += rawAmount;
 
@@ -221,7 +222,7 @@ export default function ProjectedCashFlowChart({
       baseAnnualExpense += emiAnnual;
 
       individualGoalInvestments.forEach((inv) => {
-        if (inv.type === "one-time-yearly") {
+        if (inv.type === 'one-time-yearly') {
           if (year === inv.year) {
             const amt = Number(inv.amount) || 0;
             annualExpense += amt;
@@ -236,15 +237,15 @@ export default function ProjectedCashFlowChart({
           if (year >= start && year <= end) {
             let rawAmount = Number(inv.amount) || 0;
 
-            if (inv.frequency === "monthly") rawAmount *= 12;
-            else if (inv.frequency === "quarterly") rawAmount *= 4;
+            if (inv.frequency === 'monthly') rawAmount *= 12;
+            else if (inv.frequency === 'quarterly') rawAmount *= 4;
 
             baseAnnualExpense += rawAmount;
 
             let yearlyAmount = rawAmount;
             if (
-              inv.type === "step_up_sip" ||
-              inv.investmentType === "step_up_sip"
+              inv.type === 'step_up_sip' ||
+              inv.investmentType === 'step_up_sip'
             ) {
               const stepUpRate = inv.stepUpRate ? inv.stepUpRate / 100 : 0;
               const activeYears = year - start;
@@ -308,11 +309,11 @@ export default function ProjectedCashFlowChart({
           <RechartsTooltip
             formatter={(value, name) => [formatCurrency(value), name]}
             contentStyle={{
-              borderRadius: "12px",
-              border: "none",
-              boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || "#000", 0.12)}`,
+              borderRadius: '12px',
+              border: 'none',
+              boxShadow: `0 8px 24px ${alpha(theme.palette.common.black || '#000', 0.12)}`,
               backgroundColor: alpha(theme.palette.background.paper, 0.9),
-              backdropFilter: "blur(8px)",
+              backdropFilter: 'blur(8px)',
             }}
           />
 
@@ -328,7 +329,7 @@ export default function ProjectedCashFlowChart({
           />
 
           <Area
-            hide={hiddenLines["Income"]}
+            hide={hiddenLines['Income']}
             type="monotone"
             dataKey="Income"
             name="Annual Income"
@@ -337,7 +338,7 @@ export default function ProjectedCashFlowChart({
           />
 
           <Area
-            hide={hiddenLines["Expenses"]}
+            hide={hiddenLines['Expenses']}
             legendType="none"
             type="monotone"
             dataKey="BaseExpenses"
@@ -347,7 +348,7 @@ export default function ProjectedCashFlowChart({
             fillOpacity={0.3}
           />
           <Line
-            hide={hiddenLines["Expenses"]}
+            hide={hiddenLines['Expenses']}
             type="monotone"
             dataKey="Expenses"
             name="Expenses"
@@ -358,7 +359,7 @@ export default function ProjectedCashFlowChart({
           />
 
           <Line
-            hide={hiddenLines["Surplus"]}
+            hide={hiddenLines['Surplus']}
             type="monotone"
             dataKey="Surplus"
             name="Surplus"

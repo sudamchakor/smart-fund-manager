@@ -5,7 +5,9 @@ import VisualCard from '../../../components/settings/VisualCard';
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons
-jest.mock('@mui/icons-material/CheckCircle', () => (props) => <svg data-testid="CheckIcon" {...props} />);
+jest.mock('@mui/icons-material/CheckCircle', () => (props) => (
+  <svg data-testid="CheckIcon" {...props} />
+));
 
 const theme = createTheme({
   palette: {
@@ -33,7 +35,7 @@ describe('VisualCard Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <VisualCard {...defaultProps} {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -50,7 +52,9 @@ describe('VisualCard Component', () => {
 
   it('renders the color box with the first color', () => {
     renderComponent();
-    const colorBox = screen.getByText('Test Label').nextElementSibling.querySelector('.MuiBox-root');
+    const colorBox = screen
+      .getByText('Test Label')
+      .nextElementSibling.querySelector('.MuiBox-root');
     expect(colorBox).toHaveStyle('background-color: #FF0000');
   });
 
@@ -65,8 +69,12 @@ describe('VisualCard Component', () => {
     expect(screen.getByTestId('CheckIcon')).toBeInTheDocument();
     const card = screen.getByRole('button');
     expect(card).toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(card).toHaveStyle(`background-color: ${alpha(theme.palette.primary.main, 0.03)}`);
-    expect(screen.getByText('Test Label')).toHaveStyle(`color: ${theme.palette.primary.main}`);
+    expect(card).toHaveStyle(
+      `background-color: ${alpha(theme.palette.primary.main, 0.03)}`,
+    );
+    expect(screen.getByText('Test Label')).toHaveStyle(
+      `color: ${theme.palette.primary.main}`,
+    );
   });
 
   // --- Negative Scenarios / Edge Cases ---
@@ -74,34 +82,50 @@ describe('VisualCard Component', () => {
     renderComponent({ active: 'someOtherValue' });
     expect(screen.queryByTestId('CheckIcon')).not.toBeInTheDocument();
     const card = screen.getByRole('button');
-    expect(card).toHaveStyle(`border-color: ${alpha(theme.palette.divider, 0.08)}`);
+    expect(card).toHaveStyle(
+      `border-color: ${alpha(theme.palette.divider, 0.08)}`,
+    );
     expect(card).toHaveStyle('background-color: #ffffff'); // theme.palette.background.paper
-    expect(screen.getByText('Test Label')).toHaveStyle(`color: ${theme.palette.text.primary}`);
+    expect(screen.getByText('Test Label')).toHaveStyle(
+      `color: ${theme.palette.text.primary}`,
+    );
   });
 
   it('renders with empty label and subtext strings', () => {
     renderComponent({ label: '', subtext: '' });
     expect(screen.getByRole('button')).toBeInTheDocument(); // Card itself
     expect(screen.queryByText('Test Label')).not.toBeInTheDocument();
-    expect(screen.queryByText('This is a test subtext.')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This is a test subtext.'),
+    ).not.toBeInTheDocument();
   });
 
   it('handles empty colors array gracefully (renders default background)', () => {
     renderComponent({ colors: [] });
-    const colorBox = screen.getByText('Test Label').nextElementSibling.querySelector('.MuiBox-root');
-    expect(colorBox).toHaveStyle(`background-color: ${alpha(theme.palette.divider, 0.05)}`); // Default bgcolor
+    const colorBox = screen
+      .getByText('Test Label')
+      .nextElementSibling.querySelector('.MuiBox-root');
+    expect(colorBox).toHaveStyle(
+      `background-color: ${alpha(theme.palette.divider, 0.05)}`,
+    ); // Default bgcolor
   });
 
   it('handles null/undefined colors array gracefully', () => {
     renderComponent({ colors: null });
-    const colorBox = screen.getByText('Test Label').nextElementSibling.querySelector('.MuiBox-root');
-    expect(colorBox).toHaveStyle(`background-color: ${alpha(theme.palette.divider, 0.05)}`);
+    const colorBox = screen
+      .getByText('Test Label')
+      .nextElementSibling.querySelector('.MuiBox-root');
+    expect(colorBox).toHaveStyle(
+      `background-color: ${alpha(theme.palette.divider, 0.05)}`,
+    );
   });
 
   it('handles null/undefined label and subtext gracefully', () => {
     renderComponent({ label: null, subtext: undefined });
     expect(screen.getByRole('button')).toBeInTheDocument();
     expect(screen.queryByText('Test Label')).not.toBeInTheDocument();
-    expect(screen.queryByText('This is a test subtext.')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This is a test subtext.'),
+    ).not.toBeInTheDocument();
   });
 });

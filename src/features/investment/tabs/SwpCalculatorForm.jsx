@@ -1,14 +1,9 @@
-import React, { useEffect, useCallback } from "react";
-import {
-  Box,
-  Typography,
-  useTheme,
-  Stack,
-} from "@mui/material";
-import { AccountBalanceWallet as SwpIcon } from "@mui/icons-material";
-import { useSelector } from "react-redux";
-import { selectCurrency } from "../../../store/emiSlice";
-import InvestmentSlider from "../../../components/common/InvestmentSlider";
+import React, { useEffect, useCallback } from 'react';
+import { Box, Typography, useTheme, Stack } from '@mui/material';
+import { AccountBalanceWallet as SwpIcon } from '@mui/icons-material';
+import { useSelector } from 'react-redux';
+import { selectCurrency } from '../../../store/emiSlice';
+import InvestmentSlider from '../../../components/common/InvestmentSlider';
 
 const SwpCalculatorForm = ({
   onCalculate,
@@ -16,7 +11,7 @@ const SwpCalculatorForm = ({
   onSharedStateChange,
 }) => {
   const theme = useTheme();
-  const currency = useSelector(selectCurrency) || "₹";
+  const currency = useSelector(selectCurrency) || '₹';
 
   const {
     totalInvestment,
@@ -57,7 +52,7 @@ const SwpCalculatorForm = ({
       totalWithdrawn: isFinite(totalWithdrawn) ? Math.round(totalWithdrawn) : 0,
       chartData: [], // Chart data generation can be added back if needed
     };
-    console.log("Sudam 1", sanitizedResults);
+    console.log('Sudam 1', sanitizedResults);
 
     onCalculate(sanitizedResults);
   }, [
@@ -77,7 +72,7 @@ const SwpCalculatorForm = ({
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
         <SwpIcon
           sx={{
-            fontSize: "1rem",
+            fontSize: '1rem',
             color: theme.palette.primary.main,
             opacity: 0.8,
           }}
@@ -86,8 +81,8 @@ const SwpCalculatorForm = ({
           variant="caption"
           sx={{
             fontWeight: 900,
-            color: "text.primary",
-            textTransform: "uppercase",
+            color: 'text.primary',
+            textTransform: 'uppercase',
           }}
         >
           SWP Configuration
@@ -100,7 +95,7 @@ const SwpCalculatorForm = ({
         min={50000}
         max={50000000}
         step={10000}
-        onChange={(val) => onSharedStateChange("totalInvestment", val)}
+        onChange={(val) => onSharedStateChange('totalInvestment', val)}
         color="primary"
         adornment={currency}
         adornmentPosition="start"
@@ -112,7 +107,7 @@ const SwpCalculatorForm = ({
         min={500}
         max={100000}
         step={500}
-        onChange={(val) => onSharedStateChange("withdrawalPerMonth", val)}
+        onChange={(val) => onSharedStateChange('withdrawalPerMonth', val)}
         color="warning"
         adornment={currency}
         adornmentPosition="start"
@@ -124,7 +119,7 @@ const SwpCalculatorForm = ({
         min={1}
         max={30}
         step={0.1}
-        onChange={(val) => onSharedStateChange("expectedReturnRate", val)}
+        onChange={(val) => onSharedStateChange('expectedReturnRate', val)}
         color="success"
         adornment="%"
         adornmentPosition="end"
@@ -136,7 +131,7 @@ const SwpCalculatorForm = ({
         min={1}
         max={40}
         step={1}
-        onChange={(val) => onSharedStateChange("timePeriod", val)}
+        onChange={(val) => onSharedStateChange('timePeriod', val)}
         color="info"
         adornment="Yr"
         adornmentPosition="end"

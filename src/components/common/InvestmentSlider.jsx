@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -8,13 +8,13 @@ import {
   InputAdornment,
   alpha,
   useTheme,
-} from "@mui/material";
+} from '@mui/material';
 
 export const investmentLabelStyle = {
   fontWeight: 800,
-  textTransform: "uppercase",
-  fontSize: "0.65rem",
-  color: "text.disabled",
+  textTransform: 'uppercase',
+  fontSize: '0.65rem',
+  color: 'text.disabled',
   letterSpacing: 1,
   mb: 0.5,
 };
@@ -26,9 +26,9 @@ export default function InvestmentSlider({
   max,
   step = 1,
   onChange,
-  color = "primary",
+  color = 'primary',
   adornment,
-  adornmentPosition = "start",
+  adornmentPosition = 'start',
 }) {
   const theme = useTheme();
 
@@ -36,7 +36,12 @@ export default function InvestmentSlider({
     <Box sx={{ mb: 2 }}>
       <Grid container spacing={1} alignItems="flex-end" sx={{ mb: 0.5 }}>
         <Grid item xs={7}>
-          <Typography sx={investmentLabelStyle} id={`${label}-investment-slider-label`}>{label}</Typography>
+          <Typography
+            sx={investmentLabelStyle}
+            id={`${label}-investment-slider-label`}
+          >
+            {label}
+          </Typography>
         </Grid>
         <Grid item xs={5}>
           <TextField
@@ -47,22 +52,30 @@ export default function InvestmentSlider({
             aria-labelledby={`${label}-investment-slider-label`}
             InputProps={{
               startAdornment:
-                adornmentPosition === "start" && adornment ? (
+                adornmentPosition === 'start' && adornment ? (
                   <InputAdornment
                     position="start"
                     sx={{
-                      "& p": { fontWeight: 900, fontSize: "0.8rem", color: `${color}.main` },
+                      '& p': {
+                        fontWeight: 900,
+                        fontSize: '0.8rem',
+                        color: `${color}.main`,
+                      },
                     }}
                   >
                     {adornment}
                   </InputAdornment>
                 ) : null,
               endAdornment:
-                adornmentPosition === "end" && adornment ? (
+                adornmentPosition === 'end' && adornment ? (
                   <InputAdornment
                     position="end"
                     sx={{
-                      "& p": { fontWeight: 900, fontSize: "0.8rem", color: `${color}.main` },
+                      '& p': {
+                        fontWeight: 900,
+                        fontSize: '0.8rem',
+                        color: `${color}.main`,
+                      },
                     }}
                   >
                     {adornment}
@@ -71,11 +84,11 @@ export default function InvestmentSlider({
               disableUnderline: true,
               sx: {
                 fontWeight: 900,
-                fontSize: "0.9rem",
+                fontSize: '0.9rem',
                 bgcolor: alpha(theme.palette[color].main, 0.05),
                 px: 1,
                 borderRadius: 1,
-                "& input": { textAlign: "right" },
+                '& input': { textAlign: 'right' },
               },
             }}
             fullWidth
@@ -92,9 +105,9 @@ export default function InvestmentSlider({
         aria-labelledby={`${label}-investment-slider-label`}
         sx={{
           py: 1,
-          "& .MuiSlider-thumb": { width: 12, height: 12 },
-          "& .MuiSlider-track": { height: 4 },
-          "& .MuiSlider-rail": { height: 4, opacity: 0.2 },
+          '& .MuiSlider-thumb': { width: 12, height: 12 },
+          '& .MuiSlider-track': { height: 4 },
+          '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
         }}
       />
     </Box>

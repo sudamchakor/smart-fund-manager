@@ -12,7 +12,7 @@ describe('ChartTooltip Component', () => {
     return render(
       <ThemeProvider theme={theme}>
         <ChartTooltip {...props} />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -96,7 +96,12 @@ describe('ChartTooltip Component', () => {
 
   it('renders raw value if valueFormatter is not provided', () => {
     const payload = [{ name: 'Raw Value', value: 54321, color: 'purple' }];
-    renderComponent({ active: true, payload, label: '50', valueFormatter: undefined });
+    renderComponent({
+      active: true,
+      payload,
+      label: '50',
+      valueFormatter: undefined,
+    });
 
     expect(screen.getByText('AGE: 50')).toBeInTheDocument();
     expect(screen.getByText('Raw Value')).toBeInTheDocument();

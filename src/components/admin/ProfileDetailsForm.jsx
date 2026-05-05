@@ -80,12 +80,7 @@ const ProfileDetailsForm = ({
 
       <Divider sx={{ my: 5 }} />
 
-      <Typography
-        variant="h6"
-        color="error.main"
-        gutterBottom
-        fontWeight="600"
-      >
+      <Typography variant="h6" color="error.main" gutterBottom fontWeight="600">
         Account Privacy
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>

@@ -5,25 +5,54 @@ import Declarations from '../../../components/tax/Declarations';
 import '@testing-library/jest-dom';
 
 // Mock DataCard and ExemptionRow to simplify testing
-jest.mock('../../../components/common/DataCard', () => ({ title, children }) => (
-  <div data-testid={`data-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
-    <h3>{title}</h3>
-    <div>{children}</div>
-  </div>
-));
-jest.mock('../../../components/common/ExemptionRow', () => ({ label, produced, limited, tooltip }) => (
-  <div data-testid={`exemption-row-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>
-    <span>{label}</span>
-    <div data-testid={`produced-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>{produced}</div>
-    <span data-testid={`limited-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>{limited}</span>
-    {tooltip && <span data-testid={`tooltip-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}>{tooltip}</span>}
-  </div>
-));
+jest.mock(
+  '../../../components/common/DataCard',
+  () =>
+    ({ title, children }) => (
+      <div
+        data-testid={`data-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+      >
+        <h3>{title}</h3>
+        <div>{children}</div>
+      </div>
+    ),
+);
+jest.mock(
+  '../../../components/common/ExemptionRow',
+  () =>
+    ({ label, produced, limited, tooltip }) => (
+      <div
+        data-testid={`exemption-row-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+      >
+        <span>{label}</span>
+        <div
+          data-testid={`produced-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+        >
+          {produced}
+        </div>
+        <span
+          data-testid={`limited-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+        >
+          {limited}
+        </span>
+        {tooltip && (
+          <span
+            data-testid={`tooltip-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+          >
+            {tooltip}
+          </span>
+        )}
+      </div>
+    ),
+);
 
 // Mock formStyles to prevent issues with actual style objects
 jest.mock('../../../styles/formStyles', () => ({
   labelStyle: { fontSize: '0.75rem', fontWeight: 700 },
-  getWellInputStyle: jest.fn(() => ({ border: '1px solid #ccc', padding: '8px' })),
+  getWellInputStyle: jest.fn(() => ({
+    border: '1px solid #ccc',
+    padding: '8px',
+  })),
 }));
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
@@ -75,7 +104,7 @@ describe('Declarations Component', () => {
           updateHouseProperty={mockUpdateHouseProperty}
           {...props}
         />
-      </ThemeProvider>
+      </ThemeProvider>,
     );
   };
 
@@ -106,15 +135,26 @@ describe('Declarations Component', () => {
 
   it('displays correct values for Section A exemptions', () => {
     renderComponent();
-    expect(screen.getByTestId('produced-hra-exemption')).toHaveTextContent('50000');
-    expect(screen.getByTestId('produced-transport-exemption')).toHaveTextContent('30000');
+    expect(screen.getByTestId('produced-hra-exemption')).toHaveTextContent(
+      '50000',
+    );
+    expect(
+      screen.getByTestId('produced-transport-exemption'),
+    ).toHaveTextContent('30000');
   });
 
   it('calls handleDeclarationChange when an exemption field changes', () => {
     renderComponent();
-    const hraInput = screen.getByTestId('produced-hra-exemption').querySelector('input');
+    const hraInput = screen
+      .getByTestId('produced-hra-exemption')
+      .querySelector('input');
     fireEvent.change(hraInput, { target: { value: '60000' } });
-    expect(mockHandleDeclarationChange).toHaveBeenCalledWith('exemptions', 'hra', 'produced', '60000');
+    expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
+      'exemptions',
+      'hra',
+      'produced',
+      '60000',
+    );
   });
 
   it('shows error for Transport Exemption if value exceeds limit', () => {
@@ -126,13 +166,15 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHighTransport });
-    const transportInput = screen.getByTestId('produced-transport-exemption').querySelector('input');
+    const transportInput = screen
+      .getByTestId('produced-transport-exemption')
+      .querySelector('input');
     expect(transportInput).toHaveValue('40000');
     expect(screen.getByText('Max limit is ₹38,400')).toBeInTheDocument();
     expect(transportInput).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('shows error for Children\'s Ed. Allowance if value exceeds limit', () => {
+  it("shows error for Children's Ed. Allowance if value exceeds limit", () => {
     const declarationsWithHighChildrenEduc = {
       ...defaultDeclarations,
       exemptions: {
@@ -141,7 +183,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHighChildrenEduc });
-    const childrenEducInput = screen.getByTestId('produced-children\'s-ed.-allowance').querySelector('input');
+    const childrenEducInput = screen
+      .getByTestId("produced-children's-ed.-allowance")
+      .querySelector('input');
     expect(childrenEducInput).toHaveValue('3000');
     expect(screen.getByText('Max limit is ₹2,400')).toBeInTheDocument();
     expect(childrenEducInput).toHaveAttribute('aria-invalid', 'true');
@@ -167,7 +211,12 @@ describe('Declarations Component', () => {
     renderComponent();
     const bonusInput = screen.getByLabelText('bonus');
     fireEvent.change(bonusInput, { target: { value: '12000' } });
-    expect(mockHandleDeclarationChange).toHaveBeenCalledWith('otherIncome', 'bonus', null, '12000');
+    expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
+      'otherIncome',
+      'bonus',
+      null,
+      '12000',
+    );
   });
 
   // --- Section C: Chapter VI-A Deductions ---
@@ -184,15 +233,26 @@ describe('Declarations Component', () => {
 
   it('displays correct values for Section C deductions', () => {
     renderComponent();
-    expect(screen.getByTestId('produced-80d---health-insurance')).toHaveTextContent('30000');
-    expect(screen.getByTestId('produced-80gg---rent-(no-hra)')).toHaveTextContent('70000');
+    expect(
+      screen.getByTestId('produced-80d---health-insurance'),
+    ).toHaveTextContent('30000');
+    expect(
+      screen.getByTestId('produced-80gg---rent-(no-hra)'),
+    ).toHaveTextContent('70000');
   });
 
   it('calls handleDeclarationChange when a deduction field changes', () => {
     renderComponent();
-    const sec80DInput = screen.getByTestId('produced-80d---health-insurance').querySelector('input');
+    const sec80DInput = screen
+      .getByTestId('produced-80d---health-insurance')
+      .querySelector('input');
     fireEvent.change(sec80DInput, { target: { value: '35000' } });
-    expect(mockHandleDeclarationChange).toHaveBeenCalledWith('deductions', 'sec80D', 'produced', '35000');
+    expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
+      'deductions',
+      'sec80D',
+      'produced',
+      '35000',
+    );
   });
 
   it('shows error for 80D if value exceeds limit', () => {
@@ -204,7 +264,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHigh80D });
-    const sec80DInput = screen.getByTestId('produced-80d---health-insurance').querySelector('input');
+    const sec80DInput = screen
+      .getByTestId('produced-80d---health-insurance')
+      .querySelector('input');
     expect(sec80DInput).toHaveValue('40000');
     expect(screen.getByText('Max limit is ₹1,00,000')).toBeInTheDocument(); // Limit from createTextField
     expect(sec80DInput).toHaveAttribute('aria-invalid', 'true');
@@ -219,7 +281,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHigh80GG });
-    const sec80GGInput = screen.getByTestId('produced-80gg---rent-(no-hra)').querySelector('input');
+    const sec80GGInput = screen
+      .getByTestId('produced-80gg---rent-(no-hra)')
+      .querySelector('input');
     expect(sec80GGInput).toHaveValue('70000');
     expect(screen.getByText('Max limit is ₹60,000')).toBeInTheDocument();
     expect(sec80GGInput).toHaveAttribute('aria-invalid', 'true');
@@ -234,7 +298,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHigh80TTA_U });
-    const sec80TTA_UInput = screen.getByTestId('produced-80tta/u---bank-interest').querySelector('input');
+    const sec80TTA_UInput = screen
+      .getByTestId('produced-80tta/u---bank-interest')
+      .querySelector('input');
     expect(sec80TTA_UInput).toHaveValue('15000');
     expect(screen.getByText('Max limit is ₹50,000')).toBeInTheDocument(); // Limit from createTextField
     expect(sec80TTA_UInput).toHaveAttribute('aria-invalid', 'true');
@@ -242,7 +308,9 @@ describe('Declarations Component', () => {
 
   it('calls updateHouseProperty when Sec 24(b) Home Loan interest changes', () => {
     renderComponent();
-    const sec24BInput = screen.getByTestId('produced-sec-24(b)---home-loan').querySelector('input');
+    const sec24BInput = screen
+      .getByTestId('produced-sec-24(b)---home-loan')
+      .querySelector('input');
     fireEvent.change(sec24BInput, { target: { value: '200000' } });
     expect(mockUpdateHouseProperty).toHaveBeenCalledWith('interest', '200000');
   });
@@ -250,7 +318,9 @@ describe('Declarations Component', () => {
   it('shows error for Sec 24(b) Home Loan if value exceeds limit', () => {
     const housePropertyWithHighInterest = { interest: 250000 }; // Exceeds 200000 limit
     renderComponent({ houseProperty: housePropertyWithHighInterest });
-    const sec24BInput = screen.getByTestId('produced-sec-24(b)---home-loan').querySelector('input');
+    const sec24BInput = screen
+      .getByTestId('produced-sec-24(b)---home-loan')
+      .querySelector('input');
     expect(sec24BInput).toHaveValue('250000');
     expect(screen.getByText('Max limit is ₹2,00,000')).toBeInTheDocument();
     expect(sec24BInput).toHaveAttribute('aria-invalid', 'true');
@@ -275,7 +345,12 @@ describe('Declarations Component', () => {
     renderComponent();
     const npsEmployeeInput = screen.getByLabelText('npsEmployee');
     fireEvent.change(npsEmployeeInput, { target: { value: '25000' } });
-    expect(mockHandleDeclarationChange).toHaveBeenCalledWith('sec80C', 'npsEmployee', null, '25000');
+    expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
+      'sec80C',
+      'npsEmployee',
+      null,
+      '25000',
+    );
   });
 
   it('shows error for standard80C if value exceeds limit', () => {
@@ -313,7 +388,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithNullValues });
-    const hraInput = screen.getByTestId('produced-hra-exemption').querySelector('input');
+    const hraInput = screen
+      .getByTestId('produced-hra-exemption')
+      .querySelector('input');
     expect(hraInput).toHaveValue(''); // TextField with null/undefined value renders as empty string
     const bonusInput = screen.getByLabelText('bonus');
     expect(bonusInput).toHaveValue('');
@@ -328,7 +405,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithZeroLimit });
-    const transportInput = screen.getByTestId('produced-transport-exemption').querySelector('input');
+    const transportInput = screen
+      .getByTestId('produced-transport-exemption')
+      .querySelector('input');
     expect(transportInput).toHaveValue('1000');
     expect(screen.queryByText('Max limit is ₹0')).not.toBeInTheDocument(); // Should not show error if limit is 0
     expect(transportInput).not.toHaveAttribute('aria-invalid', 'true');
@@ -343,7 +422,9 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithNegativeLimit });
-    const transportInput = screen.getByTestId('produced-transport-exemption').querySelector('input');
+    const transportInput = screen
+      .getByTestId('produced-transport-exemption')
+      .querySelector('input');
     expect(transportInput).toHaveValue('1000');
     expect(screen.queryByText(/Max limit is/i)).not.toBeInTheDocument();
     expect(transportInput).not.toHaveAttribute('aria-invalid', 'true');

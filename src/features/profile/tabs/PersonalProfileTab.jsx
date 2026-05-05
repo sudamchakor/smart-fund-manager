@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   Grid,
   Box,
@@ -12,7 +12,7 @@ import {
   Divider,
   Stack,
   Chip,
-} from "@mui/material";
+} from '@mui/material';
 import {
   AttachMoney,
   MoneyOff,
@@ -21,19 +21,19 @@ import {
   Timeline as TimelineIcon,
   PieChart as PieChartIcon,
   Person as PersonIcon, // New Icon Import
-} from "@mui/icons-material";
-import { useDispatch, useSelector } from "react-redux";
+} from '@mui/icons-material';
+import { useDispatch, useSelector } from 'react-redux';
 
 // Component Imports
-import BasicInfoDisplay from "../components/BasicInfoDisplay";
-import BasicInfoEdit from "../components/BasicInfoEdit";
-import FinancialSettings from "../components/FinancialSettings";
-import CashFlowDonutChart from "../components/CashFlowDonutChart";
-import ProjectedCashFlowChart from "../components/ProjectedCashFlowChart";
-import FinancialSection from "../components/FinancialSection";
-import CorpusManager from "../../corpus/CorpusManager";
-import FinancialModal from "../components/FinancialModal";
-import ActionSpeedDial from "../../../components/common/ActionSpeedDial";
+import BasicInfoDisplay from '../components/BasicInfoDisplay';
+import BasicInfoEdit from '../components/BasicInfoEdit';
+import FinancialSettings from '../components/FinancialSettings';
+import CashFlowDonutChart from '../components/CashFlowDonutChart';
+import ProjectedCashFlowChart from '../components/ProjectedCashFlowChart';
+import FinancialSection from '../components/FinancialSection';
+import CorpusManager from '../../corpus/CorpusManager';
+import FinancialModal from '../components/FinancialModal';
+import ActionSpeedDial from '../../../components/common/ActionSpeedDial';
 
 // Selector Imports
 import {
@@ -49,21 +49,21 @@ import {
   selectIncomes,
   selectGeneralInflationRate,
   selectCareerGrowthRate,
-} from "../../../store/profileSlice";
-import { selectCalculatedValues } from "../../emiCalculator/utils/emiCalculator";
-import { investmentCategories } from "../../../utils/taxRules";
+} from '../../../store/profileSlice';
+import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
+import { investmentCategories } from '../../../utils/taxRules';
 
 export default function PersonalProfileTab({ onEditGoal }) {
   const dispatch = useDispatch();
   const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const [speedDialOpen, setSpeedDialOpen] = useState(false);
   const [editingBasicInfo, setEditingBasicInfo] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalType, setModalType] = useState("");
+  const [modalType, setModalType] = useState('');
   const [modalAsset, setModalAsset] = useState(null);
-  const [modalMode, setModalMode] = useState("add");
+  const [modalMode, setModalMode] = useState('add');
 
   // Data Selectors
   const expenses = useSelector(selectProfileExpenses) || [];
@@ -72,11 +72,11 @@ export default function PersonalProfileTab({ onEditGoal }) {
   const retirementAge = useSelector(selectRetirementAge) || 60;
   const careerGrowthRaw = useSelector(selectCareerGrowthRate);
   const careerGrowthRate =
-    typeof careerGrowthRaw === "object"
+    typeof careerGrowthRaw === 'object'
       ? careerGrowthRaw.value
       : careerGrowthRaw || 0;
   const careerGrowthType =
-    typeof careerGrowthRaw === "object" ? careerGrowthRaw.type : "percentage";
+    typeof careerGrowthRaw === 'object' ? careerGrowthRaw.type : 'percentage';
   const generalInflationRate = useSelector(selectGeneralInflationRate) || 0.06;
 
   const { emi: monthlyEmi } = useSelector(selectCalculatedValues);
@@ -95,17 +95,17 @@ export default function PersonalProfileTab({ onEditGoal }) {
 
   // Chart Data Calculation
   const needsValue = expenses
-    .filter((e) => e.category === "basic")
+    .filter((e) => e.category === 'basic')
     .reduce((acc, curr) => acc + curr.amount, 0);
   const wantsValue = expenses
-    .filter((e) => e.category === "discretionary")
+    .filter((e) => e.category === 'discretionary')
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const donutData = [
-    { name: "Needs", value: needsValue },
-    { name: "Wants", value: wantsValue },
-    { name: "Loan EMIs", value: monthlyEmi || 0 },
-    { name: "Future Wealth", value: totalMonthlyGoalContributions },
+    { name: 'Needs', value: needsValue },
+    { name: 'Wants', value: wantsValue },
+    { name: 'Loan EMIs', value: monthlyEmi || 0 },
+    { name: 'Future Wealth', value: totalMonthlyGoalContributions },
   ].filter((item) => item.value > 0);
 
   // Handlers
@@ -115,7 +115,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
     setEditingBasicInfo(false);
   };
 
-  const handleOpenFinancialModal = (type, assetData = null, mode = "add") => {
+  const handleOpenFinancialModal = (type, assetData = null, mode = 'add') => {
     setModalType(type);
     setModalAsset(assetData);
     setModalMode(mode);
@@ -125,28 +125,28 @@ export default function PersonalProfileTab({ onEditGoal }) {
 
   const handleCloseFinancialModal = () => {
     setModalOpen(false);
-    setModalType("");
+    setModalType('');
     setModalAsset(null);
-    setModalMode("add");
+    setModalMode('add');
   };
 
   const actions = [
     {
       icon: <AccountBalanceWallet />,
-      name: "Corpus",
-      handler: () => handleOpenFinancialModal("corpus", null, "add"),
+      name: 'Corpus',
+      handler: () => handleOpenFinancialModal('corpus', null, 'add'),
       tooltipOpen: true,
     },
     {
       icon: <AttachMoney />,
-      name: "Income",
-      handler: () => handleOpenFinancialModal("income", null, "add"),
+      name: 'Income',
+      handler: () => handleOpenFinancialModal('income', null, 'add'),
       tooltipOpen: true,
     },
     {
       icon: <MoneyOff />,
-      name: "Expense",
-      handler: () => handleOpenFinancialModal("expense", null, "add"),
+      name: 'Expense',
+      handler: () => handleOpenFinancialModal('expense', null, 'add'),
       tooltipOpen: true,
     },
   ];
@@ -158,9 +158,9 @@ export default function PersonalProfileTab({ onEditGoal }) {
         <Grid item xs={12} md={6}>
           <Card
             sx={{
-              height: "520px",
-              display: "flex",
-              flexDirection: "column",
+              height: '520px',
+              display: 'flex',
+              flexDirection: 'column',
               borderRadius: 3,
               boxShadow: 1,
             }}
@@ -187,7 +187,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
               }
             />
             <Divider />
-            <CardContent sx={{ flexGrow: 1, p: 2, overflowY: "auto" }}>
+            <CardContent sx={{ flexGrow: 1, p: 2, overflowY: 'auto' }}>
               {editingBasicInfo ? (
                 <BasicInfoEdit
                   currentAge={currentAge}
@@ -241,18 +241,18 @@ export default function PersonalProfileTab({ onEditGoal }) {
         </Grid>
 
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: "100%", borderRadius: 3, boxShadow: 1 }}>
+          <Card sx={{ height: '100%', borderRadius: 3, boxShadow: 1 }}>
             <CardHeader
               title={
                 <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                   Monthly Cash Flow Breakdown
                 </Typography>
               }
-              avatar={<PieChartIcon sx={{ color: "warning.main" }} />}
+              avatar={<PieChartIcon sx={{ color: 'warning.main' }} />}
             />
             <Divider />
             <CardContent>
-              <Box sx={{ width: "100%", height: 350 }}>
+              <Box sx={{ width: '100%', height: 350 }}>
                 <CashFlowDonutChart donutData={donutData} />
               </Box>
             </CardContent>
@@ -281,7 +281,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
             />
             <Divider />
             <CardContent>
-              <Box sx={{ width: "100%", height: 400 }}>
+              <Box sx={{ width: '100%', height: 400 }}>
                 <ProjectedCashFlowChart
                   currentAge={currentAge}
                   retirementAge={retirementAge}
@@ -305,7 +305,7 @@ export default function PersonalProfileTab({ onEditGoal }) {
       {isSmallScreen && (
         <ActionSpeedDial
           actions={actions}
-          sx={{ position: "fixed", bottom: 80, right: 16, zIndex: 9999 }}
+          sx={{ position: 'fixed', bottom: 80, right: 16, zIndex: 9999 }}
           onClose={() => setSpeedDialOpen(false)}
           onOpen={() => setSpeedDialOpen(true)}
           open={speedDialOpen}

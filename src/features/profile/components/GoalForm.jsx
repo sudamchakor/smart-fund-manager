@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Box,
   Typography,
@@ -8,13 +8,13 @@ import {
   alpha,
   useTheme,
   Stack,
-} from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import AccountTreeIcon from "@mui/icons-material/AccountTree"; // Technical icon for strategies
-import GoalFormHeader from "./GoalFormHeader";
-import InvestmentPlanCard from "./InvestmentPlanCard";
-import useGoalForm from "./useGoalForm";
-import SectionHeader from "../../../components/common/SectionHeader";
+} from '@mui/material';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import AccountTreeIcon from '@mui/icons-material/AccountTree'; // Technical icon for strategies
+import GoalFormHeader from './GoalFormHeader';
+import InvestmentPlanCard from './InvestmentPlanCard';
+import useGoalForm from './useGoalForm';
+import SectionHeader from '../../../components/common/SectionHeader';
 
 export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
   const theme = useTheme();
@@ -29,16 +29,16 @@ export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
   } = useGoalForm(goal, currentYear, onSave);
 
   const formatAmount = (amount) =>
-    (amount || 0).toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    (amount || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         gap: 1,
         p: { xs: 0, md: 1 }, // Tightened padding for density
-        overflowX: "hidden",
+        overflowX: 'hidden',
       }}
     >
       {/* 1. Main Goal Settings */}
@@ -52,7 +52,7 @@ export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
         handleSaveGoal={handleSaveGoal}
       />
 
-      <Divider sx={{ my: 3, borderStyle: "dashed", opacity: 0.5 }} />
+      <Divider sx={{ my: 3, borderStyle: 'dashed', opacity: 0.5 }} />
 
       {/* 2. Investment Strategies Section */}
       <SectionHeader
@@ -83,28 +83,28 @@ export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
             onClick={handleAddPlan}
             elevation={0}
             sx={{
-              height: "100%",
+              height: '100%',
               minHeight: 160,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              cursor: "pointer",
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
               borderRadius: 3,
               border: `2px dashed ${alpha(theme.palette.primary.main, 0.3)}`,
               bgcolor: alpha(theme.palette.primary.main, 0.02),
-              transition: "all 0.2s ease-in-out",
-              "&:hover": {
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
                 bgcolor: alpha(theme.palette.primary.main, 0.05),
                 borderColor: theme.palette.primary.main,
-                transform: "translateY(-2px)",
+                transform: 'translateY(-2px)',
                 boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.1)}`,
               },
             }}
           >
             <AddCircleOutlineIcon
               sx={{
-                fontSize: "2.5rem",
+                fontSize: '2.5rem',
                 mb: 1,
                 color: theme.palette.primary.main,
                 opacity: 0.7,
@@ -115,13 +115,13 @@ export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
               sx={{
                 fontWeight: 700,
                 color: theme.palette.primary.main,
-                textTransform: "uppercase",
+                textTransform: 'uppercase',
                 letterSpacing: 1,
               }}
             >
               Add New Strategy
             </Typography>
-            <Typography variant="caption" sx={{ color: "text.disabled" }}>
+            <Typography variant="caption" sx={{ color: 'text.disabled' }}>
               (SIP, Lumpsum, or Custom Plan)
             </Typography>
           </Card>

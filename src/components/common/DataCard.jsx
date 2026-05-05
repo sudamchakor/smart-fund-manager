@@ -1,11 +1,14 @@
-import React from "react";
-import { Box, Typography, useTheme, alpha, Stack } from "@mui/material";
+import React from 'react';
+import { Box, Typography, useTheme, alpha, Stack } from '@mui/material';
 
 const DataCard = ({ title, icon, colorToken, children, sx = {} }) => {
   const theme = useTheme();
 
   // Resolve the color directly from the theme to prevent alpha() parsing errors
-  const activeColor = !colorToken || colorToken === "primary.main" ? theme.palette.primary.main : colorToken;
+  const activeColor =
+    !colorToken || colorToken === 'primary.main'
+      ? theme.palette.primary.main
+      : colorToken;
 
   return (
     <Box
@@ -13,13 +16,13 @@ const DataCard = ({ title, icon, colorToken, children, sx = {} }) => {
       sx={{
         p: { xs: 2, sm: 2.5 },
         borderRadius: 3,
-        border: "1px solid",
+        border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: theme.palette.background.paper,
-        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || "#000", 0.02)}`,
+        boxShadow: `0 4px 24px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
         mb: 3,
-        display: "flex",
-        flexDirection: "column",
+        display: 'flex',
+        flexDirection: 'column',
         ...sx, // Allow passing custom styles from parent
       }}
     >
@@ -34,7 +37,7 @@ const DataCard = ({ title, icon, colorToken, children, sx = {} }) => {
           {icon && (
             <Box
               sx={{
-                display: "flex",
+                display: 'flex',
                 p: 1,
                 borderRadius: 2,
                 bgcolor: alpha(activeColor, 0.1),
@@ -49,8 +52,8 @@ const DataCard = ({ title, icon, colorToken, children, sx = {} }) => {
             variant="subtitle2"
             sx={{
               fontWeight: 800,
-              color: "text.primary",
-              textTransform: "uppercase",
+              color: 'text.primary',
+              textTransform: 'uppercase',
               letterSpacing: 0.5,
             }}
           >

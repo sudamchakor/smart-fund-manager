@@ -6,8 +6,12 @@ import InvestmentChart from '../../../features/investment/components/InvestmentC
 
 // Mock Recharts components
 jest.mock('recharts', () => ({
-  ResponsiveContainer: ({ children }) => <div data-testid="recharts-responsive-container">{children}</div>,
-  AreaChart: ({ children }) => <div data-testid="recharts-area-chart">{children}</div>,
+  ResponsiveContainer: ({ children }) => (
+    <div data-testid="recharts-responsive-container">{children}</div>
+  ),
+  AreaChart: ({ children }) => (
+    <div data-testid="recharts-area-chart">{children}</div>
+  ),
   Area: () => <div data-testid="recharts-area"></div>,
   XAxis: () => <div data-testid="recharts-xaxis"></div>,
   YAxis: () => <div data-testid="recharts-yaxis"></div>,
@@ -25,9 +29,11 @@ describe.skip('InvestmentChart', () => {
     render(
       <Provider store={store}>
         <InvestmentChart data={mockData} />
-      </Provider>
+      </Provider>,
     );
-    expect(screen.getByTestId('recharts-responsive-container')).toBeInTheDocument();
+    expect(
+      screen.getByTestId('recharts-responsive-container'),
+    ).toBeInTheDocument();
     expect(screen.getByTestId('recharts-area-chart')).toBeInTheDocument();
   });
 });

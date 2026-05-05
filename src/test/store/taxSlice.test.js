@@ -72,45 +72,83 @@ describe.skip('taxSlice reducer', () => {
   });
 
   it('should handle updateMonthData', () => {
-    const actual = taxReducer(defaultInitialState, updateMonthData({ index: 0, field: 'basic', value: 55000, populateRemaining: false }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateMonthData({
+        index: 0,
+        field: 'basic',
+        value: 55000,
+        populateRemaining: false,
+      }),
+    );
     expect(actual.salaryMonths[0].basic).toEqual(55000);
   });
 
   it('should handle updateMonthData with populateRemaining', () => {
-    const actual = taxReducer(defaultInitialState, updateMonthData({ index: 0, field: 'basic', value: 60000, populateRemaining: true }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateMonthData({
+        index: 0,
+        field: 'basic',
+        value: 60000,
+        populateRemaining: true,
+      }),
+    );
     expect(actual.salaryMonths[0].basic).toEqual(60000);
     expect(actual.salaryMonths[11].basic).toEqual(60000);
   });
 
   it('should handle updateSettings', () => {
-    const actual = taxReducer(defaultInitialState, updateSettings({ isMetro: 'No', pfPercent: 10 }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateSettings({ isMetro: 'No', pfPercent: 10 }),
+    );
     expect(actual.settings.isMetro).toEqual('No');
     expect(actual.settings.pfPercent).toEqual(10);
   });
 
   it('should handle addDynamicRow for income', () => {
-    const actual = taxReducer(defaultInitialState, addDynamicRow({ type: 'income', label: 'Bonus' }));
+    const actual = taxReducer(
+      defaultInitialState,
+      addDynamicRow({ type: 'income', label: 'Bonus' }),
+    );
     expect(actual.dynamicRows.income.length).toBe(1);
     expect(actual.dynamicRows.income[0].label).toBe('Bonus');
-    expect(actual.salaryMonths[0]).toHaveProperty(actual.dynamicRows.income[0].id);
+    expect(actual.salaryMonths[0]).toHaveProperty(
+      actual.dynamicRows.income[0].id,
+    );
   });
 
   it('should handle addDynamicRow for deduction', () => {
-    const actual = taxReducer(defaultInitialState, addDynamicRow({ type: 'deduction', label: 'Sodexo' }));
+    const actual = taxReducer(
+      defaultInitialState,
+      addDynamicRow({ type: 'deduction', label: 'Sodexo' }),
+    );
     expect(actual.dynamicRows.deduction.length).toBe(1);
     expect(actual.dynamicRows.deduction[0].label).toBe('Sodexo');
-    expect(actual.salaryMonths[0]).toHaveProperty(actual.dynamicRows.deduction[0].id);
+    expect(actual.salaryMonths[0]).toHaveProperty(
+      actual.dynamicRows.deduction[0].id,
+    );
   });
 
   it('should handle editDynamicRow', () => {
-    let state = taxReducer(defaultInitialState, addDynamicRow({ type: 'income', label: 'Bonus' }));
+    let state = taxReducer(
+      defaultInitialState,
+      addDynamicRow({ type: 'income', label: 'Bonus' }),
+    );
     const rowId = state.dynamicRows.income[0].id;
-    state = taxReducer(state, editDynamicRow({ type: 'income', id: rowId, label: 'Annual Bonus' }));
+    state = taxReducer(
+      state,
+      editDynamicRow({ type: 'income', id: rowId, label: 'Annual Bonus' }),
+    );
     expect(state.dynamicRows.income[0].label).toBe('Annual Bonus');
   });
 
   it('should handle deleteDynamicRow', () => {
-    let state = taxReducer(defaultInitialState, addDynamicRow({ type: 'income', label: 'Bonus' }));
+    let state = taxReducer(
+      defaultInitialState,
+      addDynamicRow({ type: 'income', label: 'Bonus' }),
+    );
     const rowId = state.dynamicRows.income[0].id;
     state = taxReducer(state, deleteDynamicRow({ type: 'income', id: rowId }));
     expect(state.dynamicRows.income.length).toBe(0);
@@ -118,7 +156,10 @@ describe.skip('taxSlice reducer', () => {
   });
 
   it('should handle updateHouseProperty', () => {
-    const actual = taxReducer(defaultInitialState, updateHouseProperty({ interest: 200000 }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateHouseProperty({ interest: 200000 }),
+    );
     expect(actual.houseProperty.interest).toEqual(200000);
   });
 
@@ -134,12 +175,26 @@ describe.skip('taxSlice reducer', () => {
   });
 
   it('should handle updateDeclaration for a nested field', () => {
-    const actual = taxReducer(defaultInitialState, updateDeclaration({ section: 'exemptions', field: 'hra', value: { produced: 50000 } }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateDeclaration({
+        section: 'exemptions',
+        field: 'hra',
+        value: { produced: 50000 },
+      }),
+    );
     expect(actual.declarations.exemptions.hra.produced).toEqual(50000);
   });
 
   it('should handle updateDeclaration for a top-level field', () => {
-    const actual = taxReducer(defaultInitialState, updateDeclaration({ section: 'sec80C', field: 'standard80C', value: 100000 }));
+    const actual = taxReducer(
+      defaultInitialState,
+      updateDeclaration({
+        section: 'sec80C',
+        field: 'standard80C',
+        value: 100000,
+      }),
+    );
     expect(actual.declarations.sec80C.standard80C).toEqual(100000);
   });
 
@@ -149,27 +204,55 @@ describe.skip('taxSlice reducer', () => {
       const calculated = selectCalculatedSalary(state);
       expect(calculated.annual.basic).toBe(50000 * 12);
       expect(calculated.annual.hraReceived).toBe(25000 * 12);
-      expect(calculated.annual.totalIncome).toBe((50000 + 25000 + 10000 + 5000) * 12);
+      expect(calculated.annual.totalIncome).toBe(
+        (50000 + 25000 + 10000 + 5000) * 12,
+      );
       expect(calculated.annual.pf).toBe(6000 * 12);
       expect(calculated.annual.vpf).toBe(0);
       expect(calculated.annual.nps).toBe(0);
       expect(calculated.annual.profTax).toBe(2500);
-      expect(calculated.annual.totalDeductions).toBe((6000 * 12) + 2500);
-      expect(calculated.annual.netIncome).toBe(calculated.annual.totalIncome - calculated.annual.totalDeductions);
+      expect(calculated.annual.totalDeductions).toBe(6000 * 12 + 2500);
+      expect(calculated.annual.netIncome).toBe(
+        calculated.annual.totalIncome - calculated.annual.totalDeductions,
+      );
     });
 
     it('should handle dynamic rows in salary calculation', () => {
-      let state = taxReducer(defaultInitialState, addDynamicRow({ type: 'income', label: 'Bonus' }));
+      let state = taxReducer(
+        defaultInitialState,
+        addDynamicRow({ type: 'income', label: 'Bonus' }),
+      );
       const incomeId = state.dynamicRows.income[0].id;
-      state = taxReducer(state, updateMonthData({ index: 0, field: incomeId, value: 10000, populateRemaining: false }));
+      state = taxReducer(
+        state,
+        updateMonthData({
+          index: 0,
+          field: incomeId,
+          value: 10000,
+          populateRemaining: false,
+        }),
+      );
 
-      let stateWithDeduction = taxReducer(state, addDynamicRow({ type: 'deduction', label: 'Sodexo' }));
+      let stateWithDeduction = taxReducer(
+        state,
+        addDynamicRow({ type: 'deduction', label: 'Sodexo' }),
+      );
       const deductionId = stateWithDeduction.dynamicRows.deduction[0].id;
-      stateWithDeduction = taxReducer(stateWithDeduction, updateMonthData({ index: 0, field: deductionId, value: 1000, populateRemaining: false }));
+      stateWithDeduction = taxReducer(
+        stateWithDeduction,
+        updateMonthData({
+          index: 0,
+          field: deductionId,
+          value: 1000,
+          populateRemaining: false,
+        }),
+      );
 
       const calculated = selectCalculatedSalary({ tax: stateWithDeduction });
-      expect(calculated.annual.totalIncome).toBe(((50000 + 25000 + 10000 + 5000) * 12) + 10000);
-      expect(calculated.annual.totalDeductions).toBe(((6000 * 12) + 2500) + 1000);
+      expect(calculated.annual.totalIncome).toBe(
+        (50000 + 25000 + 10000 + 5000) * 12 + 10000,
+      );
+      expect(calculated.annual.totalDeductions).toBe(6000 * 12 + 2500 + 1000);
     });
   });
 
@@ -179,7 +262,12 @@ describe.skip('taxSlice reducer', () => {
         ...defaultInitialState,
         declarations: {
           ...defaultInitialState.declarations,
-          sec80C: { standard80C: 50000, npsEmployee: 10000, totalProduced: 0, limited: 0 },
+          sec80C: {
+            standard80C: 50000,
+            npsEmployee: 10000,
+            totalProduced: 0,
+            limited: 0,
+          },
           deductions: {
             ...defaultInitialState.declarations.deductions,
             sec80D: { produced: 30000, limited: 0 },

@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Table,
   TableBody,
@@ -19,9 +19,9 @@ import {
   Card,
   CardContent,
   Grid,
-} from "@mui/material";
-import { Add as AddIcon } from "@mui/icons-material";
-import { getWellInputStyle } from "../../styles/formStyles";
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
+import { getWellInputStyle } from '../../styles/formStyles';
 
 const SalaryTable = ({
   viewMode,
@@ -36,7 +36,7 @@ const SalaryTable = ({
   onAnnualChange,
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   const renderAnnualRow = (
     label,
@@ -56,9 +56,9 @@ const SalaryTable = ({
           scope="row"
           sx={{
             fontWeight: isCalculated ? 900 : 700,
-            color: isCalculated ? "primary.main" : "text.primary",
-            textTransform: isCalculated ? "uppercase" : "none",
-            fontSize: "0.75rem",
+            color: isCalculated ? 'primary.main' : 'text.primary',
+            textTransform: isCalculated ? 'uppercase' : 'none',
+            fontSize: '0.75rem',
           }}
         >
           {label}
@@ -72,7 +72,7 @@ const SalaryTable = ({
             disabled={isCalculated}
             InputProps={{
               disableUnderline: true,
-              sx: { ...getWellInputStyle(theme), width: "100%" },
+              sx: { ...getWellInputStyle(theme), width: '100%' },
             }}
           />
         </TableCell>
@@ -87,8 +87,8 @@ const SalaryTable = ({
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "text.secondary",
+            textTransform: 'uppercase',
+            color: 'text.secondary',
             letterSpacing: 1,
             mb: 1.5,
           }}
@@ -105,10 +105,12 @@ const SalaryTable = ({
                     variant="standard"
                     size="small"
                     value={calculatedSalary.months[0][item.field]}
-                    onChange={(e) => onAnnualChange(item.field, e.target.value * 12)}
+                    onChange={(e) =>
+                      onAnnualChange(item.field, e.target.value * 12)
+                    }
                     InputProps={{
                       disableUnderline: true,
-                      sx: { ...getWellInputStyle(theme), width: "100%" },
+                      sx: { ...getWellInputStyle(theme), width: '100%' },
                     }}
                   />
                 </CardContent>
@@ -132,8 +134,8 @@ const SalaryTable = ({
           variant="subtitle2"
           sx={{
             fontWeight: 800,
-            textTransform: "uppercase",
-            color: "text.secondary",
+            textTransform: 'uppercase',
+            color: 'text.secondary',
             letterSpacing: 1,
           }}
         >
@@ -161,23 +163,23 @@ const SalaryTable = ({
           border: `1px solid ${alpha(theme.palette.divider, 0.1)}`,
           bgcolor: theme.palette.background.paper,
           boxShadow: `0 4px 24px ${alpha(
-            theme.palette.common.black || "#000",
+            theme.palette.common.black || '#000',
             0.02,
           )}`,
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
-        <Collapse in={viewMode === "monthly"} timeout="auto" unmountOnExit>
-          <TableContainer sx={{ maxWidth: "100%", overflowX: "auto" }}>
+        <Collapse in={viewMode === 'monthly'} timeout="auto" unmountOnExit>
+          <TableContainer sx={{ maxWidth: '100%', overflowX: 'auto' }}>
             <Table size="small" sx={{ minWidth: 1000 }}>
               <TableHead>
                 <TableRow>
                   <TableCell
                     sx={{
-                      position: "sticky",
+                      position: 'sticky',
                       left: 0,
                       bgcolor: alpha(theme.palette.background.paper, 0.9),
-                      backdropFilter: "blur(10px)",
+                      backdropFilter: 'blur(10px)',
                       zIndex: 2,
                       minWidth: 100,
                       maxWidth: 120,
@@ -199,9 +201,9 @@ const SalaryTable = ({
                         minWidth: 60,
                         py: 1,
                         fontWeight: 800,
-                        fontSize: "0.7rem",
-                        textTransform: "uppercase",
-                        color: "text.secondary",
+                        fontSize: '0.7rem',
+                        textTransform: 'uppercase',
+                        color: 'text.secondary',
                         borderRight: `1px solid ${alpha(
                           theme.palette.divider,
                           0.1,
@@ -245,7 +247,7 @@ const SalaryTable = ({
                     item.id,
                     false,
                     true,
-                    "income",
+                    'income',
                     item.id,
                   ),
                 )}
@@ -263,21 +265,21 @@ const SalaryTable = ({
                     <Button
                       size="small"
                       startIcon={<AddIcon />}
-                      onClick={() => openAddModal("income")}
-                      sx={{ fontWeight: 700, color: "text.secondary" }}
+                      onClick={() => openAddModal('income')}
+                      sx={{ fontWeight: 700, color: 'text.secondary' }}
                     >
                       Inject Income Row
                     </Button>
                   </TableCell>
                 </TableRow>
                 {renderRow(
-                  "Gross Total",
-                  "total",
+                  'Gross Total',
+                  'total',
                   true,
                   false,
                   null,
                   null,
-                  "Total Monthly Gross Earnings",
+                  'Total Monthly Gross Earnings',
                 )}
 
                 {deductionsFixed.map((item) =>
@@ -297,7 +299,7 @@ const SalaryTable = ({
                     item.id,
                     false,
                     true,
-                    "deduction",
+                    'deduction',
                     item.id,
                   ),
                 )}
@@ -315,30 +317,30 @@ const SalaryTable = ({
                     <Button
                       size="small"
                       startIcon={<AddIcon />}
-                      onClick={() => openAddModal("deduction")}
-                      sx={{ fontWeight: 700, color: "text.secondary" }}
+                      onClick={() => openAddModal('deduction')}
+                      sx={{ fontWeight: 700, color: 'text.secondary' }}
                     >
                       Inject Deduction Row
                     </Button>
                   </TableCell>
                 </TableRow>
                 {renderRow(
-                  "Tot Deduct",
-                  "totDed",
+                  'Tot Deduct',
+                  'totDed',
                   true,
                   false,
                   null,
                   null,
-                  "Total Monthly Deductions",
+                  'Total Monthly Deductions',
                 )}
                 {renderRow(
-                  "Net Pay",
-                  "net",
+                  'Net Pay',
+                  'net',
                   true,
                   false,
                   null,
                   null,
-                  "Net Monthly Salary",
+                  'Net Monthly Salary',
                 )}
                 {otherFields.map((item) =>
                   renderRow(
@@ -356,7 +358,7 @@ const SalaryTable = ({
           </TableContainer>
         </Collapse>
 
-        <Collapse in={viewMode === "annual"} timeout="auto" unmountOnExit>
+        <Collapse in={viewMode === 'annual'} timeout="auto" unmountOnExit>
           <TableContainer>
             <Table size="small">
               <TableHead>
@@ -367,21 +369,16 @@ const SalaryTable = ({
               </TableHead>
               <TableBody>
                 {earningsFixed.map((item) =>
-                  renderAnnualRow(
-                    item.label,
-                    item.field,
-                    false,
-                    item.tooltip,
-                  ),
+                  renderAnnualRow(item.label, item.field, false, item.tooltip),
                 )}
                 {dynamicRows.income.map((item) =>
                   renderAnnualRow(item.label, item.id, false),
                 )}
                 {renderAnnualRow(
-                  "Gross Total",
-                  "total",
+                  'Gross Total',
+                  'total',
                   true,
-                  "Total Monthly Gross Earnings",
+                  'Total Monthly Gross Earnings',
                 )}
                 {deductionsFixed.map((item) =>
                   renderAnnualRow(
@@ -395,24 +392,14 @@ const SalaryTable = ({
                   renderAnnualRow(item.label, item.id, false),
                 )}
                 {renderAnnualRow(
-                  "Tot Deduct",
-                  "totDed",
+                  'Tot Deduct',
+                  'totDed',
                   true,
-                  "Total Monthly Deductions",
+                  'Total Monthly Deductions',
                 )}
-                {renderAnnualRow(
-                  "Net Pay",
-                  "net",
-                  true,
-                  "Net Monthly Salary",
-                )}
+                {renderAnnualRow('Net Pay', 'net', true, 'Net Monthly Salary')}
                 {otherFields.map((item) =>
-                  renderAnnualRow(
-                    item.label,
-                    item.field,
-                    false,
-                    item.tooltip,
-                  ),
+                  renderAnnualRow(item.label, item.field, false, item.tooltip),
                 )}
               </TableBody>
             </Table>
