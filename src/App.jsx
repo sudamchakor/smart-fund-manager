@@ -16,11 +16,10 @@ import {
 } from './store/emiSlice';
 
 import Header from './components/layout/Header';
-import AdminHeader from './components/layout/AdminHeader';
+// REMOVED: import AdminHeader from './components/layout/AdminHeader'; // This was causing Firebase to load early
 import Footer from './components/layout/Footer';
 import SuspenseFallback from './components/common/SuspenseFallback';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import { useAuth } from './hooks/useAuth'; // Keep useAuth for ProtectedRoute and AdminRedirect
 
 // Lazy Loaded Pages
 const Home = lazy(() => import('./pages/Home'));
@@ -49,31 +48,20 @@ const AdminArticles = lazy(() => import('./pages/admin/AdminArticles'));
 const LoginPage = lazy(() => import('./pages/admin/LoginPage'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 
-// Lazy Load FirebaseWrapper
+// Lazy Load FirebaseWrapper and Auth-related components
 const FirebaseWrapper = lazy(
   () => import('./components/layout/FirebaseWrapper'),
 );
-
-// ProtectedRoute component (Now safely inside AuthProvider context)
-const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useAuth();
-  if (loading) return <SuspenseFallback />;
-  if (!user) return <Navigate to="/admin/login" replace />;
-  return children;
-};
-
-// AdminRedirect component
-const AdminRedirect = () => {
-  const { user, loading } = useAuth();
-  if (loading) return <SuspenseFallback />;
-  if (!user) return <Navigate to="/admin/login" replace />;
-  return <Navigate to="/admin/articles" replace />;
-};
+const ProtectedRoute = lazy(() => import('./components/auth/ProtectedRoute'));
+const AdminRedirect = lazy(() => import('./components/auth/AdminRedirect'));
+const AdminHeader = lazy(() => import('./components/layout/AdminHeader')); // LAZY LOAD ADMIN HEADER
 
 // New Layout Component for Admin that includes the AdminHeader
 const AdminLayout = () => (
   <>
-    <AdminHeader />
+    <Suspense fallback={<SuspenseFallback />}>
+      <AdminHeader />
+    </Suspense>
     <Outlet />
   </>
 );
@@ -176,37 +164,52 @@ const AppContent = () => {
                   {/* Admin Pages (Wrapped in AdminHeader) */}
                   <Route element={<AdminLayout />}>
                     <Route path="/admin/login" element={<LoginPage />} />
-                    <Route path="/admin" element={<AdminRedirect />} />
+                    <Route
+                      path="/admin"
+                      element={
+                        <Suspense fallback={<SuspenseFallback />}>
+                          <AdminRedirect />
+                        </Suspense>
+                      }
+                    />
                     <Route
                       path="/admin/articles"
                       element={
-                        <ProtectedRoute>
-                          <AdminArticles />
-                        </ProtectedRoute>
+                        <Suspense fallback={<SuspenseFallback />}>
+                          <ProtectedRoute>
+                            <AdminArticles />
+                          </ProtectedRoute>
+                        </Suspense>
                       }
                     />
                     <Route
                       path="/admin/articles/new"
                       element={
-                        <ProtectedRoute>
-                          <WriteArticle />
-                        </ProtectedRoute>
+                        <Suspense fallback={<SuspenseFallback />}>
+                          <ProtectedRoute>
+                            <WriteArticle />
+                          </ProtectedRoute>
+                        </Suspense>
                       }
                     />
                     <Route
                       path="/admin/articles/edit/:id"
                       element={
-                        <ProtectedRoute>
-                          <WriteArticle />
-                        </ProtectedRoute>
+                        <Suspense fallback={<SuspenseFallback />}>
+                          <ProtectedRoute>
+                            <WriteArticle />
+                          </ProtectedRoute>
+                        </Suspense>
                       }
                     />
                     <Route
                       path="/admin/profile"
                       element={
-                        <ProtectedRoute>
-                          <AdminProfile />
-                        </ProtectedRoute>
+                        <Suspense fallback={<SuspenseFallback />}>
+                          <ProtectedRoute>
+                            <AdminProfile />
+                          </ProtectedRoute>
+                        </Suspense>
                       }
                     />
                   </Route>
