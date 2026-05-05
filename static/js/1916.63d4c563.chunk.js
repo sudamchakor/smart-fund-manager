@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunksmart_fund_manager=globalThis.webpackChunksmart_fund_manager||[]).push([[1916],{91916(a,s,n){n.r(s),n.d(s,{default:()=>h});n(65043);var r=n(73216),e=n(30342),u=n(70579);const h=()=>(0,u.jsx)(e.O,{children:(0,u.jsx)(r.sv,{})})}}]);
+//# sourceMappingURL=1916.63d4c563.chunk.js.map
