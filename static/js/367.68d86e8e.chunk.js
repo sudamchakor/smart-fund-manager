@@ -1,2 +1,0 @@
-"use strict";(globalThis.webpackChunksmart_fund_manager=globalThis.webpackChunksmart_fund_manager||[]).push([[367],{60367(a,n,e){e.r(n),e.d(n,{default:()=>u});e(65043);var r=e(73216),s=e(30342),l=e(58927),t=e(70579);const u=a=>{let{children:n}=a;const{user:e,loading:u}=(0,s.A)();return u?(0,t.jsx)(l.A,{}):e?n:(0,t.jsx)(r.C5,{to:"/admin/login",replace:!0})}}}]);
-//# sourceMappingURL=367.68d86e8e.chunk.js.map

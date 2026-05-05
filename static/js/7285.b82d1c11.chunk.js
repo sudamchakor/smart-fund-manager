@@ -1,2 +1,0 @@
-"use strict";(globalThis.webpackChunksmart_fund_manager=globalThis.webpackChunksmart_fund_manager||[]).push([[7285],{67285(a,s,e){e.r(s),e.d(s,{default:()=>u});e(65043);var n=e(73216),r=e(30342),t=e(58927),l=e(70579);const u=()=>{const{user:a,loading:s}=(0,r.A)();return s?(0,l.jsx)(t.A,{}):a?(0,l.jsx)(n.C5,{to:"/admin/articles",replace:!0}):(0,l.jsx)(n.C5,{to:"/admin/login",replace:!0})}}}]);
-//# sourceMappingURL=7285.b82d1c11.chunk.js.map
