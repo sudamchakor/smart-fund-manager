@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
 import ReadOnlyItem from '../../../components/common/ReadOnlyItem';
-import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
+import * as formatting from '../../../utils/formatting.js'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
 
 // Mock Material-UI Icons
@@ -26,7 +26,7 @@ jest.mock('@mui/icons-material/InfoOutlined', () => (props) => (
 jest.mock(
   '@mui/material/Dialog',
   () =>
-    ({ open, children, ...props }) =>
+    ({ open, children, PaperProps, ...props }) => // Destructure PaperProps to prevent warning
       open ? (
         <div data-testid="mock-dialog" {...props}>
           {children}
@@ -53,6 +53,16 @@ jest
     if (typeof value !== 'number' || isNaN(value)) return `${currency}0`;
     return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   });
+
+/**
+ * Utility to match JSDOM's computed color format
+ */
+const hexToRgb = (hex) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${r}, ${g}, ${b})`;
+};
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
@@ -111,31 +121,30 @@ describe('ReadOnlyItem Component', () => {
   it('applies correct border color based on item type (income)', () => {
     renderComponent({ isIncome: true });
     const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(
-      `border-left: 4px solid ${theme.palette.success.main}`,
-    );
+    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.success.main)}`);
   });
 
   it('applies correct border color based on item type (expense)', () => {
     renderComponent({ isExpense: true });
     const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(
-      `border-left: 4px solid ${theme.palette.error.main}`,
-    );
+    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.error.main)}`);
   });
 
   it('applies correct border color based on item type (goal)', () => {
     renderComponent({ isGoal: true });
     const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(
-      `border-left: 4px solid ${theme.palette.primary.main}`,
-    );
+    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.primary.main)}`);
   });
 
   it('applies custom expenseColor if provided for expense', () => {
     renderComponent({ isExpense: true, expenseColor: 'orange' });
     const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle('border-left: 4px solid orange');
+    // For named colors like 'orange', JSDOM might convert to RGB or keep as is.
+    // It's safer to check for the exact string if it's a direct CSS value.
+    // If it's a theme color, convert to RGB. Here, 'orange' is a direct string.
+    // If the component converts 'orange' to theme.palette.warning.main or similar,
+    // then the assertion needs to reflect that. Assuming it uses the string directly.
+    expect(itemBox).toHaveStyle('border-left: 4px solid orange'); // This should be fine if 'orange' is passed directly
   });
 
   // --- Edit Button ---
@@ -327,12 +336,13 @@ describe('ReadOnlyItem Component', () => {
     // Net Cost: 10000 - 3000 = 7000
     expect(screen.getByText('Net Cost: ₹7,000')).toBeInTheDocument();
     expect(
-      screen.getByRole('tooltip', {
-        name: 'Original: ₹10,000, Tax Saved: ₹3,000',
-      }),
+      screen.getByTestId('InfoOutlinedIcon'), // Assuming InfoOutlinedIcon is the tooltip trigger
     ).toBeInTheDocument();
+    fireEvent.mouseEnter(screen.getByTestId('InfoOutlinedIcon')); // fireEvent.mouseEnter is synchronous, but the tooltip might appear asynchronously
+    const tooltip = await screen.findByRole('tooltip'); // Use findByRole for asynchronous appearance
+    expect(tooltip).toHaveTextContent('Original: ₹10,000, Tax Saved: ₹3,000');
   });
-
+  
   it('does not render Net Cost chip if not tax deductible', () => {
     renderComponent({
       isExpense: true,

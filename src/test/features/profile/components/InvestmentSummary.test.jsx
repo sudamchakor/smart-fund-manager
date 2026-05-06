@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import InvestmentSummary from '../../../features/profile/components/InvestmentSummary';
+import InvestmentSummary from '../../../../features/profile/components/InvestmentSummary.jsx'; // Corrected path
 
 describe.skip('InvestmentSummary Component', () => {
   const mockPlans = [

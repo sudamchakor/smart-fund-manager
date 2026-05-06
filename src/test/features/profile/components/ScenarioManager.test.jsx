@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ScenarioManager from '../../../features/profile/components/ScenarioManager';
+import ScenarioManager from '../../../../features/profile/components/ScenarioManager.jsx'; // Corrected path
 
 describe.skip('ScenarioManager', () => {
   it('renders without crashing', () => {

@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import LoginPage from '../../../../src/pages/admin/LoginPage';
-import '@testing-library/jest-dom';
-import {
+import '@testing-library/jest-dom'; // This mock is fine
+import { // This mock is fine
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
@@ -18,7 +18,7 @@ jest.mock('react-router-dom', () => ({
 }));
 
 // Mock firebase/getAuthentication functions
-jest.mock('firebase/getAuthentication', () => ({
+jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(() => ({})),
   signInWithEmailAndPassword: jest.fn(),
   GoogleAuthProvider: jest.fn(),

@@ -104,14 +104,8 @@ export const getAppTheme = (themeMode, designSystem, visualStyle) => {
     },
     // INJECTING MOTION ENGINE
     transitions: {
-      easing: {
-        easeInOut: motion.easing.easeInOut,
-        sharp: motion.easing.sharp,
-      },
-      duration: {
-        short: motion.duration.short,
-        standard: motion.duration.standard,
-      },
+      easing: motion.easing,
+      duration: motion.duration,
     },
     shape: {
       borderRadius:

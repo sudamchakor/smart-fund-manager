@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import FixedLiabilities from '../../../../features/profile/tabs/OnboardingSteps/FixedLiabilities';
+import FixedLiabilities from '../../../../../features/profile/tabs/OnboardingSteps/FixedLiabilities.jsx'; // Corrected path
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
@@ -18,8 +18,7 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock(
-  '../../../../../src/components/common/EditableIncomeExpenseItem',
+jest.mock('../../../../../src/components/common/EditableIncomeExpenseItem.jsx', // Corrected path
   () =>
     ({ item }) => (
       <div data-testid={`editable-expense-item-${item ? item.id : 'new'}`}>
@@ -29,7 +28,7 @@ jest.mock(
   { virtual: true },
 );
 
-describe.skip('FixedLiabilities', () => {
+describe('FixedLiabilities', () => {
   it('renders without crashing', () => {
     render(<FixedLiabilities onNext={() => {}} onBack={() => {}} />);
     expect(

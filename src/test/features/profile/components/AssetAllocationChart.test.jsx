@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import AssetAllocationChart from '../../../features/profile/components/AssetAllocationChart';
+import AssetAllocationChart from '../../../../features/profile/components/AssetAllocationChart.jsx'; // Corrected path
 
 // Mock Recharts components
 jest.mock('recharts', () => ({

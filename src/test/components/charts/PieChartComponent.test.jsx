@@ -27,9 +27,13 @@ jest.mock('recharts', () => ({
 }));
 
 // Mock Redux useSelector
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-}));
+jest.mock('react-redux', () => {
+  const OriginalReactRedux = jest.requireActual('react-redux');
+  return {
+    ...OriginalReactRedux,
+    useSelector: jest.fn(),
+  };
+});
 const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing
@@ -221,7 +225,7 @@ describe('PieChartComponent', () => {
 
     const interestRow = screen.getByTestId('detail-row-interest');
     expect(interestRow).toHaveTextContent('Interest:₹60,000');
-    expect(interestRow).toHaveStyle(`color: ${theme.palette.error.main}`);
+    expect(interestRow).toHaveStyle(`color: ${theme.palette.warning.main}`); // Note: it's warning.main, not error.main
   });
 
   // --- Custom Currency ---

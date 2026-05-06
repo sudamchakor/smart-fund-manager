@@ -20,6 +20,9 @@ export default function LoanSummaryTerminal({
   children,
 }) {
   const theme = useTheme();
+  // Helper function to safely format numbers, defaulting to 0 if null/undefined
+  const formatNumber = (num) => (num ?? 0).toLocaleString('en-IN');
+
 
   return (
     <Box
@@ -53,7 +56,7 @@ export default function LoanSummaryTerminal({
             zIndex: 10,
           }}
         >
-          <CircularProgress color="primary" />
+          <CircularProgress color="primary" data-testid="loading-indicator" />
         </Box>
       )}
 
@@ -89,7 +92,7 @@ export default function LoanSummaryTerminal({
           variant="h3"
           sx={{ fontWeight: 900, color: 'primary.main', letterSpacing: -1 }}
         >
-          {currency} {monthlyEmi.toLocaleString('en-IN')}
+          {currency} {formatNumber(monthlyEmi)}
         </Typography>
       </Box>
 
@@ -109,7 +112,7 @@ export default function LoanSummaryTerminal({
             variant="subtitle1"
             sx={{ fontWeight: 900, color: interestColor }}
           >
-            {currency} {totalInterest.toLocaleString('en-IN')}
+            {currency} {formatNumber(totalInterest)}
           </Typography>
         </Stack>
         <Divider sx={{ borderColor: alpha(theme.palette.divider, 0.1) }} />
@@ -128,7 +131,7 @@ export default function LoanSummaryTerminal({
             variant="h6"
             sx={{ fontWeight: 900, color: 'text.primary' }}
           >
-            {currency} {totalPayable.toLocaleString('en-IN')}
+            {currency} {formatNumber(totalPayable)}
           </Typography>
         </Stack>
       </Stack>

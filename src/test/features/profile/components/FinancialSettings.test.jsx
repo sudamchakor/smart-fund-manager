@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import FinancialSettings from '../../../features/profile/components/FinancialSettings';
+import FinancialSettings from '../../../../features/profile/components/FinancialSettings.jsx'; // Corrected path
 
 describe.skip('FinancialSettings', () => {
   it('renders without crashing', () => {

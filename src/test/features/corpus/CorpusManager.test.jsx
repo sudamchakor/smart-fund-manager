@@ -3,8 +3,8 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import * as corpusSlice from '../../../../src/features/corpus/corpusSlice';
-import * as formatting from '../../../../src/utils/formatting';
+import * as corpusSlice from '../../../store/corpusSlice.js'; // Corrected path
+import * as formatting from '../../../utils/formatting.js'; // Corrected path
 import '@testing-library/jest-dom';
 
 import * as CorpusManagerModule from '../../../../src/features/corpus/CorpusManager';
@@ -40,7 +40,7 @@ const mockUseSelector = require('react-redux').useSelector;
 const mockUseDispatch = require('react-redux').useDispatch;
 
 // Mock corpusSlice selectors and actions
-jest.mock('../../../../src/features/corpus/corpusSlice', () => ({
+jest.mock('../../../store/corpusSlice.js', () => ({ // Corrected path
   selectAllAssets: jest.fn(),
   selectTotalCorpus: jest.fn(),
   selectWeightedAverageReturn: jest.fn(),
@@ -56,7 +56,7 @@ jest
   });
 
 // Mock SectionHeader
-jest.mock('../../../../src/components/common/SectionHeader', () => ({
+jest.mock('../../../../src/components/common/SectionHeader.jsx', () => ({
   __esModule: true,
   default: ({ title, icon }) => (
     <div data-testid="mock-section-header">

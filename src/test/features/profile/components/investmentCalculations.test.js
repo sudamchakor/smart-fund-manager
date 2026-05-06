@@ -1,7 +1,7 @@
 import {
   calculateSipFutureValue,
   calculateLumpsumFutureValue,
-} from '../../../features/profile/components/investmentCalculations';
+} from '../../../../features/profile/components/investmentCalculations.js'; // Corrected path
 
 describe.skip('investmentCalculations', () => {
   it('calculateSipFutureValue should correctly calculate future value of SIP', () => {

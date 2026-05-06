@@ -44,9 +44,13 @@ jest.mock('recharts', () => ({
 }));
 
 // Mock Redux useSelector
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-}));
+jest.mock('react-redux', () => {
+  const OriginalReactRedux = jest.requireActual('react-redux');
+  return {
+    ...OriginalReactRedux,
+    useSelector: jest.fn(),
+  };
+});
 const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing

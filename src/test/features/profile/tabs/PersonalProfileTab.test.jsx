@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import PersonalProfileTab from '../../../features/profile/tabs/PersonalProfileTab';
 import { useSelector, useDispatch } from 'react-redux';
-import * as profileSlice from '../../../store/profileSlice';
-
+import * as profileSlice from '../../../../store/profileSlice.js'; // Corrected path
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 const mockState = {
   emi: { tenure: 10, tenureType: 'years' },
   emiCalculator: {},
@@ -40,8 +40,7 @@ jest.mock('../../../store/profileSlice', () => ({
   setRetirementAge: jest.fn(),
   setCareerGrowthRate: jest.fn(),
 }));
-
-jest.mock('../../../store/emiSlice', () => ({
+jest.mock('../../../store/emiSlice.js', () => ({
   selectCurrency: jest.fn(() => '₹'),
 }));
 
@@ -71,21 +70,20 @@ jest.mock('@mui/x-date-pickers/DatePicker', () => ({
     <div data-testid={`datepicker-${label}`}>{label}</div>
   ),
 }));
-
-jest.mock('../../profile/components/BasicInfoDisplay', () => ({ onEdit }) => (
+const theme = createTheme();
+jest.mock('../../../../features/profile/components/BasicInfoDisplay.jsx', () => ({ onEdit }) => (
   <div data-testid="basic-info-display">
     <button onClick={onEdit}>Edit Basic Info</button>
   </div>
 ));
 
-jest.mock('../../profile/components/BasicInfoEdit', () => ({ onCancel }) => (
+jest.mock('../../../../features/profile/components/BasicInfoEdit.jsx', () => ({ onCancel }) => (
   <div data-testid="basic-info-edit">
     <button onClick={onCancel}>Cancel Edit</button>
   </div>
 ));
 
-jest.mock(
-  '../../../components/common/EditableIncomeExpenseItem',
+jest.mock('../../../../components/common/EditableIncomeExpenseItem.jsx',
   () =>
     ({ item }) => (
       <div data-testid={`editable-item-${item.id}`}>{item.name}</div>
@@ -93,21 +91,21 @@ jest.mock(
 );
 
 jest.mock(
-  '../../../components/common/ExpenseReadOnlyItem',
+  '../../../../components/common/ExpenseReadOnlyItem.jsx',
   () =>
     ({ item }) => (
       <div data-testid={`readonly-item-${item.id}`}>{item.name}</div>
     ),
 );
 
-jest.mock('../../../components/common/SliderInput', () => (props) => (
+jest.mock('../../../../components/common/SliderInput.jsx', () => (props) => (
   <div data-testid={`slider-${props.label}`}>{props.label}</div>
 ));
-jest.mock('../../../components/common/CommonComponents', () => ({
-  AmountWithUnitInput: () => <div data-testid="amount-with-unit-input" />,
+jest.mock('../../../../components/common/CommonComponents.jsx', () => ({
+  AmountWithUnitInput: () => <div data-testid="amount-with-unit-input" />, // Corrected path
 }));
 
-describe.skip('PersonalProfileTab Component', () => {
+describe('PersonalProfileTab Component', () => {
   const mockDispatch = jest.fn();
 
   beforeEach(() => {
@@ -115,7 +113,7 @@ describe.skip('PersonalProfileTab Component', () => {
     useDispatch.mockReturnValue(mockDispatch);
   });
 
-  it('renders BasicInfoDisplay by default and toggles to BasicInfoEdit', () => {
+  it('renders BasicInfoDisplay by default and toggles to BasicInfoEdit', () => { // Removed skip
     render(<PersonalProfileTab onEditGoal={jest.fn()} />);
 
     expect(screen.getByTestId('basic-info-display')).toBeInTheDocument();
@@ -130,7 +128,7 @@ describe.skip('PersonalProfileTab Component', () => {
   });
 
   it('renders incomes and expenses properly', () => {
-    render(<PersonalProfileTab onEditGoal={jest.fn()} />);
+    render(<PersonalProfileTab onEditGoal={jest.fn()} />); // Removed skip
 
     expect(screen.getByTestId('editable-item-1')).toHaveTextContent('Salary');
     expect(screen.getByTestId('editable-item-2')).toHaveTextContent(
@@ -146,7 +144,7 @@ describe.skip('PersonalProfileTab Component', () => {
     profileSlice.selectTotalMonthlyIncome.mockReturnValue(50000);
     profileSlice.selectTotalMonthlyExpenses.mockReturnValue(60000);
 
-    render(<PersonalProfileTab onEditGoal={jest.fn()} />);
+    render(<PersonalProfileTab onEditGoal={jest.fn()} />); // Removed skip
 
     // Expenses + EMI = 60,000 + 5,000 = 65,000
     // Exceeds 50,000 by 10,000 (Based on mock surplus amount).

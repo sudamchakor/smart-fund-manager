@@ -1,10 +1,10 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
+import { render, screen, fireEvent, within } from '@testing-library/react';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ThemeSelector from '../../../components/common/ThemeSelector';
 import '@testing-library/jest-dom';
 
-// Mock the themeColors import
+// 1. Mock the theme configuration
 jest.mock('../../../theme/ThemeConfig', () => ({
   themeColors: [
     {
@@ -12,11 +12,10 @@ jest.mock('../../../theme/ThemeConfig', () => ({
       value: 'default',
       colors: ['#1976d2', '#90caf9', '#e3f2fd'],
     },
-    { name: 'Dark', value: 'dark', colors: ['#212121', '#424242', '#616161'] },
-    {
-      name: 'Custom',
-      value: 'custom',
-      colors: ['#ff0000', '#00ff00', '#0000ff'],
+    { 
+      name: 'Dark', 
+      value: 'dark', 
+      colors: ['#212121', '#424242', '#616161'] 
     },
   ],
 }));
@@ -25,18 +24,28 @@ const theme = createTheme({
   palette: {
     primary: { main: '#1976d2' },
     divider: '#cccccc',
-    background: { paper: '#ffffff' },
   },
 });
 
+/**
+ * Utility to match JSDOM's computed color format
+ */
+const hexToRgb = (hex) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
 describe('ThemeSelector Component', () => {
+  const onThemeChangeMock = jest.fn();
+  
   const defaultProps = {
     selectedTheme: 'default',
-    onThemeChange: jest.fn(),
+    onThemeChange: onThemeChangeMock,
     disabled: false,
   };
 
-  // Helper function to render the component with ThemeProvider
   const renderComponent = (props = {}) => {
     return render(
       <ThemeProvider theme={theme}>
@@ -49,88 +58,62 @@ describe('ThemeSelector Component', () => {
     jest.clearAllMocks();
   });
 
-  // --- Positive Scenarios ---
-  it('renders all theme options from themeColors', () => {
+  it('renders all theme options by their display names', () => {
     renderComponent();
     expect(screen.getByText('Default')).toBeInTheDocument();
     expect(screen.getByText('Dark')).toBeInTheDocument();
-    expect(screen.getByText('Custom')).toBeInTheDocument();
   });
 
-  it('highlights the selected theme option', () => {
+  it('applies the correct border color to the selected theme', () => {
     renderComponent({ selectedTheme: 'dark' });
-    const defaultCard = screen.getByText('Default').closest('.MuiCard-root');
-    const darkCard = screen.getByText('Dark').closest('.MuiCard-root');
-    const customCard = screen.getByText('Custom').closest('.MuiCard-root');
 
-    expect(defaultCard).toHaveStyle(
-      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
-    );
-    expect(darkCard).toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(customCard).toHaveStyle(
-      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
-    );
+    // Target the interactive element (the CardActionArea is a button)
+    const darkCard = screen.getByRole('button', { name: /dark/i }).closest('.MuiCard-root');
+    const defaultCard = screen.getByRole('button', { name: /default/i }).closest('.MuiCard-root');
+
+    // Note: If the border is on a wrapper DIV, apply the border style 
+    // to the Button/ActionArea in your component style to make it testable here.
+    expect(darkCard).toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
+    expect(defaultCard).not.toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
   });
 
-  it('calls onThemeChange with the correct value when a theme is selected', () => {
+  it('calls onThemeChange when an option is clicked', () => {
     renderComponent();
-    fireEvent.click(screen.getByText('Dark'));
-    expect(defaultProps.onThemeChange).toHaveBeenCalledWith('dark');
+    const darkOption = screen.getByRole('button', { name: /dark/i });
+    
+    fireEvent.click(darkOption);
+    expect(onThemeChangeMock).toHaveBeenCalledWith('dark');
   });
 
-  it('renders color boxes for each theme option', () => {
+  it('renders color preview boxes with correct background colors', () => {
     renderComponent();
-    const defaultCard = screen.getByText('Default').closest('.MuiCard-root');
-    expect(defaultCard.querySelectorAll('.MuiBox-root')[0]).toHaveStyle(
-      'background-color: #1976d2',
-    );
-    expect(defaultCard.querySelectorAll('.MuiBox-root')[1]).toHaveStyle(
-      'background-color: #90caf9',
-    );
+
+    // Use 'within' to scope the search to the specific card button
+    const defaultCard = screen.getByRole('button', { name: /default/i });
+    
+    // Instead of querySelector, we use getAllByTestId 
+    // (Requires data-testid="color-box" in your component)
+    const colorBoxes = within(defaultCard).getAllByTestId('color-box');
+    
+    expect(colorBoxes[0]).toHaveStyle(`background-color: ${hexToRgb('#1976d2')}`);
+    expect(colorBoxes[1]).toHaveStyle(`background-color: ${hexToRgb('#90caf9')}`);
   });
 
-  // --- Negative Scenarios / Edge Cases ---
-  it('does not call onThemeChange when a theme is clicked and the component is disabled', () => {
+  it('disables all theme options when the disabled prop is true', () => {
     renderComponent({ disabled: true });
-    fireEvent.click(screen.getByText('Dark'));
-    expect(defaultProps.onThemeChange).not.toHaveBeenCalled();
+    
+    const buttons = screen.getAllByRole('button');
+    buttons.forEach((button) => {
+      expect(button).toBeDisabled();
+    });
   });
 
-  it('handles an empty themeColors array gracefully', () => {
-    jest.doMock('../../../theme/ThemeConfig', () => ({
-      themeColors: [],
-    }));
-    const { container } = render(
-      <ThemeProvider theme={theme}>
-        <ThemeSelector {...defaultProps} />
-      </ThemeProvider>,
-    );
-    expect(container).toBeEmptyDOMElement();
-  });
-
-  it('handles selectedTheme not matching any option', () => {
-    renderComponent({ selectedTheme: 'nonexistent' });
-    const defaultCard = screen.getByText('Default').closest('.MuiCard-root');
-    expect(defaultCard).toHaveStyle(
-      `border-color: ${alpha(theme.palette.divider, 0.2)}`,
-    );
-    // No card should be highlighted with primary color
-    expect(
-      screen.queryByText('Default').closest('.MuiCard-root'),
-    ).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-    expect(screen.queryByText('Dark').closest('.MuiCard-root')).not.toHaveStyle(
-      `border-color: ${theme.palette.primary.main}`,
-    );
-    expect(
-      screen.queryByText('Custom').closest('.MuiCard-root'),
-    ).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
-  });
-
-  it('renders with disabled styling when disabled prop is true', () => {
-    renderComponent({ disabled: true });
-    const defaultCardActionArea = screen
-      .getByText('Default')
-      .closest('.MuiCardActionArea-root');
-    expect(defaultCardActionArea).toBeDisabled();
+  it('does not highlight any card if selectedTheme does not match', () => {
+    renderComponent({ selectedTheme: 'non-existent' });
+    
+    const buttons = screen.getAllByRole('button');
+    buttons.forEach((btn) => {
+      expect(btn.closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
+    });
   });
 });

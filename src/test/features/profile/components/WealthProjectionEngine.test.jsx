@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import WealthProjectionEngine from '../../../features/profile/components/WealthProjectionEngine';
+import WealthProjectionEngine from '../../../../features/profile/components/WealthProjectionEngine.jsx'; // Corrected path
 
 describe.skip('WealthProjectionEngine', () => {
   it('renders without crashing', () => {

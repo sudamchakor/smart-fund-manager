@@ -2,8 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import IncomeExpenseForm from '../../../components/common/IncomeExpenseForm';
-import '@testing-library/jest-dom';
-import dayjs from 'dayjs'; // Import dayjs outside of jest.mock
+
 
 // Mock SliderInput to control its behavior
 jest.mock(
@@ -24,49 +23,52 @@ jest.mock(
 );
 
 // Mock DatePicker to control its behavior
-jest.mock('@mui/x-date-pickers/DatePicker', () => ({
-  DatePicker: ({
-    label,
-    value,
-    onChange,
-    open,
-    onOpen,
-    onClose,
-    slotProps,
-    ...props
-  }) => (
-    <div data-testid={`mock-datepicker-${label}`}>
-      <label htmlFor={`mock-datepicker-input-${label}`}>{label}</label>
-      <input
-        id={`mock-datepicker-input-${label}`}
-        data-testid={`mock-datepicker-input-field-${label}`}
-        value={value ? dayjs(value).format('YYYY') : ''} // Use dayjs here
-        readOnly
-        onClick={onOpen}
-      />
-      {open && (
-        <div data-testid={`mock-datepicker-popup-${label}`}>
-          <button
-            onClick={() => {
-              onChange(dayjs('2025-01-01'));
-              onClose();
-            }}
-          >
-            Select 2025
-          </button>
-          <button
-            onClick={() => {
-              onChange(null);
-              onClose();
-            }}
-          >
-            Clear
-          </button>
-        </div>
-      )}
-    </div>
-  ),
-}));
+jest.mock('@mui/x-date-pickers/DatePicker', () => { // Removed top-level import, now require inside
+  const dayjs = require('dayjs'); // Require dayjs inside the mock factory
+  return {
+    DatePicker: ({
+      label,
+      value,
+      onChange,
+      open,
+      onOpen,
+      onClose,
+      slotProps,
+      ...props
+    }) => (
+      <div data-testid={`mock-datepicker-${label}`}>
+        <label htmlFor={`mock-datepicker-input-${label}`}>{label}</label>
+        <input
+          id={`mock-datepicker-input-${label}`}
+          data-testid={`mock-datepicker-input-field-${label}`}
+          value={value ? dayjs(value).format('YYYY') : ''} // Use dayjs here
+          readOnly
+          onClick={onOpen}
+        />
+        {open && (
+          <div data-testid={`mock-datepicker-popup-${label}`}>
+            <button
+              onClick={() => {
+                onChange(dayjs('2025-01-01'));
+                onClose();
+              }}
+            >
+              Select 2025
+            </button>
+            <button
+              onClick={() => {
+                onChange(null);
+                onClose();
+              }}
+            >
+              Clear
+            </button>
+          </div>
+        )}
+      </div>
+    ),
+  };
+});
 
 // Mock utility data
 jest.mock('../../../utils/taxRules', () => ({
@@ -217,9 +219,8 @@ describe.skip('IncomeExpenseForm Component', () => {
       fireEvent.click(
         screen.getByTestId('mock-datepicker-input-field-Start Year'),
       );
-      await waitFor(() =>
-        fireEvent.click(screen.getByRole('button', { name: 'Select 2025' })),
-      );
+      await screen.findByRole('button', { name: 'Select 2025' });
+      fireEvent.click(screen.getByRole('button', { name: 'Select 2025' }));
       expect(screen.getByDisplayValue('2025')).toBeInTheDocument();
     });
 
@@ -228,10 +229,10 @@ describe.skip('IncomeExpenseForm Component', () => {
       fireEvent.click(
         screen.getByTestId('mock-datepicker-input-field-End Year'),
       );
-      await waitFor(() =>
-        fireEvent.click(screen.getByRole('button', { name: 'Select 2025' })),
-      );
-      expect(screen.getByDisplayValue('2025')).toBeInTheDocument();
+      // Wait for the mock datepicker popup to appear and the "Select 2025" button to be available
+      const selectButton = await screen.findByRole('button', { name: 'Select 2025' });
+      fireEvent.click(selectButton); // Click the button to select the year
+      expect(screen.getByDisplayValue('2025')).toBeInTheDocument(); // Assert the input field's value
     });
 
     it('calls onSave with correct data for regular income', () => {

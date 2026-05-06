@@ -36,7 +36,7 @@ describe('StyledPaper Component', () => {
     expect(paper).toHaveStyle('box-shadow: 0 2px 12px rgba(0,0,0,0.02)');
     expect(paper).toHaveStyle('background-color: #fff'); // Default light theme background.paper
     expect(paper).toHaveStyle('height: 100%');
-    expect(paper).toHaveAttribute('elevation', '0'); // Check elevation prop
+    // expect(paper).toHaveAttribute('elevation', '0'); // elevation is a prop that applies styles, not a direct HTML attribute
   });
 
   it('applies custom sx prop styles, overriding defaults', () => {

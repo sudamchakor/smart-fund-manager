@@ -72,7 +72,7 @@ const VisualCard = ({ label, value, active, onClick, colors, subtext }) => {
             width: '70%',
             height: '30px',
             borderRadius: `${theme.shape.borderRadius / 2}px`,
-            bgcolor: colors[0],
+            bgcolor: colors && colors.length > 0 ? colors[0] : 'transparent',
           }}
         />
       </Box>

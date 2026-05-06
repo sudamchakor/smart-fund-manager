@@ -1,12 +1,12 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import OnboardingModal from '../../../features/profile/tabs/OnboardingModal';
+import OnboardingModal from '../../../../features/profile/tabs/OnboardingModal.jsx'; // Corrected path
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 
 // Mock child components
 jest.mock(
-  '../../profile/tabs/OnboardingSteps/SystemParameters',
+  '../../../../features/profile/tabs/OnboardingSteps/SystemParameters.jsx',
   () =>
     ({ onNext }) => (
       <div data-testid="system-parameters">
@@ -15,8 +15,7 @@ jest.mock(
       </div>
     ),
 );
-jest.mock(
-  '../../profile/tabs/OnboardingSteps/IncomeStreams',
+jest.mock('../../../../features/profile/tabs/OnboardingSteps/IncomeStreams.jsx',
   () =>
     ({ onNext, onBack }) => (
       <div data-testid="income-streams">
@@ -25,9 +24,7 @@ jest.mock(
         <button onClick={onBack}>Back</button>
       </div>
     ),
-);
-jest.mock(
-  '../../profile/tabs/OnboardingSteps/FixedLiabilities',
+);jest.mock('../../../../features/profile/tabs/OnboardingSteps/FixedLiabilities.jsx',
   () =>
     ({ onNext, onBack }) => (
       <div data-testid="fixed-liabilities">
@@ -36,9 +33,7 @@ jest.mock(
         <button onClick={onBack}>Back</button>
       </div>
     ),
-);
-jest.mock(
-  '../../profile/tabs/OnboardingSteps/CapitalGoals',
+);jest.mock('../../../../features/profile/tabs/OnboardingSteps/CapitalGoals.jsx',
   () =>
     ({ onNext, onBack }) => (
       <div data-testid="capital-goals">
@@ -50,9 +45,20 @@ jest.mock(
 );
 
 const mockStore = configureStore([]);
-const store = mockStore({});
+const store = mockStore({
+  profile: {
+    incomes: [],
+    expenses: [],
+    goals: [],
+    currentAge: 30,
+    retirementAge: 60,
+    careerGrowthRate: { type: 'percentage', value: 0.05 },
+    generalInflationRate: 0.06,
+    educationInflationRate: 0.08, // Added missing property
+  },
+});
 
-describe.skip('OnboardingModal', () => {
+describe('OnboardingModal', () => {
   const mockOnClose = jest.fn();
 
   beforeEach(() => {

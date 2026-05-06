@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import IncomeStreams from '../../../../features/profile/tabs/OnboardingSteps/IncomeStreams';
+import IncomeStreams from '../../../../../features/profile/tabs/OnboardingSteps/IncomeStreams.jsx'; // Corrected path
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
@@ -19,7 +19,7 @@ jest.mock('react-redux', () => ({
 
 // Mock child components
 jest.mock(
-  '../../../../../src/components/common/EditableIncomeExpenseItem',
+  '../../../../../src/components/common/EditableIncomeExpenseItem.jsx', // Corrected path
   () =>
     ({ item }) => (
       <div data-testid={`editable-income-item-${item ? item.id : 'new'}`}>
@@ -29,7 +29,7 @@ jest.mock(
   { virtual: true },
 );
 
-describe.skip('IncomeStreams', () => {
+describe('IncomeStreams', () => {
   it('renders without crashing', () => {
     render(<IncomeStreams onNext={() => {}} onBack={() => {}} />);
     expect(

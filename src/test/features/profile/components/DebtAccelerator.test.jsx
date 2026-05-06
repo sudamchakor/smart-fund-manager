@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
+import { Provider } from 'react-redux'; // This mock is fine
 import configureStore from 'redux-mock-store';
-import DebtAccelerator from '../../../features/profile/components/DebtAccelerator';
+import DebtAccelerator from '../../../../features/profile/components/DebtAccelerator.jsx';
 
 const mockStore = configureStore([]);
 

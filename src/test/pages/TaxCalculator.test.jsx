@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import TaxCalculator from '../../pages/TaxCalculator';
-import '@testing-library/jest-dom';
+import '@testing-library/jest-dom'; // This mock is fine
 import { createTheme } from '@mui/material/styles';
 
 // Mock Redux hooks
@@ -12,15 +12,7 @@ jest.mock('react-redux', () => ({
   useSelector: (selector) => mockUseSelector(selector),
 }));
 
-// Mock lazy-loaded components
-jest.mock('../../pages/TaxDashboard', () => () => (
-  <div data-testid="mock-tax-dashboard">TaxDashboard</div>
-));
-jest.mock('../../components/common/SuspenseFallback', () => () => (
-  <div data-testid="suspense-fallback">Loading...</div>
-));
-
-// Mock themeColors and createTheme
+// Move mockThemeColors declaration above jest.mock to avoid ReferenceError
 const mockThemeColors = [
   {
     value: 'dodgerblue',
@@ -35,6 +27,13 @@ const mockThemeColors = [
     colors: ['#ff0000', '#ff5555', '#eeeeee', '#333333', '#888888'],
   },
 ];
+// Mock lazy-loaded components
+jest.mock('../../pages/TaxDashboard', () => () => (
+  <div data-testid="mock-tax-dashboard">TaxDashboard</div>
+));
+jest.mock('../../components/common/SuspenseFallback', () => () => (
+  <div data-testid="suspense-fallback">Loading...</div>
+));
 jest.mock('../../theme/ThemeConfig', () => ({
   themeColors: mockThemeColors,
 }));

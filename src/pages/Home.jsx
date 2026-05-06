@@ -1,4 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
+import { Helmet } from 'react-helmet-async';
 import {
   Grid,
   Typography,
@@ -9,8 +10,8 @@ import {
   alpha,
   keyframes,
   ButtonBase, // Added for Ripple Effect
-} from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+} from '@mui/material'; // Added for Ripple Effect
+import { Link } from 'react-router-dom';
 import {
   Calculate as CalculateIcon,
   AccountCircle as AccountCircleIcon,
@@ -34,46 +35,42 @@ const moduleBootUp = keyframes`
 const systemModules = [
   {
     title: 'User Profile',
-    description:
-      'Manage your demographics, operational liabilities, and capital goals.',
+    description: 'Set up your profile to track your current loans, income, and future financial goals.',
     icon: <AccountCircleIcon sx={{ fontSize: 32 }} />,
     path: '/profile',
     colorToken: 'secondary',
   },
   {
     title: 'EMI Calculator',
-    description:
-      'Calculate monthly amortization schedules and prepayment impacts.',
+    description: 'Calculate your monthly loan EMIs and see how early payments can save you interest.',
     icon: <CalculateIcon sx={{ fontSize: 32 }} />,
     path: '/calculator',
     colorToken: 'primary',
   },
   {
     title: 'Credit Card EMI',
-    description: 'Simulate the exact cost of converting unsecured debt to EMI.',
+    description: 'Check the hidden costs and exact interest of converting your credit card bills into EMIs.',
     icon: <CreditCardIcon sx={{ fontSize: 32 }} />,
     path: '/credit-card-emi',
     colorToken: 'success',
   },
   {
-    title: 'Investment Strategy',
-    description:
-      'Project long-term wealth accumulation and safe withdrawal rates.',
+    title: 'SIP & Investment',
+    description: 'Plan your mutual fund SIPs and project your investment growth over time.',
     icon: <TrendingUpIcon sx={{ fontSize: 32 }} />,
     path: '/investment/sip',
     colorToken: 'info',
   },
   {
     title: 'Personal Loan',
-    description:
-      'Configure unsecured debt parameters to calculate monthly liabilities.',
+    description: 'Quickly calculate your personal loan EMIs and view your complete repayment schedule.',
     icon: <AccountBalanceIcon sx={{ fontSize: 32 }} />,
     path: '/personal-loan',
     colorToken: 'warning',
   },
   {
-    title: 'Tax Optimization',
-    description: 'Compute income tax liabilities across legislative regimes.',
+    title: 'Income Tax Planner',
+    description: 'Calculate your income tax and compare the Old vs New tax regimes to save money.',
     icon: <ReceiptIcon sx={{ fontSize: 32 }} />,
     path: '/tax-calculator',
     colorToken: 'error',
@@ -81,7 +78,6 @@ const systemModules = [
 ];
 
 export default function Home() {
-  const navigate = useNavigate();
   const theme = useTheme();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
@@ -97,6 +93,13 @@ export default function Home() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 8 }, mb: 8 }}>
+      <Helmet>
+        <title>SmartFund Manager - Free EMI Calculator, Tax Planner & SIP Projector</title>
+        <meta
+          name="description"
+          content="Free financial tools to easily calculate Home Loan EMIs, compare New vs Old income tax regimes, and project your SIP investment growth."
+        />
+      </Helmet>
       {/* Hero Section */}
       <Box sx={{ textAlign: 'center', mb: 8 }}>
         <Box
@@ -111,7 +114,7 @@ export default function Home() {
         >
           <DashboardIcon sx={{ fontSize: 40 }} />
         </Box>
-        <Typography variant="h3" sx={{ fontWeight: 900, mb: 1.5 }}>
+        <Typography variant="h3" component="h1" sx={{ fontWeight: 900, mb: 1.5 }}>
           SmartFund{' '}
           <Box component="span" sx={{ color: 'primary.main' }}>
             Manager
@@ -121,8 +124,7 @@ export default function Home() {
           variant="h6"
           sx={{ color: 'text.secondary', maxWidth: 600, mx: 'auto' }}
         >
-          Your centralized financial command center for precision planning and
-          capital growth.
+          Free and simple financial tools to calculate EMIs, plan your taxes, and grow your wealth.
         </Typography>
       </Box>
 
@@ -134,7 +136,8 @@ export default function Home() {
           return (
             <Grid item xs={12} sm={6} md={4} key={index}>
               <ButtonBase
-                onClick={() => navigate(module.path)}
+                component={Link}
+                to={module.path}
                 focusRipple // Enables the Material Ripple on Click
                 sx={{
                   display: 'block', // ButtonBase is inline-flex by default
@@ -205,20 +208,6 @@ export default function Home() {
                   </Box>
 
                   <Box>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        fontWeight: 800,
-                        textTransform: 'uppercase',
-                        color: alpha(theme.palette.text.secondary, 0.5),
-                        letterSpacing: 1,
-                        display: 'block',
-                        mb: 0.5,
-                      }}
-                    >
-                      System Module
-                    </Typography>
-
                     <Stack
                       direction="row"
                       justifyContent="space-between"
@@ -227,6 +216,7 @@ export default function Home() {
                     >
                       <Typography
                         variant="h6"
+                        component="h2"
                         sx={{ fontWeight: 800, color: 'text.primary' }}
                       >
                         {module.title}

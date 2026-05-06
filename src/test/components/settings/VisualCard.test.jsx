@@ -52,10 +52,12 @@ describe('VisualCard Component', () => {
 
   it('renders the color box with the first color', () => {
     renderComponent();
-    const colorBox = screen
-      .getByText('Test Label')
-      .nextElementSibling.querySelector('.MuiBox-root');
-    expect(colorBox).toHaveStyle('background-color: #FF0000');
+    // Getting the box inside the card that uses colors[0].
+    // Given the structure, we can query the button and find the inner box.
+    const card = screen.getByRole('button');
+    // The structure has two Box components, the inner one has the color.
+    const innerBox = card.querySelector('.MuiBox-root .MuiBox-root');
+    expect(innerBox).toHaveStyle('background-color: #FF0000');
   });
 
   it('calls onClick with its value when clicked', () => {
@@ -102,22 +104,16 @@ describe('VisualCard Component', () => {
 
   it('handles empty colors array gracefully (renders default background)', () => {
     renderComponent({ colors: [] });
-    const colorBox = screen
-      .getByText('Test Label')
-      .nextElementSibling.querySelector('.MuiBox-root');
-    expect(colorBox).toHaveStyle(
-      `background-color: ${alpha(theme.palette.divider, 0.05)}`,
-    ); // Default bgcolor
+    const card = screen.getByRole('button');
+    const innerBox = card.querySelector('.MuiBox-root .MuiBox-root');
+    expect(innerBox).toHaveStyle('background-color: transparent'); 
   });
 
   it('handles null/undefined colors array gracefully', () => {
     renderComponent({ colors: null });
-    const colorBox = screen
-      .getByText('Test Label')
-      .nextElementSibling.querySelector('.MuiBox-root');
-    expect(colorBox).toHaveStyle(
-      `background-color: ${alpha(theme.palette.divider, 0.05)}`,
-    );
+    const card = screen.getByRole('button');
+    const innerBox = card.querySelector('.MuiBox-root .MuiBox-root');
+    expect(innerBox).toHaveStyle('background-color: transparent');
   });
 
   it('handles null/undefined label and subtext gracefully', () => {

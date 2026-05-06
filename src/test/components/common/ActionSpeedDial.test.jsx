@@ -105,7 +105,7 @@ describe('ActionSpeedDial Component', () => {
     renderComponent({ direction: 'left', open: true });
     const speedDial = screen.getByTestId('mock-speed-dial');
     expect(speedDial).toHaveAttribute('direction', 'left');
-    expect(speedDial).toHaveAttribute('open', 'true');
+    expect(speedDial).toHaveAttribute('open', ''); // SpeedDial renders 'open' as an empty string when true
   });
 
   it('passes tooltipOpen prop to SpeedDialAction', () => {

@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import BasicInfoEdit from '../../../features/profile/components/BasicInfoEdit';
+import BasicInfoEdit from '../../../../features/profile/components/BasicInfoEdit.jsx'; // Corrected path
 
 // Mock SliderInput since it's an external custom component
-jest.mock('../../../components/common/SliderInput', () => {
+jest.mock('../../../components/common/SliderInput.jsx', () => {
   return function MockSliderInput({ label, value, onChange }) {
     return (
       <div data-testid={`slider-${label}`}>

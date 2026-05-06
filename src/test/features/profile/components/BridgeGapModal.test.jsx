@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import BridgeGapModal from '../../../features/profile/components/BridgeGapModal';
+import BridgeGapModal from '../../../../features/profile/components/BridgeGapModal.jsx'; // Corrected path
 
 describe.skip('BridgeGapModal', () => {
   it('renders without crashing', () => {

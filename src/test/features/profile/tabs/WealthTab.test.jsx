@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import WealthTab from '../../../features/profile/tabs/WealthTab';
+import WealthTab from '../../../../features/profile/tabs/WealthTab.jsx'; // Corrected path
 
 // Mock Redux hooks and selectors
 jest.mock('react-redux', () => ({
@@ -19,8 +19,28 @@ jest.mock('react-redux', () => ({
       emi: {
         currency: '₹',
       },
-      emiCalculator: {
-        emi: 0,
+      emiCalculator: { // This is where selectCalculatedValues expects its inputs
+        loanDetails: {
+          homeValue: 5000000,
+          marginAmount: 1000000,
+          marginUnit: 'Rs',
+          loanInsurance: 0,
+          interestRate: 8.5,
+          loanTenure: 20,
+          tenureUnit: 'years',
+          loanFees: 10000,
+          feesUnit: 'Rs',
+          startDate: new Date().toISOString(),
+          yearlyPaymentIncreaseAmount: 0,
+          yearlyPaymentIncreaseUnit: '%',
+        },
+        expenses: {
+          oneTimeExpenses: 0, propertyTaxes: 0, homeInsurance: 0, maintenance: 0,
+        },
+        prepayments: {
+          monthly: { amount: 0 }, yearly: { amount: 0 }, quarterly: { amount: 0 }, oneTime: { amount: 0 },
+        },
+        emi: 0, // This is the 'emi' property that WealthTab tries to destructure
       },
     }),
   ),
@@ -28,53 +48,51 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock('../../profile/components/InvestmentSummary', () => () => (
+jest.mock('../../../../features/profile/components/InvestmentSummary.jsx', () => () => (
   <div data-testid="investment-summary">InvestmentSummary</div>
 ));
-jest.mock('../../profile/components/AssetAllocationChart', () => () => (
+jest.mock('../../../../features/profile/components/AssetAllocationChart.jsx', () => () => (
   <div data-testid="asset-allocation-chart">AssetAllocationChart</div>
 ));
-jest.mock('../../profile/components/ProjectedCashFlowChart', () => () => (
+jest.mock('../../../../features/profile/components/ProjectedCashFlowChart.jsx', () => () => (
   <div data-testid="projected-cash-flow-chart">ProjectedCashFlowChart</div>
 ));
-jest.mock('../../profile/components/CashFlowDonutChart', () => () => (
+jest.mock('../../../../features/profile/components/CashFlowDonutChart.jsx', () => () => (
   <div data-testid="cash-flow-donut-chart">CashFlowDonutChart</div>
 ));
-jest.mock('../../profile/components/WealthProjectionEngine', () => () => (
+jest.mock('../../../../features/profile/components/WealthProjectionEngine.jsx', () => () => (
   <div data-testid="wealth-projection-engine">WealthProjectionEngine</div>
 ));
-jest.mock('../../profile/components/CorrectionEngine', () => () => (
+jest.mock('../../../../features/profile/components/CorrectionEngine.jsx', () => () => (
   <div data-testid="correction-engine">CorrectionEngine</div>
 ));
-jest.mock('../../profile/components/DebtAccelerator', () => () => (
+jest.mock('../../../../features/profile/components/DebtAccelerator.jsx', () => () => (
   <div data-testid="debt-accelerator">DebtAccelerator</div>
 ));
-jest.mock('../../profile/components/ExpenseOptimizer', () => () => (
+jest.mock('../../../../features/profile/components/ExpenseOptimizer.jsx', () => () => (
   <div data-testid="expense-optimizer">ExpenseOptimizer</div>
 ));
-jest.mock('../../profile/components/AutoBalancer', () => () => (
+jest.mock('../../../../features/profile/components/AutoBalancer.jsx', () => () => ( // Corrected path
   <div data-testid="auto-balancer">AutoBalancer</div>
 ));
-jest.mock('../../profile/components/ScenarioManager', () => () => (
+jest.mock('../../../../features/profile/components/ScenarioManager.jsx', () => () => ( // Corrected path
   <div data-testid="scenario-manager">ScenarioManager</div>
-));
-jest.mock('../../profile/components/BridgeGapModal', () => () => (
+));jest.mock('../../../../features/profile/components/BridgeGapModal.jsx', () => () => (
   <div data-testid="bridge-gap-modal">BridgeGapModal</div>
 ));
-jest.mock('../../profile/components/FinancialModal', () => () => (
+jest.mock('../../../../features/profile/components/FinancialModal.jsx', () => () => (
   <div data-testid="financial-modal">FinancialModal</div>
-));
-jest.mock('../../profile/components/GoalCoverage', () => () => (
+));jest.mock('../../../../features/profile/components/GoalCoverage.jsx', () => () => ( // Corrected path
   <div data-testid="goal-coverage">GoalCoverage</div>
 ));
-jest.mock('../../profile/components/FinancialSection', () => () => (
+jest.mock('../../../../features/profile/components/FinancialSection.jsx', () => () => ( // Corrected path
   <div data-testid="financial-section">FinancialSection</div>
 ));
-jest.mock('../../profile/components/FinancialSettings', () => () => (
+jest.mock('../../../../features/profile/components/FinancialSettings.jsx', () => () => ( // Corrected path
   <div data-testid="financial-settings">FinancialSettings</div>
 ));
 
-describe.skip('WealthTab', () => {
+describe('WealthTab', () => {
   it('renders without crashing', () => {
     render(<WealthTab />);
     expect(

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ProjectedCashFlowChart from '../../../features/profile/components/ProjectedCashFlowChart';
+import ProjectedCashFlowChart from '../../../../features/profile/components/ProjectedCashFlowChart.jsx'; // Corrected path
 
 // Mock Recharts components
 jest.mock('recharts', () => ({

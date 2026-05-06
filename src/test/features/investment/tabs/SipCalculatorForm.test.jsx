@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react'; // Import fireEvent
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -48,20 +48,13 @@ describe('SipCalculatorForm', () => {
 
   const renderComponent = (
     sharedState = defaultSharedState,
-    currency = '₹',
+    currency = '₹', // Default currency
+    onCalculate = jest.fn(), // Mock onCalculate by default,
+    onSharedStateChange = jest.fn(), // Add onSharedStateChange as a direct parameter
   ) => {
-    const store = mockStore({
-      emi: { currency },
-    });
+    const store = mockStore({ emi: { currency } });
     return render(
-      <Provider store={store}>
-        <ThemeProvider theme={theme}>
-          <SipCalculatorForm
-            sharedState={sharedState}
-            onSharedStateChange={jest.fn()}
-          />
-        </ThemeProvider>
-      </Provider>,
+      <Provider store={store}><ThemeProvider theme={theme}><SipCalculatorForm sharedState={sharedState} onSharedStateChange={onSharedStateChange} onCalculate={onCalculate} /></ThemeProvider></Provider>
     );
   };
 
@@ -72,11 +65,11 @@ describe('SipCalculatorForm', () => {
   it('renders without crashing', () => {
     renderComponent();
     expect(screen.getByText('Monthly Investment')).toBeInTheDocument();
-    expect(screen.getByText('Expected Return Rate')).toBeInTheDocument();
-    expect(screen.getByText('Time Period')).toBeInTheDocument();
+    expect(screen.getByText('Expected Returns (p.a)')).toBeInTheDocument(); // Corrected text
+    expect(screen.getByText('Duration (Years)')).toBeInTheDocument(); // Corrected text
   });
 
-  it('renders InputSliders with correct props and initial values', () => {
+  it('renders InputSliders with correct props and initial values', () => { // Corrected test ID for Expected Return Rate
     renderComponent();
     // Monthly Investment
     expect(
@@ -91,31 +84,28 @@ describe('SipCalculatorForm', () => {
 
     // Expected Return Rate
     expect(
-      screen.getByTestId('mock-investment-slider-Expected-Return-Rate'),
-    ).toBeInTheDocument();
-    expect(screen.getByTestId('input-field-Expected-Return-Rate')).toHaveValue(
+      screen.getByTestId('mock-investment-slider-Expected-Returns-(p.a)'),
+    ).toBeInTheDocument(); // This will now correctly match
+    expect(screen.getByTestId('input-field-Expected-Returns-(p.a)')).toHaveValue( // Corrected test ID
       12,
     );
     expect(
-      screen.getByTestId('adornment-Expected-Return-Rate'),
+      screen.getByTestId('adornment-Expected-Returns-(p.a)'), // Corrected test ID
     ).toHaveTextContent('%');
 
     // Time Period
     expect(
-      screen.getByTestId('mock-investment-slider-Time-Period'),
+      screen.getByTestId('mock-investment-slider-Duration-(Years)'), // Corrected test ID
     ).toBeInTheDocument();
-    expect(screen.getByTestId('input-field-Time-Period')).toHaveValue(10);
-    expect(screen.getByTestId('adornment-Time-Period')).toHaveTextContent(
-      'YRS',
+    expect(screen.getByTestId('input-field-Duration-(Years)')).toHaveValue(10); // Corrected test ID
+    expect(screen.getByTestId('adornment-Duration-(Years)')).toHaveTextContent( // Corrected test ID
+      'Yr', // Changed 'YRS' to 'Yr'
     );
   });
 
   it('calls onSharedStateChange when monthly investment changes', () => {
-    const mockOnSharedStateChange = jest.fn();
-    renderComponent({
-      ...defaultSharedState,
-      onSharedStateChange: mockOnSharedStateChange,
-    });
+    const mockOnSharedStateChange = jest.fn(); // Define mock here
+    renderComponent(defaultSharedState, '₹', jest.fn(), mockOnSharedStateChange); // Pass it directly
     const input = screen.getByTestId('input-field-Monthly-Investment');
     fireEvent.change(input, { target: { value: '15000' } });
     expect(mockOnSharedStateChange).toHaveBeenCalledWith(
@@ -125,12 +115,9 @@ describe('SipCalculatorForm', () => {
   });
 
   it('calls onSharedStateChange when expected return rate changes', () => {
-    const mockOnSharedStateChange = jest.fn();
-    renderComponent({
-      ...defaultSharedState,
-      onSharedStateChange: mockOnSharedStateChange,
-    });
-    const input = screen.getByTestId('input-field-Expected-Return-Rate');
+    const mockOnSharedStateChange = jest.fn(); // Define mock here
+    renderComponent(defaultSharedState, '₹', jest.fn(), mockOnSharedStateChange); // Pass it directly
+    const input = screen.getByTestId('input-field-Expected-Returns-(p.a)'); // Corrected test ID
     fireEvent.change(input, { target: { value: '15' } });
     expect(mockOnSharedStateChange).toHaveBeenCalledWith(
       'expectedReturnRate',
@@ -139,12 +126,9 @@ describe('SipCalculatorForm', () => {
   });
 
   it('calls onSharedStateChange when time period changes', () => {
-    const mockOnSharedStateChange = jest.fn();
-    renderComponent({
-      ...defaultSharedState,
-      onSharedStateChange: mockOnSharedStateChange,
-    });
-    const input = screen.getByTestId('input-field-Time-Period');
+    const mockOnSharedStateChange = jest.fn(); // Define mock here
+    renderComponent(defaultSharedState, '₹', jest.fn(), mockOnSharedStateChange); // Pass it directly
+    const input = screen.getByTestId('input-field-Duration-(Years)'); // Corrected test ID
     fireEvent.change(input, { target: { value: '15' } });
     expect(mockOnSharedStateChange).toHaveBeenCalledWith('timePeriod', 15);
   });
@@ -154,5 +138,15 @@ describe('SipCalculatorForm', () => {
     expect(
       screen.getByTestId('adornment-Monthly-Investment'),
     ).toHaveTextContent('$');
+  });
+
+  it('calls onCalculate when relevant values change (e.g., on initial render or input change)', () => {
+    const mockOnCalculate = jest.fn();
+    renderComponent(defaultSharedState, '₹', mockOnCalculate);
+    // Since calculateSip is called in a useEffect, it should be called on initial render.
+    // If it's called on input change, you'd simulate that here.
+    expect(mockOnCalculate).toHaveBeenCalled();
+    // You can add more specific assertions about the arguments if needed
+    // expect(mockOnCalculate).toHaveBeenCalledWith(expect.any(Object));
   });
 });

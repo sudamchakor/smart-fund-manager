@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GoalForm from '../../../features/profile/components/GoalForm';
+import GoalForm from '../../../../features/profile/components/GoalForm.jsx'; // Corrected path
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
@@ -14,8 +14,7 @@ jest.mock('react-redux', () => ({
   useDispatch: () => jest.fn(),
 }));
 
-// Mock the custom hook
-jest.mock('../../../features/profile/components/useGoalForm', () => ({
+jest.mock('../../../../features/profile/components/useGoalForm.js', () => ({ // Corrected path
   __esModule: true,
   default: jest.fn(() => ({
     goal: {
@@ -36,7 +35,7 @@ jest.mock('../../../features/profile/components/useGoalForm', () => ({
   })),
 }));
 
-describe.skip('GoalForm', () => {
+describe('GoalForm', () => {
   it('renders without crashing', () => {
     render(<GoalForm />);
     expect(screen.getByText(/Goal Name/i)).toBeInTheDocument(); // Assuming Goal Name is a field

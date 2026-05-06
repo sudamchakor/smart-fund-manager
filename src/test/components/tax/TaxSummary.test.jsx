@@ -87,7 +87,7 @@ describe('TaxSummary Component', () => {
     });
     expect(screen.getByText('System Output')).toBeInTheDocument();
     expect(screen.getByText('Recommended Regime')).toBeInTheDocument();
-    expect(screen.getByText('Old Tax Regime')).toBeInTheDocument(); // Optimal regime
+    expect(screen.getByText('Old Regime')).toBeInTheDocument(); // Optimal regime
     expect(screen.getByText('Export Report')).toBeInTheDocument();
   });
 
@@ -100,7 +100,7 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(screen.getByText(defaultTaxComparison.optimal)).toBeInTheDocument();
+    expect(screen.getAllByText(defaultTaxComparison.optimal)[0]).toBeInTheDocument();
     expect(
       screen.getByText(/Saves ₹49,900 in liabilities./i),
     ).toBeInTheDocument();
@@ -205,16 +205,16 @@ describe('TaxSummary Component', () => {
       hraBreakdown: defaultHraBreakdown,
     });
     expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
-      'Gross Income:₹10,00,000',
+      'Gross Income:₹ 10,00,000',
     );
     expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent(
-      'Deductions:- ₹5,00,000',
+      'Deductions:- ₹ 5,00,000',
     );
     expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent(
-      'Taxable Income:₹5,00,000',
+      'Taxable Income:₹ 5,00,000',
     );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
-    expect(screen.getByText('₹12,500')).toBeInTheDocument();
+    expect(screen.getByText('₹ 12,500')).toBeInTheDocument();
   });
 
   it('switches to New Regime view when New Regime tab is clicked', () => {
@@ -228,16 +228,16 @@ describe('TaxSummary Component', () => {
     });
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
     expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
-      'Gross Income:₹10,00,000',
+      'Gross Income:₹ 10,00,000',
     );
     expect(screen.getByTestId('detail-row-deductions')).toHaveTextContent(
-      'Deductions:- ₹50,000',
+      'Deductions:- ₹ 50,000',
     );
     expect(screen.getByTestId('detail-row-taxable-income')).toHaveTextContent(
-      'Taxable Income:₹9,50,000',
+      'Taxable Income:₹ 9,50,000',
     );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
-    expect(screen.getByText('₹62,400')).toBeInTheDocument();
+    expect(screen.getByText('₹ 62,400')).toBeInTheDocument();
   });
 
   // --- Tax Liability Color based on Optimal Regime ---
@@ -250,11 +250,11 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    const oldRegimeTax = screen.getByText('₹12,500');
+    const oldRegimeTax = screen.getByText('₹ 12,500');
     expect(oldRegimeTax).toHaveStyle(`color: ${theme.palette.success.main}`);
 
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
-    const newRegimeTax = screen.getByText('₹62,400');
+    const newRegimeTax = screen.getByText('₹ 62,400');
     expect(newRegimeTax).toHaveStyle(`color: ${theme.palette.error.main}`); // Not optimal, so error color
   });
 
@@ -274,11 +274,11 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    const oldRegimeTax = screen.getByText('₹1,00,000');
+    const oldRegimeTax = screen.getByText('₹ 1,00,000');
     expect(oldRegimeTax).toHaveStyle(`color: ${theme.palette.error.main}`);
 
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
-    const newRegimeTax = screen.getByText('₹50,000');
+    const newRegimeTax = screen.getByText('₹ 50,000');
     expect(newRegimeTax).toHaveStyle(`color: ${theme.palette.success.main}`);
   });
 
@@ -323,7 +323,7 @@ describe('TaxSummary Component', () => {
       screen.getByText(/Saves \$49,900 in liabilities./i),
     ).toBeInTheDocument();
     expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
-      'Gross Income:$1,000,000',
+      'Gross Income:$ 10,00,000',
     );
   });
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GeneratedInvestmentPlans from '../../../features/profile/components/GeneratedInvestmentPlans';
+import GeneratedInvestmentPlans from '../../../../features/profile/components/GeneratedInvestmentPlans.jsx'; // Corrected path
 
 describe.skip('GeneratedInvestmentPlans Component', () => {
   const defaultProps = {

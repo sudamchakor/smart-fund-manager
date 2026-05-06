@@ -1,13 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import CapitalGoals from '../../../../features/profile/tabs/OnboardingSteps/CapitalGoals';
+import CapitalGoals from '../../../../../features/profile/tabs/OnboardingSteps/CapitalGoals.jsx'; // Corrected path
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
   useSelector: jest.fn((selector) =>
     selector({
       profile: {
-        goals: [
+        goalsList: [
           {
             id: 1,
             name: 'Retirement',
@@ -26,13 +26,12 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock(
-  '../../../../../src/features/profile/components/GoalForm',
+jest.mock('../../../../../src/features/profile/components/GoalForm.jsx', // Corrected path
   () => () => <div data-testid="goal-form">GoalForm</div>,
   { virtual: true },
 );
 
-describe.skip('CapitalGoals', () => {
+describe('CapitalGoals', () => {
   it('renders without crashing', () => {
     render(<CapitalGoals onNext={() => {}} onBack={() => {}} />);
     expect(

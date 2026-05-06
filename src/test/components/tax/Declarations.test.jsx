@@ -10,7 +10,7 @@ jest.mock(
   () =>
     ({ title, children }) => (
       <div
-        data-testid={`data-card-${title.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+        data-testid={`data-card-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
       >
         <h3>{title}</h3>
         <div>{children}</div>
@@ -22,22 +22,22 @@ jest.mock(
   () =>
     ({ label, produced, limited, tooltip }) => (
       <div
-        data-testid={`exemption-row-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+        data-testid={`exemption-row-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
       >
         <span>{label}</span>
         <div
-          data-testid={`produced-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+          data-testid={`produced-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
         >
           {produced}
         </div>
         <span
-          data-testid={`limited-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+          data-testid={`limited-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
         >
           {limited}
         </span>
         {tooltip && (
           <span
-            data-testid={`tooltip-${label.toLowerCase().replace(/[^a-z0-9]/g, '-')}`}
+            data-testid={`tooltip-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
           >
             {tooltip}
           </span>
@@ -135,12 +135,12 @@ describe('Declarations Component', () => {
 
   it('displays correct values for Section A exemptions', () => {
     renderComponent();
-    expect(screen.getByTestId('produced-hra-exemption')).toHaveTextContent(
-      '50000',
-    );
     expect(
-      screen.getByTestId('produced-transport-exemption'),
-    ).toHaveTextContent('30000');
+      screen.getByTestId('produced-hra-exemption').querySelector('input')
+    ).toHaveValue('50000');
+    expect(
+      screen.getByTestId('produced-transport-exemption').querySelector('input')
+    ).toHaveValue('30000');
   });
 
   it('calls handleDeclarationChange when an exemption field changes', () => {
@@ -184,7 +184,7 @@ describe('Declarations Component', () => {
     };
     renderComponent({ declarations: declarationsWithHighChildrenEduc });
     const childrenEducInput = screen
-      .getByTestId("produced-children's-ed.-allowance")
+      .getByTestId("produced-children-s-ed-allowance")
       .querySelector('input');
     expect(childrenEducInput).toHaveValue('3000');
     expect(screen.getByText('Max limit is ₹2,400')).toBeInTheDocument();
@@ -194,22 +194,22 @@ describe('Declarations Component', () => {
   // --- Section B: Other Income ---
   it('renders all other income fields in Section B', () => {
     renderComponent();
-    expect(screen.getByLabelText('bonus')).toBeInTheDocument();
-    expect(screen.getByLabelText('savingsInt')).toBeInTheDocument();
-    expect(screen.getByLabelText('dividends')).toBeInTheDocument();
-    expect(screen.getByLabelText('capitalGains')).toBeInTheDocument();
-    expect(screen.getByLabelText('crypto')).toBeInTheDocument();
+    expect(screen.getByLabelText('Bonus')).toBeInTheDocument();
+    expect(screen.getByLabelText('Savings Interest')).toBeInTheDocument();
+    expect(screen.getByLabelText('Dividends')).toBeInTheDocument();
+    expect(screen.getByLabelText('Capital Gains')).toBeInTheDocument();
+    expect(screen.getByLabelText('Crypto')).toBeInTheDocument();
   });
 
   it('displays correct values for Section B other income', () => {
     renderComponent();
-    expect(screen.getByLabelText('bonus')).toHaveValue('10000');
-    expect(screen.getByLabelText('savingsInt')).toHaveValue('5000');
+    expect(screen.getByLabelText('Bonus')).toHaveValue('10000');
+    expect(screen.getByLabelText('Savings Interest')).toHaveValue('5000');
   });
 
   it('calls handleDeclarationChange when an other income field changes', () => {
     renderComponent();
-    const bonusInput = screen.getByLabelText('bonus');
+    const bonusInput = screen.getByLabelText('Bonus');
     fireEvent.change(bonusInput, { target: { value: '12000' } });
     expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
       'otherIncome',
@@ -234,17 +234,17 @@ describe('Declarations Component', () => {
   it('displays correct values for Section C deductions', () => {
     renderComponent();
     expect(
-      screen.getByTestId('produced-80d---health-insurance'),
-    ).toHaveTextContent('30000');
+      screen.getByTestId('produced-80d-health-insurance').querySelector('input')
+    ).toHaveValue('30000');
     expect(
-      screen.getByTestId('produced-80gg---rent-(no-hra)'),
-    ).toHaveTextContent('70000');
+      screen.getByTestId('produced-80gg-rent-no-hra-').querySelector('input')
+    ).toHaveValue('70000');
   });
 
   it('calls handleDeclarationChange when a deduction field changes', () => {
     renderComponent();
     const sec80DInput = screen
-      .getByTestId('produced-80d---health-insurance')
+      .getByTestId('produced-80d-health-insurance')
       .querySelector('input');
     fireEvent.change(sec80DInput, { target: { value: '35000' } });
     expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
@@ -265,7 +265,7 @@ describe('Declarations Component', () => {
     };
     renderComponent({ declarations: declarationsWithHigh80D });
     const sec80DInput = screen
-      .getByTestId('produced-80d---health-insurance')
+      .getByTestId('produced-80d-health-insurance')
       .querySelector('input');
     expect(sec80DInput).toHaveValue('40000');
     expect(screen.getByText('Max limit is ₹1,00,000')).toBeInTheDocument(); // Limit from createTextField
@@ -282,7 +282,7 @@ describe('Declarations Component', () => {
     };
     renderComponent({ declarations: declarationsWithHigh80GG });
     const sec80GGInput = screen
-      .getByTestId('produced-80gg---rent-(no-hra)')
+      .getByTestId('produced-80gg-rent-no-hra-')
       .querySelector('input');
     expect(sec80GGInput).toHaveValue('70000');
     expect(screen.getByText('Max limit is ₹60,000')).toBeInTheDocument();
@@ -299,7 +299,7 @@ describe('Declarations Component', () => {
     };
     renderComponent({ declarations: declarationsWithHigh80TTA_U });
     const sec80TTA_UInput = screen
-      .getByTestId('produced-80tta/u---bank-interest')
+      .getByTestId('produced-80tta-u-bank-interest')
       .querySelector('input');
     expect(sec80TTA_UInput).toHaveValue('15000');
     expect(screen.getByText('Max limit is ₹50,000')).toBeInTheDocument(); // Limit from createTextField
@@ -309,7 +309,7 @@ describe('Declarations Component', () => {
   it('calls updateHouseProperty when Sec 24(b) Home Loan interest changes', () => {
     renderComponent();
     const sec24BInput = screen
-      .getByTestId('produced-sec-24(b)---home-loan')
+      .getByTestId('produced-sec-24-b-home-loan')
       .querySelector('input');
     fireEvent.change(sec24BInput, { target: { value: '200000' } });
     expect(mockUpdateHouseProperty).toHaveBeenCalledWith('interest', '200000');
@@ -319,7 +319,7 @@ describe('Declarations Component', () => {
     const housePropertyWithHighInterest = { interest: 250000 }; // Exceeds 200000 limit
     renderComponent({ houseProperty: housePropertyWithHighInterest });
     const sec24BInput = screen
-      .getByTestId('produced-sec-24(b)---home-loan')
+      .getByTestId('produced-sec-24-b-home-loan')
       .querySelector('input');
     expect(sec24BInput).toHaveValue('250000');
     expect(screen.getByText('Max limit is ₹2,00,000')).toBeInTheDocument();
@@ -329,21 +329,21 @@ describe('Declarations Component', () => {
   // --- Section D: Sec 80C Investments ---
   it('renders all 80C investment fields in Section D', () => {
     renderComponent();
-    expect(screen.getByLabelText('npsEmployee')).toBeInTheDocument();
-    expect(screen.getByLabelText('npsEmployer')).toBeInTheDocument();
-    expect(screen.getByLabelText('standard80C')).toBeInTheDocument();
-    expect(screen.getByLabelText('superannuation')).toBeInTheDocument();
+    expect(screen.getByLabelText('NPS Employee')).toBeInTheDocument();
+    expect(screen.getByLabelText('NPS Employer')).toBeInTheDocument();
+    expect(screen.getByLabelText('Standard 80C')).toBeInTheDocument();
+    expect(screen.getByLabelText('Superannuation')).toBeInTheDocument();
   });
 
   it('displays correct values for Section D 80C investments', () => {
     renderComponent();
-    expect(screen.getByLabelText('npsEmployee')).toHaveValue('20000');
-    expect(screen.getByLabelText('standard80C')).toHaveValue('100000');
+    expect(screen.getByLabelText('NPS Employee')).toHaveValue('20000');
+    expect(screen.getByLabelText('Standard 80C')).toHaveValue('100000');
   });
 
   it('calls handleDeclarationChange when an 80C field changes', () => {
     renderComponent();
-    const npsEmployeeInput = screen.getByLabelText('npsEmployee');
+    const npsEmployeeInput = screen.getByLabelText('NPS Employee');
     fireEvent.change(npsEmployeeInput, { target: { value: '25000' } });
     expect(mockHandleDeclarationChange).toHaveBeenCalledWith(
       'sec80C',
@@ -362,7 +362,7 @@ describe('Declarations Component', () => {
       },
     };
     renderComponent({ declarations: declarationsWithHighStandard80C });
-    const standard80CInput = screen.getByLabelText('standard80C');
+    const standard80CInput = screen.getByLabelText('Standard 80C');
     expect(standard80CInput).toHaveValue('160000');
     expect(screen.getByText('Max limit is ₹1,50,000')).toBeInTheDocument();
     expect(standard80CInput).toHaveAttribute('aria-invalid', 'true');
@@ -392,7 +392,7 @@ describe('Declarations Component', () => {
       .getByTestId('produced-hra-exemption')
       .querySelector('input');
     expect(hraInput).toHaveValue(''); // TextField with null/undefined value renders as empty string
-    const bonusInput = screen.getByLabelText('bonus');
+    const bonusInput = screen.getByLabelText('Bonus');
     expect(bonusInput).toHaveValue('');
   });
 

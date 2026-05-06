@@ -26,18 +26,20 @@ const Declarations = ({
     subfield,
     currentValue,
     limit,
-    isLimited = false,
+    label, // Add label prop here
   ) => {
-    const isError = limit && currentValue > limit;
+    // Ensure limit is a positive number for error checking
+    const isError = limit > 0 && parseFloat(currentValue) > limit;
     const helperText = isError
       ? `Max limit is ₹${limit.toLocaleString('en-IN')}`
       : '';
 
     return (
       <TextField
+        label={label} // Pass label to TextField
         variant="standard"
         size="small"
-        value={currentValue}
+        value={currentValue === null || currentValue === undefined ? '' : currentValue} // Handle null/undefined values
         onChange={(e) =>
           handleDeclarationChange(section, field, subfield, e.target.value)
         }
@@ -93,6 +95,8 @@ const Declarations = ({
                 'hra',
                 'produced',
                 declarations.exemptions.hra.produced,
+                null, // No limit for HRA here, limit is calculated elsewhere
+                'HRA Exemption' // Add label
               )}
               limited={declarations.exemptions.hra.limited}
               tooltip="Exemption for House Rent Allowance."
@@ -105,6 +109,7 @@ const Declarations = ({
                 'produced',
                 declarations.exemptions.transport.produced,
                 38400,
+                'Transport Exemption' // Add label
               )}
               limited={declarations.exemptions.transport.limited}
               tooltip="Exemption for transport allowance, capped at ₹3,200 per month."
@@ -116,6 +121,8 @@ const Declarations = ({
                 'gratuity',
                 'produced',
                 declarations.exemptions.gratuity.produced,
+                null, // No limit
+                'Gratuity / Other' // Add label
               )}
               limited={declarations.exemptions.gratuity.limited}
               tooltip="Exemption for gratuity and other allowances."
@@ -128,6 +135,7 @@ const Declarations = ({
                 'produced',
                 declarations.exemptions.childrenEduc.produced,
                 2400,
+                "Children's Ed. Allowance" // Add label
               )}
               limited={declarations.exemptions.childrenEduc.limited}
               tooltip="Exemption for children's education allowance, capped at ₹100 per month per child for up to 2 children."
@@ -139,6 +147,8 @@ const Declarations = ({
                 'lta',
                 'produced',
                 declarations.exemptions.lta.produced,
+                null, // No limit
+                'LTA Exemption' // Add label
               )}
               limited={declarations.exemptions.lta.limited}
               tooltip="Exemption for Leave Travel Allowance."
@@ -150,6 +160,8 @@ const Declarations = ({
                 'uniform',
                 'produced',
                 declarations.exemptions.uniform.produced,
+                null, // No limit
+                'Uniform Expenses' // Add label
               )}
               limited={declarations.exemptions.uniform.limited}
               tooltip="Exemption for expenses incurred on a uniform for official duties."
@@ -164,30 +176,40 @@ const Declarations = ({
               'bonus',
               null,
               declarations.otherIncome.bonus,
+              null, // No limit
+              'Bonus' // Add label
             )}
             {createTextField(
               'otherIncome',
               'savingsInt',
               null,
               declarations.otherIncome.savingsInt,
+              null, // No limit
+              'Savings Interest' // Add label
             )}
             {createTextField(
               'otherIncome',
               'dividends',
               null,
               declarations.otherIncome.dividends,
+              null, // No limit
+              'Dividends' // Add label
             )}
             {createTextField(
               'otherIncome',
               'capitalGains',
               null,
               declarations.otherIncome.capitalGains,
+              null, // No limit
+              'Capital Gains' // Add label
             )}
             {createTextField(
               'otherIncome',
               'crypto',
               null,
               declarations.otherIncome.crypto,
+              null, // No limit
+              'Crypto' // Add label
             )}
           </Stack>
         </DataCard>
@@ -204,6 +226,7 @@ const Declarations = ({
                 'produced',
                 declarations.deductions.sec80D.produced,
                 100000,
+                '80D - Health Insurance' // Add label
               )}
               limited={declarations.deductions.sec80D.limited}
               tooltip="Deduction for Health Insurance premiums for self, spouse, and parents."
@@ -216,6 +239,7 @@ const Declarations = ({
                 'produced',
                 declarations.deductions.sec80DD_DDB.produced,
                 125000,
+                '80DD/DDB - Medical' // Add label
               )}
               limited={declarations.deductions.sec80DD_DDB.limited}
               tooltip="Deduction for medical treatment of a dependent with a disability."
@@ -227,6 +251,8 @@ const Declarations = ({
                 'sec80E_EEB',
                 'produced',
                 declarations.deductions.sec80E_EEB.produced,
+                null, // No limit
+                '80E/EEB - Loan Interest' // Add label
               )}
               limited={declarations.deductions.sec80E_EEB.limited}
               tooltip="Deduction for interest on an education loan."
@@ -238,6 +264,8 @@ const Declarations = ({
                 'sec80G',
                 'produced',
                 declarations.deductions.sec80G.produced,
+                null, // No limit
+                '80G - Charity Donations' // Add label
               )}
               limited={declarations.deductions.sec80G.limited}
               tooltip="Deduction for donations to certain funds and charitable institutions."
@@ -250,6 +278,7 @@ const Declarations = ({
                 'produced',
                 declarations.deductions.sec80GG.produced,
                 60000,
+                '80GG - Rent (No HRA)' // Add label
               )}
               limited={declarations.deductions.sec80GG.limited}
               tooltip="Deduction for rent paid when HRA is not received, capped at ₹5,000 per month."
@@ -262,6 +291,7 @@ const Declarations = ({
                 'produced',
                 declarations.deductions.sec80TTA_U.produced,
                 50000,
+                '80TTA/U - Bank Interest' // Add label
               )}
               limited={declarations.deductions.sec80TTA_U.limited}
               tooltip="Deduction on interest income from savings accounts, capped at ₹10,000 for individuals and ₹50,000 for senior citizens."
@@ -274,6 +304,7 @@ const Declarations = ({
                 null,
                 houseProperty.interest,
                 200000,
+                'Sec 24(b) - Home Loan' // Add label
               )}
               limited={Math.min(
                 parseFloat(houseProperty.interest) || 0,
@@ -291,12 +322,16 @@ const Declarations = ({
               'npsEmployee',
               null,
               declarations.sec80C.npsEmployee,
+              null, // No limit
+              'NPS Employee' // Add label
             )}
             {createTextField(
               'sec80C',
               'npsEmployer',
               null,
               declarations.sec80C.npsEmployer,
+              null, // No limit
+              'NPS Employer' // Add label
             )}
             {createTextField(
               'sec80C',
@@ -304,12 +339,15 @@ const Declarations = ({
               null,
               declarations.sec80C.standard80C,
               150000,
+              'Standard 80C' // Add label
             )}
             {createTextField(
               'sec80C',
               'superannuation',
               null,
               declarations.sec80C.superannuation,
+              null, // No limit
+              'Superannuation' // Add label
             )}
             <Divider
               sx={{

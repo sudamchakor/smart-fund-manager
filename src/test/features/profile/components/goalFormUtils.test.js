@@ -1,4 +1,4 @@
-import { calculateGoalProjection } from '../../../features/profile/components/goalFormUtils';
+import { calculateGoalProjection } from '../../../../features/profile/components/goalFormUtils.js'; // Corrected path
 
 describe.skip('calculateGoalProjection', () => {
   it('should calculate goal projection correctly without inflation', () => {

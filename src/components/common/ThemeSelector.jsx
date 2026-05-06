@@ -44,6 +44,7 @@ const ThemeSelector = ({ selectedTheme, onThemeChange, disabled }) => {
                 {themeOption.colors.map((color, index) => (
                   <Box
                     key={index}
+                    data-testid="color-box"
                     sx={{
                       height: '100%',
                       width: `${100 / themeOption.colors.length}%`,

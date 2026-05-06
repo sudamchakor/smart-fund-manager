@@ -1,8 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { Provider } from 'react-redux';
+import { Provider } from 'react-redux'; // This mock is fine
 import configureStore from 'redux-mock-store';
-import GoalCoverage from '../../../features/profile/components/GoalCoverage';
+import GoalCoverage from '../../../../features/profile/components/GoalCoverage.jsx';
 
 const mockStore = configureStore([]);
 

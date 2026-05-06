@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import ExemptionRow from '../../../components/common/ExemptionRow';
 import '@testing-library/jest-dom';
@@ -28,7 +28,7 @@ describe('ExemptionRow Component', () => {
     expect(screen.getByText('₹4,000')).toBeInTheDocument();
   });
 
-  it('renders with a tooltip when provided', () => {
+  it('renders with a tooltip when provided', async () => {
     renderComponent({
       label: 'Tooltip Exemption',
       produced: <span data-testid="produced-value">1000</span>,
@@ -38,9 +38,10 @@ describe('ExemptionRow Component', () => {
     expect(screen.getByText('Tooltip Exemption')).toBeInTheDocument();
     expect(screen.getByTestId('InfoOutlinedIcon')).toBeInTheDocument();
     fireEvent.mouseOver(screen.getByTestId('InfoOutlinedIcon'));
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
-      'This is a helpful tooltip.',
-    );
+    
+    // Wait for the tooltip to appear in the DOM
+    const tooltip = await screen.findByRole('tooltip');
+    expect(tooltip).toHaveTextContent('This is a helpful tooltip.');
   });
 
   // --- Negative Scenarios / Edge Cases ---
@@ -60,7 +61,7 @@ describe('ExemptionRow Component', () => {
       produced: <span data-testid="produced-value"></span>,
       limited: 0,
     });
-    expect(screen.getByText('')).toBeInTheDocument(); // Empty label
+    // We query by text '₹0' directly to avoid the ambiguity of empty string
     expect(screen.getByTestId('produced-value')).toBeEmptyDOMElement();
     expect(screen.getByText('₹0')).toBeInTheDocument();
   });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { SpeedDial, SpeedDialIcon, SpeedDialAction } from '@mui/material';
 
-export default function ActionSpeedDial({ actions, sx, ...props }) {
+export default function ActionSpeedDial({ actions = [], sx, ...props }) {
   return (
     <SpeedDial
       ariaLabel="Floating Action Menu"

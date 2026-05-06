@@ -6,6 +6,16 @@ import '@testing-library/jest-dom';
 
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
+/**
+ * Utility to match JSDOM's computed color format
+ */
+const hexToRgb = (hex) => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgb(${r}, ${g}, ${b})`;
+};
+
 describe('LoanSummaryTerminal Component', () => {
   const defaultProps = {
     monthlyEmi: 15000,
@@ -32,11 +42,11 @@ describe('LoanSummaryTerminal Component', () => {
     renderComponent();
     expect(screen.getByText('Loan Summary')).toBeInTheDocument();
     expect(screen.getByText('Monthly EMI')).toBeInTheDocument();
-    expect(screen.getByText(/₹15,000/)).toBeInTheDocument();
+    expect(screen.getByText(/₹\s*15,000/)).toBeInTheDocument(); // Account for space
     expect(screen.getByText('Total Interest Burden')).toBeInTheDocument();
-    expect(screen.getByText(/₹1,00,000/)).toBeInTheDocument();
+    expect(screen.getByText(/₹\s*1,00,000/)).toBeInTheDocument(); // Account for space
     expect(screen.getByText('Total Amount Payable')).toBeInTheDocument();
-    expect(screen.getByText(/₹16,00,000/)).toBeInTheDocument();
+    expect(screen.getByText(/₹\s*16,00,000/)).toBeInTheDocument(); // Account for space
   });
 
   it('renders with a custom title', () => {
@@ -47,18 +57,15 @@ describe('LoanSummaryTerminal Component', () => {
 
   it('renders with a custom currency symbol', () => {
     renderComponent({ currency: '$' });
-    expect(screen.getByText(/\$15,000/)).toBeInTheDocument();
-    expect(screen.getByText(/\$1,00,000/)).toBeInTheDocument();
-    expect(screen.getByText(/\$16,00,000/)).toBeInTheDocument();
+    expect(screen.getByText(/\$\s*15,000/)).toBeInTheDocument(); // Account for space
+    expect(screen.getByText(/\$\s*1,00,000/)).toBeInTheDocument(); // Account for space
+    expect(screen.getByText(/\$\s*16,00,000/)).toBeInTheDocument(); // Account for space
   });
 
   it('applies custom interestColor to Total Interest Burden', () => {
     renderComponent({ interestColor: 'error.main' });
-    const totalInterestElement = screen.getByText(/₹1,00,000/);
-    // MUI uses theme.palette.error.main for 'error.main'
-    expect(totalInterestElement).toHaveStyle(
-      `color: ${theme.palette.error.main}`,
-    );
+    const totalInterestElement = screen.getByText(/₹\s*1,00,000/); // Account for space
+    expect(totalInterestElement).toHaveStyle(`color: ${hexToRgb(theme.palette.error.main)}`);
   });
 
   it('renders children correctly', () => {
@@ -78,7 +85,7 @@ describe('LoanSummaryTerminal Component', () => {
       totalInterest: 0,
       totalPayable: 0,
     });
-    expect(screen.getAllByText(/₹0/).length).toBe(3); // Monthly EMI, Total Interest Burden, Total Amount Payable
+    expect(screen.getAllByText(/₹\s*0/)).toHaveLength(3); // Account for space
   });
 
   it('handles null/undefined values for financial figures gracefully (renders 0)', () => {
@@ -87,7 +94,7 @@ describe('LoanSummaryTerminal Component', () => {
       totalInterest: undefined,
       totalPayable: null,
     });
-    expect(screen.getAllByText(/₹0/).length).toBe(3);
+    expect(screen.getAllByText(/₹\s*0/)).toHaveLength(3); // Account for space
   });
 
   it('handles empty string for title gracefully (renders empty)', () => {

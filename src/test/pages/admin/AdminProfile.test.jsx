@@ -26,10 +26,9 @@ jest.mock('react-router-dom', () => ({
   Link: ({ to, children }) => <a href={to}>{children}</a>, // Mock Link component
 }));
 
-// Mock useAuth hook
-const mockUseAuth = jest.fn();
-jest.mock('../../../../src/hooks/useAuth', () => ({
-  useAuth: () => mockUseAuth(),
+// Mock useAuth hook (corrected path)
+jest.mock('../../../../src/hooks/useAuth.js', () => ({
+  useAuth: jest.fn(),
 }));
 
 // Mock Firebase Firestore
@@ -42,7 +41,7 @@ jest.mock('firebase/firestore', () => ({
 }));
 
 // Mock Firebase Auth
-jest.mock('firebase/getAuthentication', () => ({
+jest.mock('firebase/auth', () => ({
   getAuth: jest.fn(),
   updateProfile: jest.fn(),
   deleteUser: jest.fn(),
@@ -73,7 +72,7 @@ describe('AdminProfile Component', () => {
   const mockLogout = jest.fn();
 
   const renderComponent = (authLoading = false, user = mockUser) => {
-    mockUseAuth.mockReturnValue({
+    require('../../../../src/hooks/useAuth.js').useAuth.mockReturnValue({
       user,
       loading: authLoading,
       logout: mockLogout,

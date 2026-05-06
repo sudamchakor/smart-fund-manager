@@ -1,58 +1,39 @@
 import React from 'react';
-import { Box, Stack, Typography, useTheme, alpha } from '@mui/material';
+import { Box, Grid, Typography } from '@mui/material';
 
-export default function PageHeader({
-  title,
-  subtitle,
-  icon: Icon,
-  iconColor = 'primary',
-  action,
-}) {
-  const theme = useTheme();
-
+const PageHeader = ({ title, subtitle, icon: IconComponent, action }) => {
   return (
-    <Stack
-      direction="row"
-      justifyContent="space-between"
-      alignItems={action ? 'flex-end' : 'center'}
-      sx={{ mb: 4 }}
-    >
-      <Stack direction="row" spacing={2} alignItems="center">
-        {Icon && ( // Conditionally render the icon box only if Icon is provided
-          <Box
-            sx={{
-              display: 'flex',
-              p: 1.5,
-              borderRadius: 2,
-              bgcolor: alpha(theme.palette[iconColor].main, 0.1),
-              color: `${iconColor}.main`,
-            }}
-          >
-            <Icon fontSize="medium" />
-          </Box>
-        )}
-        <Box>
-          <Typography
-            variant="h5"
-            sx={{
-              fontWeight: 900,
-              color: 'text.primary',
-              letterSpacing: -0.5,
-            }}
-          >
-            {title}
-          </Typography>
-          {subtitle && (
-            <Typography
-              variant="caption"
-              sx={{ fontWeight: 600, color: 'text.secondary' }}
+    <Grid container alignItems="center" justifyContent="space-between" sx={{ mb: 2 }}>
+      <Grid item>
+        <Box display="flex" alignItems="center">
+          {IconComponent && ( // Check if IconComponent is provided
+            <Box
+              sx={{
+                mr: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
             >
-              {subtitle}
-            </Typography>
+              {/* Correct: Render the component type passed as a prop */}
+              <IconComponent fontSize="medium" data-testid="page-header-icon" />
+            </Box>
           )}
+          <Box>
+            <Typography variant="h5" component="h5"> {/* This renders an h5 */}
+              {title}
+            </Typography>
+            {subtitle && (
+              <Typography variant="subtitle2" color="textSecondary">
+                {subtitle}
+              </Typography>
+            )}
+          </Box>
         </Box>
-      </Stack>
-      {action && <Box>{action}</Box>}
-    </Stack>
+      </Grid>
+      {action && <Grid item>{action}</Grid>}
+    </Grid>
   );
-}
+};
+
+export default PageHeader;

@@ -1,14 +1,16 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import SystemParameters from '../../../../features/profile/tabs/OnboardingSteps/SystemParameters';
+import SystemParameters from '../../../../../features/profile/tabs/OnboardingSteps/SystemParameters.jsx'; // Corrected path
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
   useSelector: jest.fn((selector) =>
     selector({
       profile: {
-        name: '',
-        occupation: '',
+        basicInfo: {
+          name: '',
+          occupation: '',
+        },
         riskTolerance: 'medium',
         currentAge: 30,
         retirementAge: 60,
@@ -22,15 +24,14 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock(
-  '../../../../../src/components/common/SliderInput',
+jest.mock('../../../../../src/components/common/SliderInput.jsx', // Corrected path
   () => (props) => (
     <div data-testid={`slider-${props.label}`}>{props.label}</div>
   ),
   { virtual: true },
 );
 
-describe.skip('SystemParameters', () => {
+describe('SystemParameters', () => {
   it('renders without crashing', () => {
     render(<SystemParameters onNext={() => {}} />);
     expect(

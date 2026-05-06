@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import InvestmentChart from '../../../features/investment/components/InvestmentChart';
-
+import InvestmentChart from '../../../../features/investment/components/InvestmentChart.jsx';
+// This mock is fine
 // Mock Recharts components
 jest.mock('recharts', () => ({
   ResponsiveContainer: ({ children }) => (

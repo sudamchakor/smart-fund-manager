@@ -1,21 +1,20 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 import { useDispatch, useSelector } from 'react-redux';
-import useGoalForm from '../../../features/profile/components/useGoalForm';
-import { addGoal, updateGoal } from '../../../store/profileSlice';
-
+import useGoalForm from '../../../../features/profile/components/useGoalForm.js'; // Corrected path
+import { addGoal, updateGoal } from '../../../../store/profileSlice.js'; // Corrected path
 jest.mock('react-redux', () => ({
   useDispatch: jest.fn(),
   useSelector: jest.fn(),
 }));
 
-jest.mock('../../../store/profileSlice', () => ({
+jest.mock('../../../../store/profileSlice.js', () => ({ // Corrected path
   addGoal: jest.fn(),
   updateGoal: jest.fn(),
   selectGoals: jest.fn(() => []),
   selectCurrentAge: jest.fn(() => 30),
 }));
 
-describe.skip('useGoalForm', () => {
+describe('useGoalForm', () => {
   const mockDispatch = jest.fn();
 
   beforeEach(() => {

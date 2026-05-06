@@ -11,8 +11,18 @@ export default function SectionHeader({
   const theme = useTheme();
 
   // Resolve the color directly from the theme to prevent alpha() parsing errors
-  const resolvedColor =
-    !color || color === 'primary.main' ? theme.palette.primary.main : color;
+  let resolvedColor = theme.palette.primary.main;
+  if (color) {
+    if (color === 'secondary') {
+      resolvedColor = theme.palette.secondary.main;
+    } else if (color === 'primary') {
+      resolvedColor = theme.palette.primary.main;
+    } else if (theme.palette[color] && theme.palette[color].main) {
+      resolvedColor = theme.palette[color].main;
+    } else if (color.startsWith('#') || color.startsWith('rgb')) {
+      resolvedColor = color;
+    }
+  }
 
   return (
     <Stack
@@ -26,17 +36,19 @@ export default function SectionHeader({
         spacing={1.5}
         alignItems={subtitle ? 'flex-start' : 'center'}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            p: 1,
-            borderRadius: 2,
-            bgcolor: alpha(resolvedColor, 0.1),
-            color: resolvedColor,
-          }}
-        >
-          {icon}
-        </Box>
+        {icon && (
+          <Box
+            sx={{
+              display: 'flex',
+              p: 1,
+              borderRadius: 2,
+              bgcolor: alpha(resolvedColor, 0.1),
+              color: resolvedColor,
+            }}
+          >
+            {icon}
+          </Box>
+        )}
         <Box>
           <Typography
             variant="h6"

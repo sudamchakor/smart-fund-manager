@@ -2,8 +2,8 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import BasicInfoDisplay from '../../../features/profile/components/BasicInfoDisplay';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import BasicInfoDisplay from '../../../../features/profile/components/BasicInfoDisplay.jsx';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp'; // This mock is fine
 import GraphicEqIcon from '@mui/icons-material/GraphicEq';
 
 // Mock the icons to allow for testing

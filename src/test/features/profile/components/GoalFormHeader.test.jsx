@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import GoalFormHeader from '../../../features/profile/components/GoalFormHeader';
+import GoalFormHeader from '../../../../features/profile/components/GoalFormHeader.jsx'; // Corrected path
 
 describe.skip('GoalFormHeader', () => {
   it('renders without crashing', () => {

@@ -14,8 +14,7 @@ jest.mock('react-redux', () => ({
 }));
 
 // Mock child components
-jest.mock(
-  '../../../../../src/components/common/AmountInputWithDate',
+jest.mock('../../../../../src/components/common/AmountInputWithDate.jsx', // Corrected path
   () =>
     ({
       title,
