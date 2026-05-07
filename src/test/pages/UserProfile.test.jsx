@@ -192,7 +192,62 @@ describe('UserProfile Page', () => {
     expect(await screen.findByTestId('future-goals-tab')).toBeInTheDocument();
     expect(
       screen.queryByTestId('personal-profile-tab'),
-    ).not.toBeInTheDocument();
+    ).not.toBeInTheDocument();// src/test/features/investment/tabs/LumpsumCalculatorForm.test.jsx
+import { screen } from '@testing-library/react';
+// Import your custom render method
+import { render } from '../../../../test/test-utils';
+import LumpsumCalculatorForm from '../../../../features/investment/tabs/LumpsumCalculatorForm';
+
+it('renders without crashing', () => {
+  // Make sure the 'settings' reducer (or whichever provides 'selectCurrency')
+  // is included in your test-utils store setup.
+  render(<LumpsumCalculatorForm />);
+});// src/test/features/profile/components/AutoBalancer.test.jsx
+import { screen } from '@testing-library/react';
+// Import your custom render method
+import { render } from '../../../../test/test-utils';
+import AutoBalancer from '../../../../features/profile/components/AutoBalancer';
+
+it('renders without crashing', () => {
+  // The custom render will wrap AutoBalancer in a Provider
+  render(<AutoBalancer />);
+  // You can add assertions here to make the test more meaningful
+});// src/test/test-utils.jsx
+import React from 'react';
+import { render as rtlRender } from '@testing-library/react';
+import { configureStore } from '@reduxjs/toolkit';
+import { Provider } from 'react-redux';
+
+// Import your reducers
+// You'll need to import all reducers used by the components you are testing.
+import profileReducer from '../store/profileSlice';
+// import settingsReducer from '../store/settingsSlice'; // for LumpsumCalculatorForm
+
+function render(
+  ui,
+  {
+    preloadedState,
+    // Automatically create a store instance if no store is passed in
+    store = configureStore({
+      reducer: {
+        profile: profileReducer,
+        // settings: settingsReducer,
+      },
+      preloadedState,
+    }),
+    ...renderOptions
+  } = {}
+) {
+  function Wrapper({ children }) {
+    return <Provider store={store}>{children}</Provider>;
+  }
+  return rtlRender(ui, { wrapper: Wrapper, ...renderOptions });
+}
+
+// re-export everything
+export * from '@testing-library/react';
+// override render method
+export { render };
     });
   });
 

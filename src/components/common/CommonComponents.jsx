@@ -217,7 +217,6 @@ export const DatePickerInput = ({ label, value, onChange }) => {
         </Typography>
       )}
       <DatePicker
-        label={label}
         views={['year', 'month']}
         openTo="month"
         open={open}
