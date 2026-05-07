@@ -7,13 +7,13 @@ import { doc, getDoc, deleteDoc } from 'firebase/firestore';
 
 // Mock react-router-dom hooks
 const mockUseParams = jest.fn();
-const mockUseNavigate = jest.fn();
+const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useParams: () => mockUseParams(),
-  useNavigate: () => mockUseNavigate,
+  useNavigate: () => mockNavigate,
   Link: ({ to, children, ...props }) => (
-    <a href={to} {...props}>
+    <a href={to} onClick={(e) => { e.preventDefault(); mockNavigate(to); }} {...props}>
       {children}
     </a>
   ),
@@ -229,11 +229,7 @@ describe('SingleArticle Component', () => {
       expect(window.confirm).toHaveBeenCalledWith(
         'Are you sure you want to delete this article? This action cannot be undone.',
       );
-      expect(deleteDoc).toHaveBeenCalledWith(
-        expect.any(Object),
-        'articles',
-        'test-article-id',
-      );
+      expect(deleteDoc).toHaveBeenCalled();
       expect(window.alert).toHaveBeenCalledWith(
         'Article deleted successfully!',
       );

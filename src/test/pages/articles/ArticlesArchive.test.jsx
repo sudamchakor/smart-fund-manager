@@ -6,10 +6,12 @@ import '@testing-library/jest-dom';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 
 // Mock react-router-dom's Link
+const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
   Link: ({ to, children, ...props }) => (
-    <a href={to} {...props}>
+    <a href={to} onClick={(e) => { e.preventDefault(); mockNavigate(to); }} {...props}>
       {children}
     </a>
   ),

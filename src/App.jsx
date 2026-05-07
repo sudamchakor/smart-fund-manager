@@ -1,6 +1,6 @@
-import React, { useMemo, useEffect, Suspense, lazy } from 'react';
-import { Routes, Route, Navigate, useLocation, Outlet } from 'react-router-dom';
-import { ThemeProvider, CssBaseline, Box } from '@mui/material';
+import React, { useEffect, Suspense, lazy } from 'react';
+import { Routes, Route, useLocation, Outlet } from 'react-router-dom';
+import { CssBaseline, Box } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { HelmetProvider } from 'react-helmet-async';
@@ -8,7 +8,7 @@ import { Provider, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import store, { persistor } from './store';
 
-import { getAppTheme } from './theme/ThemeConfig';
+import ThemeResolver from './theme/ThemeResolver';
 import {
   selectThemeMode,
   selectDesignSystem,
@@ -16,7 +16,6 @@ import {
 } from './store/emiSlice';
 
 import Header from './components/layout/Header';
-// REMOVED: import AdminHeader from './components/layout/AdminHeader'; // This was causing Firebase to load early
 import Footer from './components/layout/Footer';
 import SuspenseFallback from './components/common/SuspenseFallback';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -77,11 +76,6 @@ const AppContent = () => {
     location.pathname.startsWith('/articles/') &&
     location.pathname.split('/').length === 3;
 
-  const muiTheme = useMemo(
-    () => getAppTheme(themeMode, designSystem, visualStyle),
-    [themeMode, designSystem, visualStyle],
-  );
-
   useEffect(() => {
     document.body.setAttribute('data-theme', themeMode || 'dodgerblue');
     document.body.setAttribute('data-arch', designSystem || 'material');
@@ -89,7 +83,7 @@ const AppContent = () => {
   }, [themeMode, designSystem, visualStyle]);
 
   return (
-    <ThemeProvider theme={muiTheme}>
+    <ThemeResolver>
       <CssBaseline />
       <Box
         sx={{
@@ -222,7 +216,7 @@ const AppContent = () => {
         </Box>
         <Footer />
       </Box>
-    </ThemeProvider>
+    </ThemeResolver>
   );
 };
 

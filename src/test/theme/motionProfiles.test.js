@@ -1,12 +1,12 @@
-import * as motionProfiles from '../../../src/theme/motionProfiles';
+import { fadeIn, slideIn, staggerContainer, textVariant, textVariant2, zoomIn, footerVariants } from '../../../src/theme/motionProfiles';
 
-describe.skip('Motion Profiles', () => {
+describe('Motion Profiles', () => {
   it('fadeIn should return correct animation properties', () => {
     const direction = 'up';
     const type = 'tween';
     const delay = 0.5;
     const duration = 1;
-    const result = motionProfiles.fadeIn(direction, type, delay, duration);
+    const result = fadeIn(direction, type, delay, duration);
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
@@ -24,7 +24,7 @@ describe.skip('Motion Profiles', () => {
     const type = 'tween';
     const delay = 0.3;
     const duration = 0.8;
-    const result = motionProfiles.slideIn(direction, type, delay, duration);
+    const result = slideIn(direction, type, delay, duration);
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
@@ -40,7 +40,7 @@ describe.skip('Motion Profiles', () => {
   it('staggerContainer should return correct animation properties', () => {
     const staggerChildren = 0.1;
     const delayChildren = 0.2;
-    const result = motionProfiles.staggerContainer(
+    const result = staggerContainer(
       staggerChildren,
       delayChildren,
     );
@@ -53,7 +53,7 @@ describe.skip('Motion Profiles', () => {
 
   it('textVariant should return correct animation properties', () => {
     const delay = 0.1;
-    const result = motionProfiles.textVariant(delay);
+    const result = textVariant(delay);
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
@@ -61,7 +61,7 @@ describe.skip('Motion Profiles', () => {
   });
 
   it('textVariant2 should return correct animation properties', () => {
-    const result = motionProfiles.textVariant2();
+    const result = textVariant2();
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
@@ -72,7 +72,7 @@ describe.skip('Motion Profiles', () => {
   it('zoomIn should return correct animation properties', () => {
     const delay = 0.4;
     const duration = 0.6;
-    const result = motionProfiles.zoomIn(delay, duration);
+    const result = zoomIn(delay, duration);
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');
@@ -81,7 +81,7 @@ describe.skip('Motion Profiles', () => {
   });
 
   it('footerVariants should return correct animation properties', () => {
-    const result = motionProfiles.footerVariants();
+    const result = footerVariants();
 
     expect(result).toHaveProperty('hidden');
     expect(result).toHaveProperty('show');

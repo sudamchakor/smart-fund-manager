@@ -218,8 +218,8 @@ export default function SettingsPage() {
               transform: 'translateX(-50%) !important',
               p: 0.8,
               borderRadius: 2,
-              bgcolor: 'text.primary',
-              color: 'background.paper',
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
               display: 'flex',
               alignItems: 'center',
               gap: 3,
@@ -238,7 +238,7 @@ export default function SettingsPage() {
                 size="small"
                 onClick={handleUndo}
                 sx={{
-                  color: alpha(theme.palette.common.white, 0.6),
+                  color: alpha(theme.palette.primary.contrastText, 0.7),
                   fontSize: '0.7rem',
                 }}
               >
@@ -254,6 +254,11 @@ export default function SettingsPage() {
                   fontWeight: 800,
                   textTransform: 'none',
                   px: 2,
+                  bgcolor: theme.palette.primary.contrastText,
+                  color: theme.palette.primary.main,
+                  '&:hover': {
+                    bgcolor: alpha(theme.palette.primary.contrastText, 0.9),
+                  },
                 }}
               >
                 Save

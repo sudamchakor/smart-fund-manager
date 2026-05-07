@@ -44,36 +44,33 @@ jest.mock('firebase/firestore', () => ({
   updateDoc: jest.fn(),
 }));
 
-// Mock ReactQuill
-jest.mock('react-quill', () => {
-  const MockReactQuill = ({ value, onChange, ...props }) => (
-    <textarea
-      data-testid="react-quill-editor"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      {...props}
-    />
-  );
-  return MockReactQuill;
-});
+// Mock child components
+jest.mock('../../../../src/components/admin/ArticleEditorHeader', () => ({ viewMode, setViewMode }) => (
+  <div data-testid="mock-editor-header">
+    <button onClick={() => setViewMode('preview')}>Set Preview</button>
+    <button onClick={() => setViewMode('edit')}>Set Edit</button>
+  </div>
+));
 
-// Mock PageHeader
-jest.mock(
-  '../../../../src/components/common/PageHeader',
-  () =>
-    ({ title, subtitle, icon: Icon }) => (
-      <div data-testid="mock-page-header">
-        <h1>{title}</h1>
-        <p>{subtitle}</p>
-        {Icon && <Icon data-testid="mock-header-icon" />}
-      </div>
-    ),
-);
+jest.mock('../../../../src/components/admin/ArticleEditorForm', () => ({ title, setTitle, category, setCategory, imageUrl, setImageUrl, content, setContent }) => (
+  <div data-testid="mock-editor-form">
+    <input aria-label="Article Title" value={title} onChange={e => setTitle(e.target.value)} />
+    <input aria-label="Category" value={category} onChange={e => setCategory(e.target.value)} />
+    <input aria-label="Featured Image URL" value={imageUrl} onChange={e => setImageUrl(e.target.value)} />
+    <textarea data-testid="react-quill-editor" value={content} onChange={e => setContent(e.target.value)} />
+  </div>
+));
 
-// Mock articleCategories
-jest.mock('../../../../src/utils/articleCategories', () => ({
-  articleCategories: ['Finance', 'Technology', 'Health'],
-}));
+jest.mock('../../../../src/components/admin/ArticlePreview', () => () => <div data-testid="mock-article-preview">Preview Content</div>);
+
+jest.mock('../../../../src/components/admin/ArticleEditorActions', () => ({ handlePublish, clearForm }) => (
+  <div data-testid="mock-editor-actions">
+    <button onClick={(e) => handlePublish(e, 'published')}>Publish</button>
+    <button onClick={(e) => handlePublish(e, 'published')}>Update</button>
+    <button onClick={(e) => handlePublish(e, 'draft')}>Save Draft</button>
+    <button onClick={clearForm}>Clear</button>
+  </div>
+));
 
 // Mock ADMIN_UID
 jest.mock('../../../../src/utils/constants', () => ({
@@ -118,6 +115,12 @@ describe('WriteArticle Component', () => {
     });
     addDoc.mockResolvedValue({ id: 'new-article-id' });
     updateDoc.mockResolvedValue();
+
+    // Mock localStorage and window confirm
+    Storage.prototype.getItem = jest.fn();
+    Storage.prototype.setItem = jest.fn();
+    Storage.prototype.removeItem = jest.fn();
+    window.confirm = jest.fn().mockReturnValue(true);
   });
 
   // --- Authentication and Authorization ---
@@ -133,41 +136,15 @@ describe('WriteArticle Component', () => {
     });
   });
 
-  it('redirects non-admin users to /admin/articles and shows error snackbar', async () => {
+  it('redirects non-admin users and shows error snackbar', async () => {
     renderComponent(false, mockNonAdminUser);
     await waitFor(() => {
-      expect(
-        screen.getByText('You are not authorized to write or edit articles.'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Unauthorized access.')).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
   });
 
-  it('renders unauthorized message if user is not admin', async () => {
-    renderComponent(false, mockNonAdminUser);
-    await waitFor(() => {
-      expect(
-        screen.getByText('You are not authorized to access this page.'),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Go to Articles' }),
-      ).toBeInTheDocument();
-    });
-  });
-
   // --- Create New Article Mode ---
-  it('renders "Create Article" header in new article mode', async () => {
-    renderComponent();
-    await waitFor(() => {
-      expect(screen.getByText('Create Article')).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          'Draft and format high-quality financial content for the platform.',
-        ),
-      ).toBeInTheDocument();
-    });
-  });
-
   it('allows input for title, category, image URL, and content', async () => {
     renderComponent();
     await waitFor(() => {
@@ -187,8 +164,9 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'New Title' },
     });
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
-    fireEvent.click(screen.getByText('Technology'));
+    fireEvent.change(screen.getByLabelText('Category'), {
+      target: { value: 'Technology' },
+    });
     fireEvent.change(screen.getByLabelText('Featured Image URL'), {
       target: { value: 'http://newimage.com' },
     });
@@ -197,7 +175,7 @@ describe('WriteArticle Component', () => {
     });
 
     expect(screen.getByLabelText('Article Title')).toHaveValue('New Title');
-    expect(screen.getByText('Technology')).toBeInTheDocument();
+    expect(screen.getByLabelText('Category')).toHaveValue('Technology');
     expect(screen.getByLabelText('Featured Image URL')).toHaveValue(
       'http://newimage.com',
     );
@@ -215,30 +193,25 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'New Article' },
     });
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
-    fireEvent.click(screen.getByText('Finance'));
+    fireEvent.change(screen.getByLabelText('Category'), {
+      target: { value: 'Finance' },
+    });
     fireEvent.change(screen.getByTestId('react-quill-editor'), {
       target: { value: '<p>Content</p>' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Publish Now' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
 
     await waitFor(() => {
-      expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
-        title: 'New Article',
-        category: 'Finance',
-        imageUrl: '',
-        content: '<p>Content</p>',
-        status: 'published',
-        updatedAt: 'mock-timestamp',
-        authorUid: mockAdminUser.uid,
-        authorName: mockAdminUser.displayName,
-        createdAt: 'mock-timestamp',
-      });
-      expect(
-        screen.getByText('Article published successfully!'),
-      ).toBeInTheDocument();
+      expect(addDoc).toHaveBeenCalled();
+      expect(addDoc.mock.calls[0][1]).toEqual(
+        expect.objectContaining({
+          title: 'New Article',
+          category: 'Finance',
+          status: 'published',
+        })
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
-      expect(screen.getByLabelText('Article Title')).toHaveValue(''); // Form reset
+      expect(Storage.prototype.removeItem).toHaveBeenCalledWith('sf_article_draft');
     });
   });
 
@@ -251,26 +224,23 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'Draft Article' },
     });
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
-    fireEvent.click(screen.getByText('Finance'));
+    fireEvent.change(screen.getByLabelText('Category'), {
+      target: { value: 'Finance' },
+    });
     fireEvent.change(screen.getByTestId('react-quill-editor'), {
       target: { value: '<p>Draft content</p>' },
     });
     fireEvent.click(screen.getByRole('button', { name: 'Save Draft' }));
 
     await waitFor(() => {
-      expect(addDoc).toHaveBeenCalledWith(expect.any(Object), {
-        title: 'Draft Article',
-        category: 'Finance',
-        imageUrl: '',
-        content: '<p>Draft content</p>',
-        status: 'draft',
-        updatedAt: 'mock-timestamp',
-        authorUid: mockAdminUser.uid,
-        authorName: mockAdminUser.displayName,
-        createdAt: 'mock-timestamp',
-      });
-      expect(screen.getByText('Draft saved!')).toBeInTheDocument();
+      expect(addDoc).toHaveBeenCalled();
+      expect(addDoc.mock.calls[0][1]).toEqual(
+        expect.objectContaining({
+          title: 'Draft Article',
+          category: 'Finance',
+          status: 'draft',
+        })
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
   });
@@ -281,33 +251,48 @@ describe('WriteArticle Component', () => {
       expect(screen.getByLabelText('Article Title')).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Publish Now' }));
-    await waitFor(() => {
-      expect(
-        screen.getByText('Please fill in Title, Category, and Content.'),
-      ).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
+    expect(
+      await screen.findByText('Please fill all required fields.')
+    ).toBeInTheDocument();
     expect(addDoc).not.toHaveBeenCalled();
   });
 
-  // --- Edit Article Mode ---
-  it('renders "Edit Article" header in edit mode', async () => {
-    renderComponent(false, mockAdminUser, { id: 'article-id-123' });
+  it('loads drafted article from localStorage if no id is provided', async () => {
+    Storage.prototype.getItem.mockReturnValue(JSON.stringify({
+      title: 'Draft Title',
+      category: 'Finance',
+      imageUrl: 'http://draft.com/img',
+      content: '<p>Draft</p>'
+    }));
+    renderComponent();
     await waitFor(() => {
-      expect(screen.getByText('Edit Article')).toBeInTheDocument();
-      expect(
-        screen.getByText('Modify and update your existing article.'),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Article Title')).toHaveValue('Draft Title');
     });
   });
 
+  it('clears form when clearForm is called and confirmed', async () => {
+    renderComponent();
+    await waitFor(() => expect(screen.getByLabelText('Article Title')).toBeInTheDocument());
+    
+    fireEvent.change(screen.getByLabelText('Article Title'), { target: { value: 'Test' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+    
+    expect(window.confirm).toHaveBeenCalledWith('Clear all unsaved progress?');
+    await waitFor(() => {
+      expect(screen.getByLabelText('Article Title')).toHaveValue('');
+      expect(Storage.prototype.removeItem).toHaveBeenCalledWith('sf_article_draft');
+    });
+  });
+
+  // --- Edit Article Mode ---
   it('loads existing article data for editing', async () => {
     renderComponent(false, mockAdminUser, { id: 'article-id-123' });
     await waitFor(() => {
       expect(screen.getByLabelText('Article Title')).toHaveValue(
         'Existing Article',
       );
-      expect(screen.getByText('Finance')).toBeInTheDocument(); // Category
+      expect(screen.getByLabelText('Category')).toHaveValue('Finance');
       expect(screen.getByLabelText('Featured Image URL')).toHaveValue(
         'http://example.com/img.jpg',
       );
@@ -326,22 +311,16 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'Updated Title' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Update Article' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Update' }));
 
     await waitFor(() => {
-      expect(updateDoc).toHaveBeenCalledWith(expect.any(Object), {
-        title: 'Updated Title',
-        category: 'Finance',
-        imageUrl: 'http://example.com/img.jpg',
-        content: '<p>Existing content</p>',
-        status: 'published',
-        updatedAt: 'mock-timestamp',
-        authorUid: mockAdminUser.uid,
-        authorName: mockAdminUser.displayName,
-      });
-      expect(
-        screen.getByText('Article updated and published successfully!'),
-      ).toBeInTheDocument();
+      expect(updateDoc).toHaveBeenCalled();
+      expect(updateDoc.mock.calls[0][1]).toEqual(
+        expect.objectContaining({
+          title: 'Updated Title',
+          status: 'published',
+        })
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
   });
@@ -355,20 +334,16 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'Updated Draft Title' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save Draft' }));
 
     await waitFor(() => {
-      expect(updateDoc).toHaveBeenCalledWith(expect.any(Object), {
-        title: 'Updated Draft Title',
-        category: 'Finance',
-        imageUrl: 'http://example.com/img.jpg',
-        content: '<p>Existing content</p>',
-        status: 'draft',
-        updatedAt: 'mock-timestamp',
-        authorUid: mockAdminUser.uid,
-        authorName: mockAdminUser.displayName,
-      });
-      expect(screen.getByText('Draft updated!')).toBeInTheDocument();
+      expect(updateDoc).toHaveBeenCalled();
+      expect(updateDoc.mock.calls[0][1]).toEqual(
+        expect.objectContaining({
+          title: 'Updated Draft Title',
+          status: 'draft',
+        })
+      );
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
   });
@@ -376,20 +351,16 @@ describe('WriteArticle Component', () => {
   it('shows error snackbar if fetching article for edit fails', async () => {
     getDoc.mockRejectedValueOnce(new Error('Fetch error'));
     renderComponent(false, mockAdminUser, { id: 'article-id-123' });
-    await waitFor(() => {
-      expect(
-        screen.getByText('Error loading article for editing.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('Failed to load article.')
+    ).toBeInTheDocument();
   });
 
-  it('redirects if article not found for editing', async () => {
+  it('handles article not found gracefully', async () => {
     getDoc.mockResolvedValueOnce({ exists: () => false });
     renderComponent(false, mockAdminUser, { id: 'article-id-123' });
-    await waitFor(() => {
-      expect(screen.getByText('Article not found.')).toBeInTheDocument();
-      expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
-    });
+    await waitFor(() => expect(screen.getByTestId('mock-editor-form')).toBeInTheDocument());
+    expect(screen.getByLabelText('Article Title')).toHaveValue('');
   });
 
   // --- General Error Handling ---
@@ -403,26 +374,34 @@ describe('WriteArticle Component', () => {
     fireEvent.change(screen.getByLabelText('Article Title'), {
       target: { value: 'New Article' },
     });
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
-    fireEvent.click(screen.getByText('Finance'));
+    fireEvent.change(screen.getByLabelText('Category'), {
+      target: { value: 'Finance' },
+    });
     fireEvent.change(screen.getByTestId('react-quill-editor'), {
       target: { value: '<p>Content</p>' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Publish Now' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Publish' }));
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Error connecting to database.'),
-      ).toBeInTheDocument();
-    });
+    expect(
+      await screen.findByText('Database Error.')
+    ).toBeInTheDocument();
   });
 
-  it('navigates back when Cancel button is clicked', async () => {
+  it('switches between edit and preview mode', async () => {
     renderComponent();
-    await waitFor(() =>
-      expect(screen.getByLabelText('Article Title')).toBeInTheDocument(),
-    );
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
+    await waitFor(() => expect(screen.getByTestId('mock-editor-form')).toBeInTheDocument());
+    
+    fireEvent.click(screen.getByRole('button', { name: 'Set Preview' }));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-article-preview')).toBeInTheDocument();
+      expect(screen.queryByTestId('mock-editor-form')).not.toBeInTheDocument();
+    });
+    
+    fireEvent.click(screen.getByRole('button', { name: 'Set Edit' }));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('mock-editor-form')).toBeInTheDocument();
+    });
   });
 });

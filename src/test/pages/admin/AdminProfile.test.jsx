@@ -34,7 +34,7 @@ jest.mock('../../../../src/hooks/useAuth.js', () => ({
 // Mock Firebase Firestore
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  doc: jest.fn(),
+  doc: jest.fn(() => 'mock-doc-ref'),
   getDoc: jest.fn(),
   setDoc: jest.fn(),
   deleteDoc: jest.fn(),
@@ -68,12 +68,14 @@ describe('AdminProfile Component', () => {
     uid: 'test-uid',
     displayName: 'Test Admin',
     email: 'test@example.com',
+    providerData: [{ providerId: 'password' }],
   };
   const mockLogout = jest.fn();
 
   const renderComponent = (authLoading = false, user = mockUser) => {
+    const safeUser = user ? { ...user, providerData: user.providerData || [{ providerId: 'password' }] } : null;
     require('../../../../src/hooks/useAuth.js').useAuth.mockReturnValue({
-      user,
+      user: safeUser,
       loading: authLoading,
       logout: mockLogout,
     });
@@ -118,8 +120,8 @@ describe('AdminProfile Component', () => {
   it('renders profile details fields with fetched data', async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByLabelText('Display Name')).toHaveValue('Fetched Name');
-      expect(screen.getByLabelText('Bio')).toHaveValue('Fetched Bio');
+      expect(screen.getByLabelText(/Display Name/i)).toHaveValue('Fetched Name');
+      expect(screen.getByLabelText(/Bio/i)).toHaveValue('Fetched Bio');
     });
   });
 
@@ -127,41 +129,41 @@ describe('AdminProfile Component', () => {
     getDoc.mockResolvedValueOnce({ exists: () => false });
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByLabelText('Display Name')).toHaveValue('Test Admin');
-      expect(screen.getByLabelText('Bio')).toHaveValue('');
+      expect(screen.getByLabelText(/Display Name/i)).toHaveValue('Test Admin');
+      expect(screen.getByLabelText(/Bio/i)).toHaveValue('');
     });
   });
 
   it('updates profile data on input change', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Display Name')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Display Name/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Display Name'), {
+    fireEvent.change(screen.getByLabelText(/Display Name/i), {
       target: { value: 'New Name' },
     });
-    fireEvent.change(screen.getByLabelText('Bio'), {
+    fireEvent.change(screen.getByLabelText(/Bio/i), {
       target: { value: 'New Bio' },
     });
 
-    expect(screen.getByLabelText('Display Name')).toHaveValue('New Name');
-    expect(screen.getByLabelText('Bio')).toHaveValue('New Bio');
+    expect(screen.getByLabelText(/Display Name/i)).toHaveValue('New Name');
+    expect(screen.getByLabelText(/Bio/i)).toHaveValue('New Bio');
   });
 
   it('saves profile data to Firebase Auth and Firestore', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Display Name')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Display Name/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Display Name'), {
+    fireEvent.change(screen.getByLabelText(/Display Name/i), {
       target: { value: 'Updated Name' },
     });
-    fireEvent.change(screen.getByLabelText('Bio'), {
+    fireEvent.change(screen.getByLabelText(/Bio/i), {
       target: { value: 'Updated Bio' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Save Profile' }));
+    fireEvent.click(screen.getByRole('button', { name: /Save Profile/i }));
 
     await waitFor(() => {
       expect(updateProfile).toHaveBeenCalledWith(mockUser, {
@@ -182,10 +184,10 @@ describe('AdminProfile Component', () => {
     setDoc.mockRejectedValueOnce(new Error('Firestore error'));
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Display Name')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Display Name/i)).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Save Profile' }));
+    fireEvent.click(screen.getByRole('button', { name: /Save Profile/i }));
 
     await waitFor(() => {
       expect(
@@ -198,11 +200,11 @@ describe('AdminProfile Component', () => {
   it('renders change password fields', async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument();
-      expect(screen.getByLabelText('New Password')).toBeInTheDocument();
-      expect(screen.getByLabelText('Confirm New Password')).toBeInTheDocument();
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^New Password/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Confirm New Password/i)).toBeInTheDocument();
       expect(
-        screen.getByRole('button', { name: 'Change Password' }),
+        screen.getByRole('button', { name: /Change Password/i }),
       ).toBeInTheDocument();
     });
   });
@@ -210,19 +212,19 @@ describe('AdminProfile Component', () => {
   it('changes password successfully', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Current Password'), {
+    fireEvent.change(screen.getByLabelText(/Current Password/i), {
       target: { value: 'oldpass' },
     });
-    fireEvent.change(screen.getByLabelText('New Password'), {
+    fireEvent.change(screen.getByLabelText(/^New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+    fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
 
     await waitFor(() => {
       expect(EmailAuthProvider.credential).toHaveBeenCalledWith(
@@ -237,17 +239,17 @@ describe('AdminProfile Component', () => {
       expect(
         screen.getByText('Password updated successfully!'),
       ).toBeInTheDocument();
-      expect(screen.getByLabelText('Current Password')).toHaveValue('');
+      expect(screen.getByLabelText(/Current Password/i)).toHaveValue('');
     });
   });
 
   it('shows error if password fields are empty', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
     await waitFor(() => {
       expect(
         screen.getByText('All password fields are required.'),
@@ -258,19 +260,19 @@ describe('AdminProfile Component', () => {
   it('shows error if new passwords do not match', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Current Password'), {
+    fireEvent.change(screen.getByLabelText(/Current Password/i), {
       target: { value: 'oldpass' },
     });
-    fireEvent.change(screen.getByLabelText('New Password'), {
+    fireEvent.change(screen.getByLabelText(/^New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+    fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass456' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
     await waitFor(() => {
       expect(
         screen.getByText('New password and confirm password do not match.'),
@@ -281,19 +283,19 @@ describe('AdminProfile Component', () => {
   it('shows error if new password is too short', async () => {
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Current Password'), {
+    fireEvent.change(screen.getByLabelText(/Current Password/i), {
       target: { value: 'oldpass' },
     });
-    fireEvent.change(screen.getByLabelText('New Password'), {
+    fireEvent.change(screen.getByLabelText(/^New Password/i), {
       target: { value: 'short' },
     });
-    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+    fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'short' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
     await waitFor(() => {
       expect(
         screen.getByText('New password must be at least 6 characters long.'),
@@ -308,19 +310,19 @@ describe('AdminProfile Component', () => {
     });
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Current Password'), {
+    fireEvent.change(screen.getByLabelText(/Current Password/i), {
       target: { value: 'wrongoldpass' },
     });
-    fireEvent.change(screen.getByLabelText('New Password'), {
+    fireEvent.change(screen.getByLabelText(/^New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+    fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
 
     await waitFor(() => {
       expect(
@@ -337,19 +339,19 @@ describe('AdminProfile Component', () => {
     });
     renderComponent();
     await waitFor(() =>
-      expect(screen.getByLabelText('Current Password')).toBeInTheDocument(),
+      expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Current Password'), {
+    fireEvent.change(screen.getByLabelText(/Current Password/i), {
       target: { value: 'oldpass' },
     });
-    fireEvent.change(screen.getByLabelText('New Password'), {
+    fireEvent.change(screen.getByLabelText(/^New Password/i), {
       target: { value: '123456' },
     });
-    fireEvent.change(screen.getByLabelText('Confirm New Password'), {
+    fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: '123456' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Change Password' }));
+    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
 
     await waitFor(() => {
       expect(
@@ -365,11 +367,11 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
     await waitFor(() => {
       expect(screen.getByText('Confirm Account Deletion')).toBeInTheDocument();
     });
@@ -379,12 +381,12 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
 
     await waitFor(() => {
       expect(deleteUser).toHaveBeenCalledWith(mockUser);
@@ -404,12 +406,12 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
 
     await waitFor(() => {
       expect(
@@ -426,12 +428,12 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
 
     await waitFor(() =>
       expect(
@@ -439,10 +441,10 @@ describe('AdminProfile Component', () => {
       ).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Password'), {
+    fireEvent.change(screen.getByLabelText(/Password/i), {
       target: { value: 'reauthpass' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Re-authenticate' }));
+    fireEvent.click(screen.getByRole('button', { name: /Re-authenticate/i }));
 
     await waitFor(() => {
       expect(EmailAuthProvider.credential).toHaveBeenCalledWith(
@@ -468,12 +470,12 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
 
     await waitFor(() => {
       expect(
@@ -490,12 +492,12 @@ describe('AdminProfile Component', () => {
     renderComponent();
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Delete My Account' }),
+        screen.getByRole('button', { name: /Delete My Account/i }),
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Delete My Account' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Account' }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
 
     await waitFor(() =>
       expect(
@@ -503,7 +505,7 @@ describe('AdminProfile Component', () => {
       ).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
     expect(
       screen.queryByText('Re-authenticate to Delete Account'),
     ).not.toBeInTheDocument();

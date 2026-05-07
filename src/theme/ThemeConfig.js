@@ -36,6 +36,11 @@ export const themePresets = {
 // --- EXPANDED COLOR PALETTE (10 Professional Themes) ---
 export const themeColors = [
   {
+    name: 'System',
+    value: 'system',
+    colors: ['#0061A4', '#D1E4FF', '#F8FAFF', '#001D35', '#535F70'], // fallback values
+  },
+  {
     name: 'DodgerBlue',
     value: 'dodgerblue',
     colors: ['#0061A4', '#D1E4FF', '#F8FAFF', '#001D35', '#535F70'],
@@ -72,37 +77,45 @@ export const themeColors = [
   },
 ];
 
-export const getAppTheme = (themeMode, designSystem, visualStyle) => {
+export const getAppTheme = (resolvedThemeMode, designSystem, visualStyle) => {
+  let isDarkMode = false;
+  let colorName = resolvedThemeMode;
+
+  // Determine mode and color palette name from the resolved theme mode.
+  if (resolvedThemeMode === 'dark') {
+    isDarkMode = true;
+    colorName = 'dodgerblue'; // Use default color palette for system dark mode
+  } else if (resolvedThemeMode === 'light') {
+    isDarkMode = false;
+    colorName = 'dodgerblue'; // Use default color palette for system light mode
+  }
+  // If a specific color theme (e.g., 'green') is passed, isDarkMode will be false.
+  // This is a pre-existing limitation: selecting a color theme forces light mode.
+
   const selectedTheme =
-    themeColors.find((t) => t.value === themeMode) || themeColors[0];
+    themeColors.find((t) => t.value === colorName) ||
+    themeColors.find((t) => t.value === 'dodgerblue');
+
   const [primary, secondary, background, textPrimary, textSecondary] =
     selectedTheme.colors;
 
-  const isDarkMode =
-    themeMode === 'dark' || themeMode === 'zinc' || themeMode === 'slate';
   const motion = getMotionProfile(designSystem);
 
-  return createTheme({
+  // Define palette options, with specific overrides for dark mode.
+  const themeOptions = {
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       primary: { main: primary },
       secondary: { main: secondary },
       background: {
-        default:
-          visualStyle === 'neumorphic'
-            ? isDarkMode
-              ? '#1e1e1e'
-              : '#f3f4f6'
-            : background,
-        paper: isDarkMode
-          ? themeMode === 'slate'
-            ? '#1E293B'
-            : '#1C1B1F'
-          : '#ffffff',
+        default: isDarkMode ? '#121212' : background,
+        paper: isDarkMode ? '#1E1E1E' : '#ffffff',
       },
-      text: { primary: textPrimary, secondary: textSecondary },
+      text: {
+        primary: isDarkMode ? '#FFFFFF' : textPrimary,
+        secondary: isDarkMode ? '#B0B0B0' : textSecondary,
+      },
     },
-    // INJECTING MOTION ENGINE
     transitions: {
       easing: motion.easing,
       duration: motion.duration,
@@ -121,7 +134,6 @@ export const getAppTheme = (themeMode, designSystem, visualStyle) => {
       MuiPaper: {
         styleOverrides: {
           root: ({ theme }) => ({
-            // This now uses the dynamic duration from the profile
             transition: theme.transitions.create(['all'], {
               duration: theme.transitions.duration.standard,
               easing: theme.transitions.easing.easeInOut,
@@ -134,7 +146,7 @@ export const getAppTheme = (themeMode, designSystem, visualStyle) => {
               border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
             }),
             ...(visualStyle === 'neumorphic' && {
-              backgroundColor: theme.palette.background.default,
+              backgroundColor: isDarkMode ? '#1e1e1e' : '#f3f4f6',
               boxShadow: isDarkMode
                 ? '5px 5px 10px #0b0b0b, -5px -5px 10px #252525'
                 : '6px 6px 12px #d1d5db, -6px -6px 12px #ffffff',
@@ -147,5 +159,14 @@ export const getAppTheme = (themeMode, designSystem, visualStyle) => {
         },
       },
     },
-  });
+  };
+
+  // Apply special background for neumorphic style, overriding the default.
+  if (visualStyle === 'neumorphic') {
+    themeOptions.palette.background.default = isDarkMode
+      ? '#1e1e1e'
+      : '#f3f4f6';
+  }
+
+  return createTheme(themeOptions);
 };

@@ -41,17 +41,43 @@ const ThemeSelector = ({ selectedTheme, onThemeChange, disabled }) => {
               disabled={disabled}
             >
               <Stack direction="row" sx={{ height: { xs: 30, sm: 40 } }}>
-                {themeOption.colors.map((color, index) => (
+                {themeOption.value === 'system' ? (
                   <Box
-                    key={index}
-                    data-testid="color-box"
                     sx={{
                       height: '100%',
-                      width: `${100 / themeOption.colors.length}%`,
-                      backgroundColor: color,
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background:
+                        'linear-gradient(to right, #fff 50%, #121212 50%)',
                     }}
-                  />
-                ))}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        fontWeight: 700,
+                        color: '#121212',
+                        mixBlendMode: 'difference',
+                        filter: 'invert(1)',
+                      }}
+                    >
+                      AUTO
+                    </Typography>
+                  </Box>
+                ) : (
+                  themeOption.colors.map((color, index) => (
+                    <Box
+                      key={index}
+                      data-testid="color-box"
+                      sx={{
+                        height: '100%',
+                        width: `${100 / themeOption.colors.length}%`,
+                        backgroundColor: color,
+                      }}
+                    />
+                  ))
+                )}
               </Stack>
               <Typography
                 variant="caption"

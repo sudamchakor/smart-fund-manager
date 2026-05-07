@@ -37,7 +37,7 @@ import {
   ExpandLess,
   ExpandMore,
   Payments as PersonalLoanIcon,
-  Dashboard as WealthIcon,
+  Dashboard as DashboardIcon,
   Article as ArticleIcon,
 } from '@mui/icons-material';
 
@@ -164,7 +164,17 @@ const Header = () => {
               gap: theme.spacing(1),
             }}
           >
-            <CalculateIcon sx={{ fontSize: theme.spacing(4) }} />
+            <Box
+              sx={{
+                display: 'inline-flex',
+                p: 0.5,
+                borderRadius: `${theme.shape.borderRadius}px`,
+                bgcolor: 'background.paper',
+                color: 'primary.main',
+              }}
+            >
+              <DashboardIcon sx={{ fontSize: theme.spacing(3.5) }} />
+            </Box>
             <Typography
               variant="h6"
               sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'block' } }}
@@ -306,7 +316,7 @@ const Header = () => {
           </MenuItem>
           <MenuItem onClick={() => handleNavigation('/profile?tab=wealth')}>
             <ListItemIcon>
-              <WealthIcon fontSize="small" />
+              <DashboardIcon fontSize="small" />
             </ListItemIcon>{' '}
             Wealth Dashboard
           </MenuItem>

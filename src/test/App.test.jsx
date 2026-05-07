@@ -93,8 +93,10 @@ jest.mock('../store', () => ({
     dispatch: jest.fn(),
   },
   persistor: {
-    // Mock persistor methods if they are called directly in App.jsx
-    // For PersistGate, it usually just needs to be an object
+    persist: jest.fn(),
+    subscribe: jest.fn(),
+    dispatch: jest.fn(),
+    getState: () => ({}),
   },
 }));
 

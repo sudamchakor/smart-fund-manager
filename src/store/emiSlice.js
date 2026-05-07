@@ -33,7 +33,7 @@ const defaultInitialState = {
   },
   isLoanActive: true,
   currency: '₹',
-  themeMode: 'dodgerblue',
+  themeMode: 'system',
 
   // --- ARCHITECTURAL STATE ---
   designSystem: 'material', // 'material' | 'apple' | 'fluent'

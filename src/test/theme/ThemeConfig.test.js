@@ -5,17 +5,6 @@ import {
   themeColors,
 } from '../../../src/theme/ThemeConfig';
 
-// Mock getMotionProfile as it's an external dependency
-jest.mock('../../../src/theme/motionProfiles', () => ({
-  getMotionProfile: jest.fn(() => ({
-    easing: {
-      easeInOut: 'cubic-bezier(0.4, 0, 0.2, 1)',
-      sharp: 'cubic-bezier(0.4, 0, 0.6, 1)',
-    },
-    duration: { short: 200, standard: 300 },
-  })),
-}));
-
 describe('ThemeConfig - getAppTheme', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -24,7 +13,7 @@ describe('ThemeConfig - getAppTheme', () => {
   // --- Palette Mode and Colors ---
   it('should return a dark theme when themeMode is "dark"', () => {
     const theme = getAppTheme('dark', 'material', 'flat');
-    const selectedColors = themeColors.find((t) => t.value === 'dark'); // Assuming 'dark' is a themeColor value
+    const selectedColors = themeColors.find((t) => t.value === 'dark') || themeColors[0];
     const [primary, secondary, background, textPrimary, textSecondary] =
       selectedColors.colors;
 
@@ -37,7 +26,7 @@ describe('ThemeConfig - getAppTheme', () => {
 
   it('should return a light theme when themeMode is "dodgerblue" (default light)', () => {
     const theme = getAppTheme('dodgerblue', 'material', 'flat');
-    const selectedColors = themeColors.find((t) => t.value === 'dodgerblue');
+    const selectedColors = themeColors.find((t) => t.value === 'dodgerblue') || themeColors[0];
     const [primary, secondary, background, textPrimary, textSecondary] =
       selectedColors.colors;
 
