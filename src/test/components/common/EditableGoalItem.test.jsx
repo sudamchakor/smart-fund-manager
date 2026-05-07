@@ -127,12 +127,12 @@ describe('EditableGoalItem Component', () => {
     );
   });
 
-  it('renders inflation-adjusted target with tooltip when present', () => {
+  it('renders inflation-adjusted target with tooltip when present', async () => {
     renderComponent();
     expect(screen.getByText('Real Value: ₹75,00,000')).toBeInTheDocument();
     expect(screen.getByTestId('InfoIcon')).toBeInTheDocument();
     fireEvent.mouseOver(screen.getByTestId('InfoIcon'));
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
       "This is the target amount adjusted for inflation in today's money.",
     );
   });

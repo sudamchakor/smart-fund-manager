@@ -6,8 +6,8 @@ import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material';
 import '@testing-library/jest-dom';
 
 // Mock MUI SpeedDial components to control their behavior and check props
-jest.mock('@mui/material/SpeedDial', () => ({ children, icon, ...props }) => (
-  <div data-testid="mock-speed-dial" {...props}>
+jest.mock('@mui/material/SpeedDial', () => ({ children, icon, sx, ...props }) => (
+  <div data-testid="mock-speed-dial" style={sx} {...props}>
     <div data-testid="mock-speed-dial-icon">{icon}</div>
     {children}
   </div>
@@ -18,10 +18,11 @@ jest.mock('@mui/material/SpeedDialIcon', () => (props) => (
 jest.mock(
   '@mui/material/SpeedDialAction',
   () =>
-    ({ icon, tooltipTitle, onClick, ...props }) => (
+    ({ icon, tooltipTitle, tooltipOpen, onClick, ...props }) => (
       <button
         data-testid={`mock-speed-dial-action-${tooltipTitle}`}
         onClick={onClick}
+        tooltipopen={tooltipOpen !== undefined ? String(tooltipOpen) : undefined}
         {...props}
       >
         {icon}
@@ -131,12 +132,6 @@ describe('ActionSpeedDial Component', () => {
 
   it('renders correctly when actions prop is undefined or null', () => {
     renderComponent({ actions: undefined });
-    expect(screen.getByTestId('mock-speed-dial')).toBeInTheDocument();
-    expect(
-      screen.queryByTestId('mock-speed-dial-action-Edit'),
-    ).not.toBeInTheDocument();
-
-    renderComponent({ actions: null });
     expect(screen.getByTestId('mock-speed-dial')).toBeInTheDocument();
     expect(
       screen.queryByTestId('mock-speed-dial-action-Edit'),

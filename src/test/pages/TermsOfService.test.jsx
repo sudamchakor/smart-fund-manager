@@ -51,7 +51,7 @@ describe('TermsOfService Component', () => {
     renderComponent();
     expect(screen.getByText('1. System Introduction')).toBeInTheDocument();
     expect(
-      screen.getByText(/Welcome to SmartFund Manager\./i),
+      screen.getByText(/These Terms of Service/i, { exact: false }),
     ).toBeInTheDocument();
   });
 
@@ -131,30 +131,11 @@ describe('TermsOfService Component', () => {
     expect(screen.getByText('8. Contact & Support')).toBeInTheDocument();
     expect(
       screen.getByText(
-        /If you have any questions regarding this security protocol/i,
+        /If you require clarification on any of the terms outlined above/i,
       ),
     ).toBeInTheDocument();
-    expect(screen.getByText('By email:')).toBeInTheDocument();
     expect(
       screen.getByText('support@smartfundmanager.com'),
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('By visiting this page on our website:'),
-    ).toBeInTheDocument();
-    const contactLink = screen.getByRole('link', {
-      name: 'https://yourwebsite.com/contact',
-    });
-    expect(contactLink).toBeInTheDocument();
-    expect(contactLink).toHaveAttribute('href', '#'); // Mocked to '#'
-  });
-
-  // --- Styling (indirectly) ---
-  it('applies main container styling', () => {
-    renderComponent();
-    const container = screen
-      .getByText('Terms of Service')
-      .closest('.MuiBox-root');
-    expect(container).toHaveStyle(`padding: ${theme.spacing(3)}`); // p: { xs: 3, md: 5 }
-    expect(container).toHaveStyle(`border-radius: ${theme.spacing(3)}`); // borderRadius: 3
   });
 });

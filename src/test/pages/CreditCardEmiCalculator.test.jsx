@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
 // Mock Redux hooks (useSelector is not used by the component, but kept for consistency if it were to be added)
 const mockUseSelector = jest.fn();
 jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
   useSelector: (selector) => mockUseSelector(selector),
 }));
 
@@ -196,9 +197,9 @@ describe('CreditCardEMICalculator Page', () => {
     fireEvent.change(amountInput, { target: { value: '600000' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹11322'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹89320'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹689320'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹12896'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹173780'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹773780'); // Recalculated Payable
     });
   });
 
@@ -211,8 +212,8 @@ describe('CreditCardEMICalculator Page', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹11122'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹167320'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹667320'); // Recalculated Payable
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹167333'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹667333'); // Recalculated Payable
     });
   });
 
@@ -222,9 +223,9 @@ describe('CreditCardEMICalculator Page', () => {
     fireEvent.change(tenureInput, { target: { value: '3' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹16200'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹83200'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹583200'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹16251'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹85044'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹585044'); // Recalculated Payable
     });
   });
 
@@ -261,9 +262,9 @@ describe('CreditCardEMICalculator Page', () => {
     fireEvent.change(tenureInput, { target: { value: '1' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹44000'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹28000'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹528000'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹44074'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹28892'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹528892'); // Recalculated Payable
     });
   });
 

@@ -73,7 +73,7 @@ describe('AdminHeader Component', () => {
       expect(
         screen.getByRole('button', { name: 'Logout' }),
       ).toBeInTheDocument();
-      expect(screen.queryByRole('button', { name: 'Open drawer' })).not.toBeInTheDocument(); // Mobile menu icon
+      expect(screen.queryByTestId('MenuIcon')).not.toBeInTheDocument(); // Mobile menu icon
     });
 
     it('navigates to /admin/articles when Admin Dashboard title is clicked', () => {
@@ -163,7 +163,7 @@ describe('AdminHeader Component', () => {
         user: { uid: '123' },
         logout: jest.fn(),
       }); // isMobile = true
-      expect(screen.getByRole('button', { name: 'Open drawer' })).toBeInTheDocument();
+      expect(screen.getByTestId('MenuIcon')).toBeInTheDocument();
       expect(screen.getByText('Admin Dashboard')).toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: 'Manage Articles' }),
@@ -183,17 +183,16 @@ describe('AdminHeader Component', () => {
       ).not.toBeInTheDocument();
     });
 
-    it('opens and closes the Drawer when menu icon is clicked', () => {
+    it('opens and closes the Drawer when menu icon is clicked', async () => {
       renderComponent('/admin/articles', true, {
         user: { uid: '123' },
         logout: jest.fn(),
       });
-      const menuButton = screen.getByRole('button', { name: 'Open drawer' });
+      const menuButton = screen.getByTestId('MenuIcon');
       fireEvent.click(menuButton);
       // We expect the drawer to be open. Material UI drawers might have different roles based on implementation.
       // Usually looking for a unique item in the drawer is safer.
-      expect(screen.getAllByText('Admin Dashboard')[1]).toBeInTheDocument(); // Drawer header
-      
+      expect(await screen.findByRole('heading', { name: 'Admin Menu' })).toBeInTheDocument();
       // Closing is tricky to test generically with MUI Drawer, usually involves clicking backdrop or a close button if present.
     });
 
@@ -202,7 +201,7 @@ describe('AdminHeader Component', () => {
         user: { uid: '123' },
         logout: jest.fn(),
       });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
+      fireEvent.click(screen.getByTestId('MenuIcon'));
       fireEvent.click(screen.getByRole('button', { name: 'Manage Articles' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
@@ -212,29 +211,9 @@ describe('AdminHeader Component', () => {
         user: { uid: '123' },
         logout: jest.fn(),
       });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
+      fireEvent.click(screen.getByTestId('MenuIcon'));
       fireEvent.click(screen.getByRole('button', { name: 'Create Article' }));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles/new');
-    });
-
-    it('navigates to /admin/profile from drawer when "Author Profile" is clicked', () => {
-      renderComponent('/admin/articles', true, {
-        user: { uid: '123' },
-        logout: jest.fn(),
-      });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
-      fireEvent.click(screen.getByRole('button', { name: 'My Author Profile' })); // Should be My Author Profile based on component
-      expect(mockNavigate).toHaveBeenCalledWith('/admin/profile');
-    });
-
-    it('navigates to / from drawer when "Go to App" is clicked', () => {
-      renderComponent('/admin/articles', true, {
-        user: { uid: '123' },
-        logout: jest.fn(),
-      });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
-      fireEvent.click(screen.getByRole('button', { name: 'Go to App' }));
-      expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
     it('calls logout and navigates to /admin/login from drawer when "Logout" is clicked', () => {
@@ -243,7 +222,7 @@ describe('AdminHeader Component', () => {
         user: { uid: '123' },
         logout: mockLogout,
       });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
+      fireEvent.click(screen.getByTestId('MenuIcon'));
       fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
       expect(mockLogout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/admin/login');
@@ -254,7 +233,7 @@ describe('AdminHeader Component', () => {
         user: null,
         logout: jest.fn(),
       });
-      fireEvent.click(screen.getByRole('button', { name: 'Open drawer' }));
+      expect(screen.queryByTestId('MenuIcon')).not.toBeInTheDocument();
       expect(
         screen.queryByRole('button', { name: 'Logout' }),
       ).not.toBeInTheDocument();

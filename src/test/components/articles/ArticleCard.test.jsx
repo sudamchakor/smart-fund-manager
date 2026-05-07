@@ -6,25 +6,31 @@ import '@testing-library/jest-dom';
 
 // Mock react-router-dom's Link component
 jest.mock('react-router-dom', () => ({
-  Link: React.forwardRef(({ to, children, ...props }, ref) => (
-    <a href={to} {...props} ref={ref} data-testid={`link-to-${to.replace(/\//g, '-')}`}>
-      {children}
-    </a>
-  )),
+  Link: require('react').forwardRef(({ to, children, ...props }, ref) => {
+    return require('react').createElement(
+      'a',
+      { href: to, ...props, ref, 'data-testid': `link-to-${to.replace(/\//g, '-')}` },
+      children
+    );
+  }),
 }));
 
 // Mock DataCard to isolate ArticleCard's rendering
-jest.mock('../../../components/common/DataCard', () => ({ children, sx }) => (
-  <div data-testid="mock-data-card" style={sx}>
-    {children}
-  </div>
-));
+jest.mock('../../../components/common/DataCard', () => {
+  return ({ children, sx }) => {
+    return require('react').createElement(
+      'div',
+      { 'data-testid': 'mock-data-card', style: sx },
+      children
+    );
+  };
+});
 
 // Mock categoryIcons and ImageIcon
 jest.mock('../../../utils/articleCategories', () => ({
   categoryIcons: {
-    Finance: () => <svg data-testid="FinanceIcon" />,
-    Tech: () => <svg data-testid="TechIcon" />,
+    Finance: () => require('react').createElement('svg', { 'data-testid': 'FinanceIcon' }),
+    Tech: () => require('react').createElement('svg', { 'data-testid': 'TechIcon' }),
   },
 }));
 

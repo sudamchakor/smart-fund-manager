@@ -102,7 +102,7 @@ export const SliderInput = ({
 
   const renderSliderComponent = () => (
     <Slider
-      value={internalValue}
+      value={internalValue === '' ? min : internalValue}
       onChange={handleSliderChange}
       onChangeCommitted={handleSliderChangeCommitted}
       min={min}
@@ -207,7 +207,7 @@ export const SliderInput = ({
           {renderInputComponent()}
         </Box>
       ) : (
-        <>
+        <Stack direction="column" data-testid="stacked-layout">
           <Stack
             direction="row"
             justifyContent="space-between"
@@ -218,7 +218,7 @@ export const SliderInput = ({
             {renderInputComponent()}
           </Stack>
           {renderSliderComponent()}
-        </>
+        </Stack>
       )}
       {renderWarningComponent()}
     </Box>

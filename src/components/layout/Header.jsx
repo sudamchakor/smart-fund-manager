@@ -97,7 +97,7 @@ const Header = () => {
     if (format === 'pdf') {
       window.print();
     } else if (format === 'excel') {
-      if (!calculatedValues?.schedule)
+      if (!calculatedValues?.schedule || calculatedValues.schedule.length === 0)
         return enqueueSnackbar('No data to export', { variant: 'info' });
       const XLSX = await import('xlsx');
       const ws = XLSX.utils.json_to_sheet(calculatedValues.schedule);

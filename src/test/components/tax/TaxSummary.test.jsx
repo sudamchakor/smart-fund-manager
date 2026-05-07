@@ -87,7 +87,7 @@ describe('TaxSummary Component', () => {
     });
     expect(screen.getByText('System Output')).toBeInTheDocument();
     expect(screen.getByText('Recommended Regime')).toBeInTheDocument();
-    expect(screen.getByText('Old Regime')).toBeInTheDocument(); // Optimal regime
+    expect(screen.getByRole('heading', { name: 'Old Regime' })).toBeInTheDocument(); // Optimal regime
     expect(screen.getByText('Export Report')).toBeInTheDocument();
   });
 
@@ -101,9 +101,12 @@ describe('TaxSummary Component', () => {
       hraBreakdown: defaultHraBreakdown,
     });
     expect(screen.getAllByText(defaultTaxComparison.optimal)[0]).toBeInTheDocument();
-    expect(
-      screen.getByText(/Saves ₹49,900 in liabilities./i),
-    ).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      const hasText = (node) => node.textContent === "Saves ₹ 49,900 in liabilities.";
+      const nodeHasText = hasText(element);
+      const childrenDontHaveText = Array.from(element.children).every(child => !hasText(child));
+      return nodeHasText && childrenDontHaveText;
+    })).toBeInTheDocument();
   });
 
   // --- HRA Breakdown Alert ---
@@ -150,12 +153,12 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    expect(
-      screen.getByText(/You could save an additional ₹2,000/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/if you invest ₹10,000 more in Section 80C./i),
-    ).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      const hasText = (node) => node.textContent.includes("You could save an additional ₹ 2,000") && node.textContent.includes("if you invest ₹ 10,000 more in Section 80C");
+      const nodeHasText = hasText(element);
+      const childrenDontHaveText = Array.from(element.children).every(child => !hasText(child));
+      return nodeHasText && childrenDontHaveText;
+    })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Quick-Fill/i }),
     ).toBeInTheDocument();
@@ -214,7 +217,7 @@ describe('TaxSummary Component', () => {
       'Taxable Income:₹ 5,00,000',
     );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
-    expect(screen.getByText('₹ 12,500')).toBeInTheDocument();
+    expect(screen.getByText('Tax Liability').nextElementSibling).toHaveTextContent('₹ 12,500');
   });
 
   it('switches to New Regime view when New Regime tab is clicked', () => {
@@ -237,7 +240,7 @@ describe('TaxSummary Component', () => {
       'Taxable Income:₹ 9,50,000',
     );
     expect(screen.getByText('Tax Liability')).toBeInTheDocument();
-    expect(screen.getByText('₹ 62,400')).toBeInTheDocument();
+    expect(screen.getByText('Tax Liability').nextElementSibling).toHaveTextContent('₹ 62,400');
   });
 
   // --- Tax Liability Color based on Optimal Regime ---
@@ -250,11 +253,11 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    const oldRegimeTax = screen.getByText('₹ 12,500');
+    const oldRegimeTax = screen.getByText('Tax Liability').nextElementSibling;
     expect(oldRegimeTax).toHaveStyle(`color: ${theme.palette.success.main}`);
 
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
-    const newRegimeTax = screen.getByText('₹ 62,400');
+    const newRegimeTax = screen.getByText('Tax Liability').nextElementSibling;
     expect(newRegimeTax).toHaveStyle(`color: ${theme.palette.error.main}`); // Not optimal, so error color
   });
 
@@ -274,11 +277,11 @@ describe('TaxSummary Component', () => {
       calculatedSalary: defaultCalculatedSalary,
       hraBreakdown: defaultHraBreakdown,
     });
-    const oldRegimeTax = screen.getByText('₹ 1,00,000');
+    const oldRegimeTax = screen.getByText('Tax Liability').nextElementSibling;
     expect(oldRegimeTax).toHaveStyle(`color: ${theme.palette.error.main}`);
 
     fireEvent.click(screen.getByRole('tab', { name: /New Regime/i }));
-    const newRegimeTax = screen.getByText('₹ 50,000');
+    const newRegimeTax = screen.getByText('Tax Liability').nextElementSibling;
     expect(newRegimeTax).toHaveStyle(`color: ${theme.palette.success.main}`);
   });
 
@@ -319,9 +322,12 @@ describe('TaxSummary Component', () => {
         </ThemeProvider>
       </Provider>,
     );
-    expect(
-      screen.getByText(/Saves \$49,900 in liabilities./i),
-    ).toBeInTheDocument();
+    expect(screen.getByText((content, element) => {
+      const hasText = (node) => node.textContent === "Saves $ 49,900 in liabilities.";
+      const nodeHasText = hasText(element);
+      const childrenDontHaveText = Array.from(element.children).every(child => !hasText(child));
+      return nodeHasText && childrenDontHaveText;
+    })).toBeInTheDocument();
     expect(screen.getByTestId('detail-row-gross-income')).toHaveTextContent(
       'Gross Income:$ 10,00,000',
     );

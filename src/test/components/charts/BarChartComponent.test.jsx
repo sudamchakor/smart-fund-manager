@@ -3,10 +3,13 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { ThemeProvider, createTheme, alpha } from '@mui/material/styles';
-import BarChartComponent from '../../../components/charts/BarChartComponent';
+import * as BarChartModule from '../../../components/charts/BarChartComponent';
+const BarChartComponent = BarChartModule.default || BarChartModule.BarChartComponent || Object.values(BarChartModule)[0];
 import * as formatting from '../../../utils/formatting'; // Import the actual formatting functions
 import '@testing-library/jest-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
+
+let mockTooltipProps = { active: false, payload: [], label: '' };
 
 // Mock Recharts components to avoid actual chart rendering in tests
 jest.mock('recharts', () => ({
@@ -21,36 +24,51 @@ jest.mock('recharts', () => ({
       {children}
     </div>
   ),
-  Line: (props) => (
-    <div data-testid={`recharts-line-${props.dataKey}`} {...props}></div>
+  Line: ({ dataKey }) => (
+    <div data-testid={`recharts-line-${dataKey}`}></div>
   ),
-  Bar: (props) => (
-    <div data-testid={`recharts-bar-${props.dataKey}`} {...props}></div>
+  Bar: ({ dataKey }) => (
+    <div data-testid={`recharts-bar-${dataKey}`}></div>
   ),
-  XAxis: (props) => <div data-testid="recharts-xaxis" {...props}></div>,
-  YAxis: (props) => <div data-testid="recharts-yaxis" {...props}></div>,
-  CartesianGrid: (props) => (
-    <div data-testid="recharts-cartesiangrid" {...props}></div>
+  XAxis: () => <div data-testid="recharts-xaxis"></div>,
+  YAxis: ({ tickFormatter }) => (
+    <div 
+      data-testid="recharts-yaxis"
+      data-formatter-1000={tickFormatter ? tickFormatter(1000) : ''}
+      data-formatter-100000={tickFormatter ? tickFormatter(100000) : ''}
+      data-formatter-10000000={tickFormatter ? tickFormatter(10000000) : ''}
+    ></div>
   ),
-  Tooltip: ({ content: Content, active, payload, label }) => (
-    <div data-testid="recharts-tooltip">
-      {Content ? (
-        <Content active={active} payload={payload} label={label} />
-      ) : null}
-    </div>
-  ),
-  Legend: (props) => <div data-testid="recharts-legend" {...props}></div>,
+  CartesianGrid: () => <div data-testid="recharts-cartesiangrid"></div>,
+  Tooltip: ({ content }) => {
+    const React = require('react');
+    return (
+      <div data-testid="recharts-tooltip">
+        {content && React.isValidElement(content)
+          ? React.cloneElement(content, mockTooltipProps)
+          : null}
+      </div>
+    );
+  },
+  Legend: () => <div data-testid="recharts-legend"></div>,
 }));
 
 // Mock useMediaQuery
-jest.mock('@mui/material/useMediaQuery', () => {
-  return jest.fn();
-});
+jest.mock('@mui/material/useMediaQuery', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 // Mock Redux useSelector
-jest.mock('react-redux', () => ({
-  useSelector: jest.fn(),
-}));
+jest.mock('react-redux', () => {
+  const OriginalReactRedux = jest.requireActual('react-redux');
+  return {
+    __esModule: true,
+    ...OriginalReactRedux,
+    default: OriginalReactRedux.default || OriginalReactRedux,
+    useSelector: jest.fn(),
+  };
+});
 const mockUseSelector = require('react-redux').useSelector;
 
 // Mock formatCurrency to control its output for testing
@@ -84,9 +102,19 @@ describe('BarChartComponent', () => {
     currency = '₹',
   ) => {
     mockUseSelector.mockImplementation((selector) => {
-      if (selector.name === 'selectCalculatedValues') return calculatedValues;
-      if (selector.name === 'selectCurrency') return currency;
-      return undefined;
+      try {
+        const state = {
+          emi: { calculatedValues, currency },
+          emiCalculator: { calculatedValues, currency },
+        };
+        const val = selector(state);
+        if (val !== undefined) return val;
+      } catch (e) {}
+
+      const selectorStr = selector ? selector.toString().toLowerCase() : '';
+      if (selectorStr.includes('currency')) return currency;
+      
+      return calculatedValues;
     });
     return render(
       <Provider store={mockStore({})}>
@@ -99,6 +127,7 @@ describe('BarChartComponent', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockTooltipProps = { active: false, payload: [], label: '' };
     useMediaQuery.mockReturnValue(false); // Default to desktop
     formatting.formatCurrency.mockClear(); // Clear calls for each test
     formatting.formatCurrency.mockImplementation((value, currency) => {
@@ -110,20 +139,17 @@ describe('BarChartComponent', () => {
   // --- Initial Rendering and Skeleton ---
   it('renders Skeleton when schedule is empty or null', () => {
     renderComponent({ schedule: [] });
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.queryByTestId('recharts-responsive-container')).not.toBeInTheDocument();
   });
 
   it('renders Skeleton when schedule is undefined', () => {
     renderComponent({ schedule: undefined });
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.queryByTestId('recharts-responsive-container')).not.toBeInTheDocument();
   });
 
   it('renders the chart when schedule data is present', () => {
     renderComponent();
-    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(
-      screen.getByTestId('recharts-responsive-container'),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('recharts-responsive-container')).toBeInTheDocument();
     expect(screen.getByTestId('recharts-composed-chart')).toBeInTheDocument();
   });
 
@@ -213,7 +239,7 @@ describe('BarChartComponent', () => {
   // --- Responsiveness (useMediaQuery) ---
   it('adjusts maxBars for mobile view', () => {
     useMediaQuery.mockImplementation((query) =>
-      query.includes('sm') ? true : false,
+      query === theme.breakpoints.down('sm')
     ); // Simulate mobile
     renderComponent();
     const chartData = JSON.parse(
@@ -226,7 +252,7 @@ describe('BarChartComponent', () => {
 
   it('adjusts maxBars for tablet view', () => {
     useMediaQuery.mockImplementation((query) =>
-      query.includes('md') ? true : false,
+      query === theme.breakpoints.down('md')
     ); // Simulate tablet
     renderComponent();
     const chartData = JSON.parse(
@@ -240,55 +266,57 @@ describe('BarChartComponent', () => {
   // --- YAxis Formatting ---
   it('formats YAxis values correctly for thousands', () => {
     renderComponent();
-    const yAxis = screen.getByTestId('recharts-yaxis');
-    // The tickFormatter is a function, we can't directly test its output from DOM.
-    // We need to test the function itself or ensure it's passed correctly.
-    // For now, we'll check if the prop is present.
-    expect(yAxis).toHaveAttribute('tickformatter');
+    const yAxis = screen.getAllByTestId('recharts-yaxis')[0];
+    expect(yAxis).toHaveAttribute('data-formatter-1000', '₹1k');
   });
 
   it('formats YAxis values correctly for lakhs', () => {
     renderComponent();
-    const yAxis = screen.getByTestId('recharts-yaxis');
-    // Since YAxis is mocked as a div, properties are stringified
-    // We can extract the original tickFormatter function from the mock's props, but the DOM representation might vary.
-    // Instead we can test that the mock function formatCurrency is called.
-    expect(yAxis).toHaveAttribute('tickformatter');
+    const yAxis = screen.getAllByTestId('recharts-yaxis')[0];
+    expect(yAxis).toHaveAttribute('data-formatter-100000', '₹1.0L');
   });
 
   it('formats YAxis values correctly for crores', () => {
     renderComponent();
-    const yAxis = screen.getByTestId('recharts-yaxis');
-    expect(yAxis).toHaveAttribute('tickformatter');
+    const yAxis = screen.getAllByTestId('recharts-yaxis')[0];
+    expect(yAxis).toHaveAttribute('data-formatter-10000000', '₹1.0Cr');
   });
 
   // --- CustomTooltip ---
   it('CustomTooltip does not render when not active', () => {
     renderComponent();
-    const tooltipContent = screen.getByTestId('recharts-tooltip').firstChild;
-    expect(tooltipContent).toBeNull();
+    const tooltipWrapper = screen.getByTestId('recharts-tooltip');
+    expect(tooltipWrapper).toBeEmptyDOMElement();
   });
 
   it('CustomTooltip renders correctly when active with payload', () => {
+    mockTooltipProps = {
+      active: true,
+      payload: [
+        { name: 'Principal', value: 10000, color: 'green' },
+        { name: 'Interest', value: 5000, color: 'red' },
+      ],
+      label: 'Month 1 - Month 2',
+    };
     renderComponent();
-    const payload = [
-      { name: 'Principal', value: 10000, color: 'green' },
-      { name: 'Interest', value: 5000, color: 'red' },
-    ];
-    const label = 'Month 1 - Month 2';
-
-    // A better way is to mock the Tooltip component from recharts and check its props.
-    // Given the current mock setup for Tooltip, we can simulate its rendering.
-    // Since Tooltip is mocked to pass props.content, we need to extract that and render it
     const tooltipWrapper = screen.getByTestId('recharts-tooltip');
-    expect(tooltipWrapper).toBeInTheDocument();
+    expect(tooltipWrapper).not.toBeEmptyDOMElement();
+    expect(screen.getByText('Month 1 - Month 2')).toBeInTheDocument();
+    expect(screen.getByText('Principal')).toBeInTheDocument();
+    expect(screen.getByText('₹10,000')).toBeInTheDocument();
+    expect(screen.getByText('Interest')).toBeInTheDocument();
+    expect(screen.getByText('₹5,000')).toBeInTheDocument();
   });
 
   it('CustomTooltip handles empty payload when active', () => {
+    mockTooltipProps = {
+      active: true,
+      payload: [],
+      label: 'Month 1 - Month 2',
+    };
     renderComponent();
-    const label = 'Month 1 - Month 2';
     const tooltipWrapper = screen.getByTestId('recharts-tooltip');
-    expect(tooltipWrapper).toBeInTheDocument();
+    expect(tooltipWrapper).toBeEmptyDOMElement();
   });
 
   // --- Bar and Line elements ---

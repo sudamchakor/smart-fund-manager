@@ -25,6 +25,8 @@ jest.mock('../../../../features/profile/components/useGoalForm.js', () => ({ // 
       priority: '',
       investmentPlans: [],
     },
+    editedGoal: null, // Provide a default null value
+    setEditedGoal: jest.fn(), // Provide a mock function
     handleChange: jest.fn(),
     handleInvestmentPlanChange: jest.fn(),
     addInvestmentPlan: jest.fn(),

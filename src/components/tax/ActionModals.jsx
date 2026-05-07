@@ -134,6 +134,7 @@ export const SettingsModal = ({
             <FormControl fullWidth variant="standard">
               <Select
                 value={settings.isMetro}
+                name="isMetro"
                 onChange={(e) => onSettingChange('isMetro', e.target.value)}
                 disableUnderline
                 sx={getWellInputStyle(theme)}
@@ -225,6 +226,7 @@ export const SettingsModal = ({
                       >
                         <Select
                           variant="standard"
+                          name={item.includeField}
                           value={
                             calculatedSalary.months[0][item.includeField] || 'N'
                           }
@@ -281,6 +283,7 @@ export const SettingsModal = ({
                         >
                           <Select
                             variant="standard"
+                            name={fieldName}
                             value={calculatedSalary.months[0][fieldName] || 'N'}
                             onChange={(e) =>
                               onInclusionChange(fieldName, e.target.value)

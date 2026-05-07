@@ -54,16 +54,6 @@ jest
     return `${currency}${value.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
   });
 
-/**
- * Utility to match JSDOM's computed color format
- */
-const hexToRgb = (hex) => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return `rgb(${r}, ${g}, ${b})`;
-};
-
 const theme = createTheme(); // Create a basic theme for ThemeProvider
 
 describe('ReadOnlyItem Component', () => {
@@ -119,32 +109,28 @@ describe('ReadOnlyItem Component', () => {
   });
 
   it('applies correct border color based on item type (income)', () => {
-    renderComponent({ isIncome: true });
-    const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.success.main)}`);
+    const { container } = renderComponent({ isIncome: true });
+    expect(container.firstChild).toHaveStyle(`border-left: 4px solid ${theme.palette.success.main}`);
   });
 
   it('applies correct border color based on item type (expense)', () => {
-    renderComponent({ isExpense: true });
-    const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.error.main)}`);
+    const { container } = renderComponent({ isExpense: true });
+    expect(container.firstChild).toHaveStyle(`border-left: 4px solid ${theme.palette.error.main}`);
   });
 
   it('applies correct border color based on item type (goal)', () => {
-    renderComponent({ isGoal: true });
-    const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
-    expect(itemBox).toHaveStyle(`border-left: 4px solid ${hexToRgb(theme.palette.primary.main)}`);
+    const { container } = renderComponent({ isGoal: true });
+    expect(container.firstChild).toHaveStyle(`border-left: 4px solid ${theme.palette.primary.main}`);
   });
 
   it('applies custom expenseColor if provided for expense', () => {
-    renderComponent({ isExpense: true, expenseColor: 'orange' });
-    const itemBox = screen.getByText('Test Item').closest('.MuiBox-root');
+    const { container } = renderComponent({ isExpense: true, expenseColor: 'orange' });
     // For named colors like 'orange', JSDOM might convert to RGB or keep as is.
     // It's safer to check for the exact string if it's a direct CSS value.
     // If it's a theme color, convert to RGB. Here, 'orange' is a direct string.
     // If the component converts 'orange' to theme.palette.warning.main or similar,
     // then the assertion needs to reflect that. Assuming it uses the string directly.
-    expect(itemBox).toHaveStyle('border-left: 4px solid orange'); // This should be fine if 'orange' is passed directly
+    expect(container.firstChild).toHaveStyle('border-left: 4px solid orange'); // This should be fine if 'orange' is passed directly
   });
 
   // --- Edit Button ---
@@ -325,7 +311,7 @@ describe('ReadOnlyItem Component', () => {
   });
 
   // --- Net Cost Chip (Tax Savings) ---
-  it('renders Net Cost chip for tax deductible expenses', () => {
+  it('renders Net Cost chip for tax deductible expenses', async () => {
     renderComponent({
       isExpense: true,
       item: { ...defaultItem, amount: 10000, isTaxDeductible: true },
@@ -334,11 +320,12 @@ describe('ReadOnlyItem Component', () => {
     });
     // Tax Saved: 10000 * 0.3 = 3000
     // Net Cost: 10000 - 3000 = 7000
-    expect(screen.getByText('Net Cost: ₹7,000')).toBeInTheDocument();
-    expect(
-      screen.getByTestId('InfoOutlinedIcon'), // Assuming InfoOutlinedIcon is the tooltip trigger
-    ).toBeInTheDocument();
-    fireEvent.mouseEnter(screen.getByTestId('InfoOutlinedIcon')); // fireEvent.mouseEnter is synchronous, but the tooltip might appear asynchronously
+    const chipLabel = screen.getByText('Net Cost: ₹7,000');
+    expect(chipLabel).toBeInTheDocument();
+    
+    // Trigger the tooltip by hovering over the chip instead of an icon
+    fireEvent.mouseEnter(chipLabel); 
+    
     const tooltip = await screen.findByRole('tooltip'); // Use findByRole for asynchronous appearance
     expect(tooltip).toHaveTextContent('Original: ₹10,000, Tax Saved: ₹3,000');
   });

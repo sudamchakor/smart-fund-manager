@@ -4,16 +4,22 @@ import FixedLiabilities from '../../../../../features/profile/tabs/OnboardingSte
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector) =>
-    selector({
-      profile: {
-        expenses: [],
-      },
-      emi: {
-        currency: '₹',
-      },
-    }),
-  ),
+  useSelector: jest.fn((selector) => {
+    try {
+      return selector({
+        profile: {
+          // Ensure these are arrays, even if empty
+          expenses: [],
+          expensesList: [],
+        },
+        emi: {
+          currency: '₹',
+        },
+      });
+    } catch (e) {
+      return undefined;
+    }
+  }),
   useDispatch: () => jest.fn(),
 }));
 
@@ -30,9 +36,21 @@ jest.mock('../../../../../src/components/common/EditableIncomeExpenseItem.jsx', 
 
 describe('FixedLiabilities', () => {
   it('renders without crashing', () => {
-    render(<FixedLiabilities onNext={() => {}} onBack={() => {}} />);
+    const mockExpense = { name: '', amount: '', type: 'monthly', category: 'basic' };
+    const mockSetExpense = jest.fn();
+    render(
+      <FixedLiabilities
+        onNext={jest.fn()}
+        onBack={jest.fn()}
+        expense={mockExpense}
+        setExpense={mockSetExpense}
+        expensesList={[]} // Provide an empty array as a default
+        setExpensesList={jest.fn()} // Provide a mock function
+        // The component might expect a specific structure for its initial state, ensure mockExpense matches
+      />
+    );
     expect(
-      screen.getByText(/What are your fixed liabilities and expenses?/i),
+      screen.getByText(/Operational Liabilities/i), // Updated text matcher
     ).toBeInTheDocument();
     expect(screen.getByText(/New Expense/i)).toBeInTheDocument();
   });

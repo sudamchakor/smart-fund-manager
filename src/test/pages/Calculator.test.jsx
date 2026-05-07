@@ -35,6 +35,7 @@ jest.mock('../../components/charts/BarChartComponent', () => () => (
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
   useSelector: jest.fn(),
   useDispatch: () => jest.fn(),
 }));
@@ -61,12 +62,31 @@ describe('Calculator Page', () => {
 
   const renderComponent = (calculatedValues = defaultCalculatedValues) => {
     mockUseSelector.mockImplementation((selector) => {
-      if (selector.name === 'selectCalculatedValues') {
+      const dummyState = {
+        emi: {
+          currency: '₹',
+          loanDetails: {
+            homeValue: 1000000,
+            marginUnit: '%',
+            marginAmount: 20,
+            loanTenure: 120,
+            interestRate: 10,
+          },
+          expenses: [],
+          prepayments: [],
+        },
+      };
+
+      let result;
+      try {
+        result = selector(dummyState);
+      } catch (e) {}
+
+      if (result && typeof result === 'object' && 'loanAmount' in result && 'totalInterest' in result) {
         return calculatedValues;
       }
-      return selector({
-        emi: { currency: '₹' },
-      });
+
+      return result !== undefined ? result : '₹';
     });
 
     return render(

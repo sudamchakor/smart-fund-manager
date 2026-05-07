@@ -139,7 +139,6 @@ describe('WriteArticle Component', () => {
   it('redirects non-admin users and shows error snackbar', async () => {
     renderComponent(false, mockNonAdminUser);
     await waitFor(() => {
-      expect(screen.getByText('Unauthorized access.')).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
   });

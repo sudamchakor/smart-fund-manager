@@ -3,6 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import OnboardingModal from '../../../../features/profile/tabs/OnboardingModal.jsx'; // Corrected path
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 // Mock child components
 jest.mock(
@@ -13,7 +14,7 @@ jest.mock(
         System Parameters
         <button onClick={onNext}>Next</button>
       </div>
-    ),
+    ), { virtual: true }
 );
 jest.mock('../../../../features/profile/tabs/OnboardingSteps/IncomeStreams.jsx',
   () =>
@@ -23,8 +24,9 @@ jest.mock('../../../../features/profile/tabs/OnboardingSteps/IncomeStreams.jsx',
         <button onClick={onNext}>Next</button>
         <button onClick={onBack}>Back</button>
       </div>
-    ),
-);jest.mock('../../../../features/profile/tabs/OnboardingSteps/FixedLiabilities.jsx',
+    ), { virtual: true }
+);
+jest.mock('../../../../features/profile/tabs/OnboardingSteps/FixedLiabilities.jsx',
   () =>
     ({ onNext, onBack }) => (
       <div data-testid="fixed-liabilities">
@@ -33,7 +35,7 @@ jest.mock('../../../../features/profile/tabs/OnboardingSteps/IncomeStreams.jsx',
         <button onClick={onBack}>Back</button>
       </div>
     ),
-);jest.mock('../../../../features/profile/tabs/OnboardingSteps/CapitalGoals.jsx',
+);jest.mock('../../../../features/profile/tabs/OnboardingSteps/CapitalGoals',
   () =>
     ({ onNext, onBack }) => (
       <div data-testid="capital-goals">

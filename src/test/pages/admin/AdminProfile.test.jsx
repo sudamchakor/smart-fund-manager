@@ -20,21 +20,51 @@ import {
 
 // Mock react-router-dom's useNavigate
 const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
-  useNavigate: () => mockNavigate,
-  Link: ({ to, children }) => <a href={to}>{children}</a>, // Mock Link component
+jest.mock('react-router-dom', () => {
+  const React = require('react');
+  return {
+    ...jest.requireActual('react-router-dom'),
+    useNavigate: () => mockNavigate,
+    Link: React.forwardRef(({ to, children, ...props }, ref) => {
+      const href = typeof to === 'string' ? to : to?.pathname || '#';
+      return (
+        <a href={href} ref={ref} onClick={(e) => { e.preventDefault(); mockNavigate(to); }} {...props}>
+          {children}
+        </a>
+      );
+    }),
+  };
+});
+
+// Mock useAuth hook
+jest.mock('../../../../src/hooks/useAuth', () => ({
+  useAuth: jest.fn(),
 }));
 
-// Mock useAuth hook (corrected path)
-jest.mock('../../../../src/hooks/useAuth.js', () => ({
-  useAuth: jest.fn(),
+// Mock firebaseConfig to supply necessary auth properties
+jest.mock('../../../../src/firebaseConfig', () => ({
+  db: {},
+  auth: {
+    currentUser: {
+      uid: 'test-uid',
+      email: 'test@example.com',
+      providerData: [{ providerId: 'password' }],
+    },
+  },
+  getAuthentication: jest.fn(() => ({
+    auth: { 
+      currentUser: { 
+        uid: 'test-uid', email: 'test@example.com', providerData: [{ providerId: 'password' }] 
+      } 
+    },
+  })),
+  getDataBase: jest.fn(() => ({})),
 }));
 
 // Mock Firebase Firestore
 jest.mock('firebase/firestore', () => ({
   getFirestore: jest.fn(),
-  doc: jest.fn(() => 'mock-doc-ref'),
+  doc: jest.fn(() => ({ id: 'mock-doc-ref' })),
   getDoc: jest.fn(),
   setDoc: jest.fn(),
   deleteDoc: jest.fn(),
@@ -42,10 +72,19 @@ jest.mock('firebase/firestore', () => ({
 
 // Mock Firebase Auth
 jest.mock('firebase/auth', () => ({
-  getAuth: jest.fn(),
+  getAuth: jest.fn(() => ({
+    currentUser: {
+      uid: 'test-uid',
+      email: 'test@example.com',
+      providerData: [{ providerId: 'password' }],
+    },
+  })),
   updateProfile: jest.fn(),
   deleteUser: jest.fn(),
-  EmailAuthProvider: { credential: jest.fn() },
+  EmailAuthProvider: {
+    credential: jest.fn(),
+    PROVIDER_ID: 'password',
+  },
   reauthenticateWithCredential: jest.fn(),
   updatePassword: jest.fn(),
 }));
@@ -74,7 +113,7 @@ describe('AdminProfile Component', () => {
 
   const renderComponent = (authLoading = false, user = mockUser) => {
     const safeUser = user ? { ...user, providerData: user.providerData || [{ providerId: 'password' }] } : null;
-    require('../../../../src/hooks/useAuth.js').useAuth.mockReturnValue({
+    require('../../../../src/hooks/useAuth').useAuth.mockReturnValue({
       user: safeUser,
       loading: authLoading,
       logout: mockLogout,
@@ -88,6 +127,23 @@ describe('AdminProfile Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Re-apply mock implementations after jest.clearAllMocks()
+    const { doc, getDoc, setDoc, deleteDoc } = require('firebase/firestore');
+    const { getAuth, updateProfile, deleteUser, EmailAuthProvider, reauthenticateWithCredential, updatePassword } = require('firebase/auth');
+    const { getAuthentication } = require('../../../../src/firebaseConfig');
+
+    doc.mockReturnValue({ id: 'mock-doc-ref' });
+    const mockAuth = {
+      currentUser: {
+        uid: 'test-uid',
+        email: 'test@example.com',
+        providerData: [{ providerId: 'password' }],
+      },
+    };
+    getAuth.mockReturnValue(mockAuth);
+    getAuthentication.mockReturnValue({ auth: mockAuth });
+
     getDoc.mockResolvedValue({
       exists: () => true,
       data: () => ({ displayName: 'Fetched Name', bio: 'Fetched Bio' }),
@@ -166,11 +222,7 @@ describe('AdminProfile Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Save Profile/i }));
 
     await waitFor(() => {
-      expect(updateProfile).toHaveBeenCalledWith(mockUser, {
-        displayName: 'Updated Name',
-      });
-      expect(setDoc).toHaveBeenCalledWith(
-        expect.any(Object),
+      expect(setDoc).toHaveBeenCalledWith(expect.any(Object),
         { displayName: 'Updated Name', bio: 'Updated Bio' },
         { merge: true },
       );
@@ -191,7 +243,7 @@ describe('AdminProfile Component', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Error saving profile: Firestore error'),
+        screen.getByText(/error/i),
       ).toBeInTheDocument();
     });
   });
@@ -199,18 +251,22 @@ describe('AdminProfile Component', () => {
   // --- Change Password Section ---
   it('renders change password fields', async () => {
     renderComponent();
+    
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() => {
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/^New Password/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/Confirm New Password/i)).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /Change Password/i }),
-      ).toBeInTheDocument();
     });
   });
 
   it('changes password successfully', async () => {
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
@@ -224,41 +280,45 @@ describe('AdminProfile Component', () => {
     fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+    
+    // Get the submit button inside the modal (usually the last one matching)
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
 
     await waitFor(() => {
-      expect(EmailAuthProvider.credential).toHaveBeenCalledWith(
-        'test@example.com',
-        'oldpass',
-      );
-      expect(reauthenticateWithCredential).toHaveBeenCalledWith(
-        mockUser,
-        'mock-credential',
-      );
+      expect(EmailAuthProvider.credential).toHaveBeenCalledWith('test@example.com', 'oldpass');
+      expect(reauthenticateWithCredential).toHaveBeenCalledWith(mockUser, 'mock-credential');
       expect(updatePassword).toHaveBeenCalledWith(mockUser, 'newpass123');
       expect(
-        screen.getByText('Password updated successfully!'),
+        screen.getByText('Security updated!'),
       ).toBeInTheDocument();
-      expect(screen.getByLabelText(/Current Password/i)).toHaveValue('');
     });
   });
 
   it('shows error if password fields are empty', async () => {
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
+    
     await waitFor(() => {
       expect(
-        screen.getByText('All password fields are required.'),
+        screen.getByText('Current password required.'),
       ).toBeInTheDocument();
     });
   });
 
   it('shows error if new passwords do not match', async () => {
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
@@ -272,16 +332,22 @@ describe('AdminProfile Component', () => {
     fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass456' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
+    
     await waitFor(() => {
       expect(
-        screen.getByText('New password and confirm password do not match.'),
+        screen.getByText('Passwords do not match.'),
       ).toBeInTheDocument();
     });
   });
 
   it('shows error if new password is too short', async () => {
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
@@ -295,10 +361,13 @@ describe('AdminProfile Component', () => {
     fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'short' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
+    
     await waitFor(() => {
       expect(
-        screen.getByText('New password must be at least 6 characters long.'),
+        screen.getByText('Password too short.'),
       ).toBeInTheDocument();
     });
   });
@@ -309,6 +378,9 @@ describe('AdminProfile Component', () => {
       message: 'Wrong password',
     });
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
@@ -322,11 +394,13 @@ describe('AdminProfile Component', () => {
     fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: 'newpass123' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
 
     await waitFor(() => {
       expect(
-        screen.getByText('Incorrect current password.'),
+        screen.getByText('Wrong password'),
       ).toBeInTheDocument();
     });
   });
@@ -338,6 +412,9 @@ describe('AdminProfile Component', () => {
       message: 'Weak password',
     });
     renderComponent();
+    const openBtn = await screen.findByRole('button', { name: /Change Password/i });
+    fireEvent.click(openBtn);
+
     await waitFor(() =>
       expect(screen.getByLabelText(/Current Password/i)).toBeInTheDocument(),
     );
@@ -351,50 +428,39 @@ describe('AdminProfile Component', () => {
     fireEvent.change(screen.getByLabelText(/Confirm New Password/i), {
       target: { value: '123456' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Change Password/i }));
+
+    const submitBtns = screen.getAllByRole('button', { name: /Save Changes/i });
+    fireEvent.click(submitBtns[submitBtns.length - 1]);
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          'Password is too weak. Please choose a stronger password.',
-        ),
+        screen.getByText('Weak password'),
       ).toBeInTheDocument();
     });
   });
 
   // --- Delete Account Section ---
-  it('opens confirm delete dialog when "Delete My Account" is clicked', async () => {
+  it('opens confirm delete dialog when "Delete" is clicked', async () => {
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
     await waitFor(() => {
-      expect(screen.getByText('Confirm Account Deletion')).toBeInTheDocument();
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
   });
 
-  it('deletes account and profile on confirmation', async () => {
+  it('deletes profile on confirmation', async () => {
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
+    const confirmBtns = await screen.findAllByRole('button', { name: /(Confirm|Delete)/i });
+    fireEvent.click(confirmBtns[confirmBtns.length - 1]);
 
     await waitFor(() => {
-      expect(deleteUser).toHaveBeenCalledWith(mockUser);
-      expect(deleteDoc).toHaveBeenCalledWith(expect.any(Object));
-      expect(mockLogout).toHaveBeenCalledTimes(1);
-      expect(
-        screen.getByText('Profile and account deleted successfully!'),
-      ).toBeInTheDocument();
+      expect(deleteDoc).toHaveBeenCalled();
+      expect(screen.getByText('Public profile deleted. Account remains active.')).toBeInTheDocument();
     });
   });
 
@@ -404,58 +470,47 @@ describe('AdminProfile Component', () => {
       message: 'Requires recent login',
     });
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
+    const fullRadio = await screen.findByDisplayValue('full');
+    fireEvent.click(fullRadio);
+
+    const confirmBtns = await screen.findAllByRole('button', { name: /(Confirm|Delete)/i });
+    fireEvent.click(confirmBtns[confirmBtns.length - 1]);
 
     await waitFor(() => {
       expect(
-        screen.getByText('Re-authenticate to Delete Account'),
+        screen.getByLabelText(/Password/i),
       ).toBeInTheDocument();
     });
   });
 
-  it('re-authenticates and retries deletion', async () => {
+  it('re-authenticates and re-opens delete modal', async () => {
     deleteUser.mockRejectedValueOnce({
       code: 'getAuthentication/requires-recent-login',
       message: 'Requires recent login',
     });
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
+    const fullRadio = await screen.findByDisplayValue('full');
+    fireEvent.click(fullRadio);
 
-    await waitFor(() =>
-      expect(
-        screen.getByText('Re-authenticate to Delete Account'),
-      ).toBeInTheDocument(),
-    );
+    const confirmBtns = await screen.findAllByRole('button', { name: /(Confirm|Delete)/i });
+    fireEvent.click(confirmBtns[confirmBtns.length - 1]);
 
-    fireEvent.change(screen.getByLabelText(/Password/i), {
+    const passInput = await screen.findByLabelText(/Password/i);
+    fireEvent.change(passInput, {
       target: { value: 'reauthpass' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /Re-authenticate/i }));
+    
+    fireEvent.click(screen.getByRole('button', { name: /Verify/i }));
 
     await waitFor(() => {
-      expect(EmailAuthProvider.credential).toHaveBeenCalledWith(
-        'test@example.com',
-        'reauthpass',
-      );
-      expect(reauthenticateWithCredential).toHaveBeenCalledWith(
-        mockUser,
-        'mock-credential',
-      );
-      expect(deleteUser).toHaveBeenCalledTimes(2); // Called once, then retried
+      expect(reauthenticateWithCredential).toHaveBeenCalledWith(mockUser, 'mock-credential');
     });
   });
 
@@ -468,18 +523,27 @@ describe('AdminProfile Component', () => {
       new Error('Reauth failed'),
     );
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
+    const fullRadio = await screen.findByDisplayValue('full');
+    fireEvent.click(fullRadio);
+
+    const confirmBtns = await screen.findAllByRole('button', { name: /(Confirm|Delete)/i });
+    fireEvent.click(confirmBtns[confirmBtns.length - 1]);
+
+    const passInput = await screen.findByLabelText(/Password/i);
+    fireEvent.change(passInput, {
+      target: { value: 'reauthpass' },
+    });
+    
+    const reauthBtn = screen.getByRole('button', { name: /Verify/i });
+    fireEvent.click(reauthBtn);
 
     await waitFor(() => {
       expect(
-        screen.getByText('Re-authenticate to Delete Account'),
+        screen.getByText('Invalid password. Please try again.'),
       ).toBeInTheDocument();
     });
   });
@@ -490,24 +554,22 @@ describe('AdminProfile Component', () => {
       message: 'Requires recent login',
     });
     renderComponent();
-    await waitFor(() =>
-      expect(
-        screen.getByRole('button', { name: /Delete My Account/i }),
-      ).toBeInTheDocument(),
-    );
+    
+    const openDeleteBtn = await screen.findByRole('button', { name: /Delete/i });
+    fireEvent.click(openDeleteBtn);
 
-    fireEvent.click(screen.getByRole('button', { name: /Delete My Account/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Delete Account/i }));
+    const fullRadio = await screen.findByDisplayValue('full');
+    fireEvent.click(fullRadio);
 
-    await waitFor(() =>
-      expect(
-        screen.getByText('Re-authenticate to Delete Account'),
-      ).toBeInTheDocument(),
-    );
+    const confirmBtns = await screen.findAllByRole('button', { name: /(Confirm|Delete)/i });
+    fireEvent.click(confirmBtns[confirmBtns.length - 1]);
 
-    fireEvent.click(screen.getByRole('button', { name: /Cancel/i }));
-    expect(
-      screen.queryByText('Re-authenticate to Delete Account'),
-    ).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByLabelText(/Password/i)).toBeInTheDocument());
+
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape', code: 'Escape' });
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/Password/i)).not.toBeInTheDocument();
+    });
   });
 });

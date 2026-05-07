@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import {
   DynamicRowModal,
@@ -39,7 +39,8 @@ describe('DynamicRowModal', () => {
       </ThemeProvider>,
     );
     expect(screen.getByText('Inject Data Row')).toBeInTheDocument();
-    expect(screen.getByLabelText('Row Identifier')).toBeInTheDocument();
+    expect(screen.getByText('Row Identifier')).toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Apply Change' }),
@@ -70,7 +71,7 @@ describe('DynamicRowModal', () => {
         <DynamicRowModal {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Row Identifier'), {
+    fireEvent.change(screen.getByRole('textbox'), {
       target: { value: 'New Label' },
     });
     expect(defaultProps.onLabelChange).toHaveBeenCalledWith(expect.any(Object)); // Event object
@@ -153,10 +154,10 @@ describe('SettingsModal', () => {
       </ThemeProvider>,
     );
     expect(screen.getByText('System Configuration')).toBeInTheDocument();
-    expect(screen.getByLabelText('Assessee Age')).toBeInTheDocument();
-    expect(screen.getByLabelText('Metro City Residence?')).toBeInTheDocument();
-    expect(screen.getByLabelText('Employee PF Base (%)')).toBeInTheDocument();
-    expect(screen.getByLabelText('Voluntary PF Boost (%)')).toBeInTheDocument();
+    expect(screen.getByText('Assessee Age')).toBeInTheDocument();
+    expect(screen.getByText('Metro City Residence?')).toBeInTheDocument();
+    expect(screen.getByText('Employee PF Base (%)')).toBeInTheDocument();
+    expect(screen.getByText('Voluntary PF Boost (%)')).toBeInTheDocument();
     expect(screen.getByText('PF Inclusion Logic Engine')).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Apply Config' }),
@@ -178,7 +179,8 @@ describe('SettingsModal', () => {
         <SettingsModal {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Assessee Age'), {
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[0], {
       target: { value: '31' },
     });
     expect(defaultProps.onAgeChange).toHaveBeenCalledWith(expect.any(Object));
@@ -193,7 +195,8 @@ describe('SettingsModal', () => {
         />
       </ThemeProvider>,
     );
-    expect(screen.getByRole('button', { name: 'Yes' })).toBeInTheDocument();
+    const isMetroRow = screen.getByText('Metro City Residence?').parentElement;
+    expect(isMetroRow).toHaveTextContent('Yes');
   });
 
   it('calls onSettingChange when isMetro Select value changes', () => {
@@ -202,8 +205,10 @@ describe('SettingsModal', () => {
         <SettingsModal {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'No' }));
-    fireEvent.click(screen.getByText('Yes'));
+    const isMetroRow = screen.getByText('Metro City Residence?').parentElement;
+    fireEvent.mouseDown(within(isMetroRow).getByRole('combobox'));
+    const listbox = screen.getByRole('listbox');
+    fireEvent.click(within(listbox).getByText('Yes'));
     expect(defaultProps.onSettingChange).toHaveBeenCalledWith('isMetro', 'Yes');
   });
 
@@ -226,7 +231,8 @@ describe('SettingsModal', () => {
         <SettingsModal {...defaultProps} />
       </ThemeProvider>,
     );
-    fireEvent.change(screen.getByLabelText('Employee PF Base (%)'), {
+    const inputs = screen.getAllByRole('textbox');
+    fireEvent.change(inputs[1], { // pfPercent is the second textbox
       target: { value: '13' },
     });
     expect(defaultProps.onSettingChange).toHaveBeenCalledWith(
@@ -243,12 +249,10 @@ describe('SettingsModal', () => {
     );
     expect(screen.getByText('Basic')).toBeInTheDocument();
     expect(screen.getByText('HRA')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Included' }),
-    ).toBeInTheDocument(); // Basic is 'Y'
-    expect(
-      screen.getByRole('button', { name: 'Excluded' }),
-    ).toBeInTheDocument(); // HRA is 'N'
+    const basicRow = screen.getByText('Basic').closest('tr');
+    expect(basicRow).toHaveTextContent('Included'); // Basic is 'Y'
+    const hraRow = screen.getByText('HRA').closest('tr');
+    expect(hraRow).toHaveTextContent('Excluded'); // HRA is 'N'
   });
 
   it('renders dynamic income items in the PF inclusion table', () => {
@@ -258,9 +262,8 @@ describe('SettingsModal', () => {
       </ThemeProvider>,
     );
     expect(screen.getByText('Bonus')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Included' }),
-    ).toBeInTheDocument(); // Bonus is 'Y'
+    const bonusRow = screen.getByText('Bonus').closest('tr');
+    expect(bonusRow).toHaveTextContent('Included'); // Bonus is 'Y'
   });
 
   it('calls onInclusionChange when a Select value changes in the PF inclusion table', () => {
@@ -270,8 +273,10 @@ describe('SettingsModal', () => {
       </ThemeProvider>,
     );
     // Change HRA from 'Excluded' to 'Included'
-    fireEvent.mouseDown(screen.getByRole('button', { name: 'Excluded' })); // HRA's current value
-    fireEvent.click(screen.getByText('Included'));
+    const hraRow = screen.getByText('HRA').closest('tr');
+    fireEvent.mouseDown(within(hraRow).getByRole('combobox'));
+    const listbox = screen.getByRole('listbox');
+    fireEvent.click(within(listbox).getByText('Included'));
     expect(defaultProps.onInclusionChange).toHaveBeenCalledWith(
       'includePfHra',
       'Y',
@@ -313,7 +318,7 @@ describe('SettingsModal', () => {
     expect(screen.getByText('PF Inclusion Logic Engine')).toBeInTheDocument(); // Header still present
   });
 
-  it('ensures default "N" is selected if calculatedSalary does not have the field', () => {
+  it('ensures default "Excluded" is selected if calculatedSalary does not have the field', () => {
     const customCalculatedSalary = { months: [{}] }; // No includePfBasic
     render(
       <ThemeProvider theme={theme}>
@@ -325,7 +330,6 @@ describe('SettingsModal', () => {
     );
     // Find the select for Basic and check its value
     const basicRow = screen.getByText('Basic').closest('tr');
-    const select = basicRow.querySelector('input[type="hidden"]'); // MUI Select uses hidden input for value
-    expect(select).toHaveValue('N');
+    expect(basicRow).toHaveTextContent('Excluded');
   });
 });

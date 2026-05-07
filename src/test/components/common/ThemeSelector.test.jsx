@@ -73,8 +73,8 @@ describe('ThemeSelector Component', () => {
 
     // Note: If the border is on a wrapper DIV, apply the border style 
     // to the Button/ActionArea in your component style to make it testable here.
-    expect(darkCard).toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
-    expect(defaultCard).not.toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
+    expect(darkCard).toHaveStyle(`border-color: ${theme.palette.primary.main}`);
+    expect(defaultCard).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
   });
 
   it('calls onThemeChange when an option is clicked', () => {
@@ -113,7 +113,7 @@ describe('ThemeSelector Component', () => {
     
     const buttons = screen.getAllByRole('button');
     buttons.forEach((btn) => {
-      expect(btn.closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
+      expect(btn.closest('.MuiCard-root')).not.toHaveStyle(`border-color: ${theme.palette.primary.main}`);
     });
   });
 });

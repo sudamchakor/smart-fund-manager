@@ -4,24 +4,29 @@ import CapitalGoals from '../../../../../features/profile/tabs/OnboardingSteps/C
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector) =>
-    selector({
-      profile: {
-        goalsList: [
-          {
-            id: 1,
-            name: 'Retirement',
-            targetAmount: 1000000,
-            targetYear: 2050,
-            category: 'retirement',
-          },
-        ],
-      },
-      emi: {
-        currency: '₹',
-      },
-    }),
-  ),
+  useSelector: jest.fn((selector) => {
+    try {
+      return selector({
+        profile: {
+          goalsList: [ // Ensure this is always an array
+            {
+              id: 1,
+              name: 'Retirement',
+              targetAmount: 1000000,
+              targetYear: 2050,
+              category: 'retirement',
+            },
+          ],
+          goals: [],
+        },
+        emi: {
+          currency: '₹',
+        },
+      });
+    } catch (e) {
+      return undefined;
+    }
+  }),
   useDispatch: () => jest.fn(),
 }));
 
@@ -33,7 +38,18 @@ jest.mock('../../../../../src/features/profile/components/GoalForm.jsx', // Corr
 
 describe('CapitalGoals', () => {
   it('renders without crashing', () => {
-    render(<CapitalGoals onNext={() => {}} onBack={() => {}} />);
+    const mockGoal = { name: '', targetAmount: '', targetYear: '', category: '' };
+    const mockSetGoal = jest.fn();
+    render(
+      <CapitalGoals
+        onNext={() => {}}
+        onBack={() => {}}
+        goal={mockGoal}
+        setGoal={mockSetGoal}
+        goalsList={[]} // Provide an empty array as a default
+        setGoalsList={jest.fn()} // Provide a mock function
+      />
+    );
     expect(
       screen.getByText(/What are your capital goals?/i),
     ).toBeInTheDocument();

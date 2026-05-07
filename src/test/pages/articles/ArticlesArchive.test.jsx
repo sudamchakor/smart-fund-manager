@@ -10,11 +10,6 @@ const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
-  Link: ({ to, children, ...props }) => (
-    <a href={to} onClick={(e) => { e.preventDefault(); mockNavigate(to); }} {...props}>
-      {children}
-    </a>
-  ),
 }));
 
 // Mock useAuth hook
@@ -97,19 +92,24 @@ describe('ArticlesArchive Component', () => {
     collection.mockReturnValue('articles-collection-ref');
     query.mockImplementation((colRef, ...args) => ({ colRef, args }));
     orderBy.mockImplementation((field, direction) => ({ field, direction }));
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   // --- Initial Loading and Error States ---
   it('shows loading spinner initially', () => {
     getDocs.mockReturnValueOnce(new Promise(() => {})); // Never resolve
     renderComponent();
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getByTestId('suspense-message')).toBeInTheDocument();
   });
 
   it('hides loading spinner and displays articles after fetching', async () => {
     renderComponent();
     await waitFor(() => {
-      expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('suspense-message')).not.toBeInTheDocument();
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument();
       expect(screen.getByText('AI in Investing')).toBeInTheDocument();
     });
@@ -120,7 +120,7 @@ describe('ArticlesArchive Component', () => {
     renderComponent();
     await waitFor(() => {
       expect(
-        screen.getByText('No articles found matching your criteria.'),
+        screen.getByText(/No matching insights found/i),
       ).toBeInTheDocument();
     });
   });
@@ -129,9 +129,9 @@ describe('ArticlesArchive Component', () => {
   it('renders PageHeader with correct title, subtitle, and icon', () => {
     renderComponent();
     expect(screen.getByTestId('mock-page-header')).toBeInTheDocument();
-    expect(screen.getByText('Finance Articles')).toBeInTheDocument();
+    expect(screen.getByText('Knowledge Hub')).toBeInTheDocument();
     expect(
-      screen.getByText('Stay informed with our latest insights and guides.'),
+      screen.getByText('Empowering your financial journey with expert insights.'),
     ).toBeInTheDocument();
     expect(screen.getByTestId('mock-header-icon')).toBeInTheDocument(); // ArticleIcon
   });
@@ -143,7 +143,7 @@ describe('ArticlesArchive Component', () => {
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), {
+    fireEvent.change(screen.getByPlaceholderText(/Search by title or topic/i), {
       target: { value: 'future' },
     });
     expect(screen.getByText('The Future of Finance')).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe('ArticlesArchive Component', () => {
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
     );
 
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Category/i }));
     fireEvent.click(screen.getByText('Technology'));
 
     expect(screen.getByText('AI in Investing')).toBeInTheDocument();
@@ -170,10 +170,10 @@ describe('ArticlesArchive Component', () => {
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), {
+    fireEvent.change(screen.getByPlaceholderText(/Search by title or topic/i), {
       target: { value: 'tax' },
     });
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Category/i }));
     fireEvent.click(screen.getByText('Finance'));
 
     expect(screen.getByText('Tax Saving Strategies')).toBeInTheDocument();
@@ -187,11 +187,11 @@ describe('ArticlesArchive Component', () => {
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
     );
 
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Category/i }));
     fireEvent.click(screen.getByText('Technology'));
     expect(screen.queryByText('The Future of Finance')).not.toBeInTheDocument();
 
-    fireEvent.mouseDown(screen.getByLabelText('Category'));
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Category/i }));
     fireEvent.click(screen.getByText('All'));
     expect(screen.getByText('The Future of Finance')).toBeInTheDocument();
     expect(screen.getByText('AI in Investing')).toBeInTheDocument();
@@ -204,40 +204,40 @@ describe('ArticlesArchive Component', () => {
       expect(screen.getByText('The Future of Finance')).toBeInTheDocument(),
     );
 
-    fireEvent.change(screen.getByLabelText('Search Articles'), {
+    fireEvent.change(screen.getByPlaceholderText(/Search by title or topic/i), {
       target: { value: 'nonexistent' },
     });
     expect(
-      screen.getByText('No articles found matching your criteria.'),
+      screen.getByText(/No matching insights found/i),
     ).toBeInTheDocument();
     expect(screen.queryByText('The Future of Finance')).not.toBeInTheDocument();
   });
 
   // --- Add Article Button ---
-  it('renders "Add Article" button if user is authenticated', async () => {
+  it('renders "Create Article" button if user is authenticated', async () => {
     renderComponent(true); // isAuthenticated = true
     await waitFor(() => {
       expect(
-        screen.getByRole('link', { name: 'Add Article' }),
+        screen.getByRole('link', { name: /Create Article/i }),
       ).toBeInTheDocument();
     });
   });
 
-  it('does not render "Add Article" button if user is not authenticated', async () => {
+  it('does not render "Create Article" button if user is not authenticated', async () => {
     renderComponent(false); // isAuthenticated = false
     await waitFor(() => {
       expect(
-        screen.queryByRole('link', { name: 'Add Article' }),
+        screen.queryByRole('link', { name: /Create Article/i }),
       ).not.toBeInTheDocument();
     });
   });
 
-  it('navigates to /admin/write-article when "Add Article" button is clicked', async () => {
+  it('renders "Create Article" link pointing to /admin/write-article', async () => {
     renderComponent(true);
-    await waitFor(() => {
-      fireEvent.click(screen.getByRole('link', { name: 'Add Article' }));
-      expect(mockNavigate).toHaveBeenCalledWith('/admin/write-article');
-    });
+    await waitFor(() => expect(screen.getByRole('link', { name: /Create Article/i })).toBeInTheDocument());
+    const createLink = screen.getByRole('link', { name: /Create Article/i });
+    expect(createLink).toBeInTheDocument();
+    expect(createLink).toHaveAttribute('href', '/admin/write-article');
   });
 
   // --- Edge Cases ---
@@ -246,21 +246,21 @@ describe('ArticlesArchive Component', () => {
     renderComponent();
     await waitFor(() => {
       expect(
-        screen.getByText('No articles found matching your criteria.'),
+        screen.getByText(/No matching insights found/i),
       ).toBeInTheDocument();
     });
   });
 
   it('ensures categories list is unique and includes "All"', async () => {
     renderComponent();
-    await waitFor(() => {
-      fireEvent.mouseDown(screen.getByLabelText('Category'));
-      const options = screen.getAllByRole('option');
-      expect(options.map((opt) => opt.textContent)).toEqual([
-        'All',
-        'Finance',
-        'Technology',
-      ]);
-    });
+    await waitFor(() => expect(screen.getByText('The Future of Finance')).toBeInTheDocument());
+    
+    fireEvent.mouseDown(screen.getByRole('combobox', { name: /Category/i }));
+    const options = await screen.findAllByRole('option');
+    expect(options.map((opt) => opt.textContent)).toEqual([
+      'All',
+      'Finance',
+      'Technology',
+    ]);
   });
 });

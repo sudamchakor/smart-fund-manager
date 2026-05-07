@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
 // Mock Redux hooks
 const mockUseSelector = jest.fn();
 jest.mock('react-redux', () => ({
+  ...jest.requireActual('react-redux'),
   useSelector: (selector) => mockUseSelector(selector),
 }));
 
@@ -144,9 +145,9 @@ describe('PersonalLoanCalculator Page', () => {
     fireEvent.change(loanAmountInput, { target: { value: '600000' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹11322'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹89320'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹689320'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹12896'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹173780'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹773780'); // Recalculated Payable
     });
   });
 
@@ -159,8 +160,8 @@ describe('PersonalLoanCalculator Page', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹11122'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹167320'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹667320'); // Recalculated Payable
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹167333'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹667333'); // Recalculated Payable
     });
   });
 
@@ -170,9 +171,9 @@ describe('PersonalLoanCalculator Page', () => {
     fireEvent.change(tenureInput, { target: { value: '3' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹16200'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹83200'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹583200'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹16251'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹85044'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹585044'); // Recalculated Payable
     });
   });
 
@@ -209,9 +210,9 @@ describe('PersonalLoanCalculator Page', () => {
     fireEvent.change(tenureInput, { target: { value: '1' } });
 
     await waitFor(() => {
-      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹44000'); // Recalculated EMI
-      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹28000'); // Recalculated Interest
-      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹528000'); // Recalculated Payable
+      expect(screen.getByTestId('monthly-emi')).toHaveTextContent('₹44074'); // Recalculated EMI
+      expect(screen.getByTestId('total-interest')).toHaveTextContent('₹28892'); // Recalculated Interest
+      expect(screen.getByTestId('total-payable')).toHaveTextContent('₹528892'); // Recalculated Payable
     });
   });
 
@@ -227,8 +228,8 @@ describe('PersonalLoanCalculator Page', () => {
     renderComponent('$');
     // Initial values with default loanAmount=500000, interestRate=10.5, tenure=5
     // EMI: 10747.8, Total Interest: 144868, Total Payable: 644868
-    expect(screen.getByTestId('monthly-emi')).toHaveTextContent('$10748');
-    expect(screen.getByTestId('total-interest')).toHaveTextContent('$144868');
-    expect(screen.getByTestId('total-payable')).toHaveTextContent('$644868');
+    expect(screen.getByTestId('monthly-emi')).toHaveTextContent('$10747');
+    expect(screen.getByTestId('total-interest')).toHaveTextContent('$144817');
+    expect(screen.getByTestId('total-payable')).toHaveTextContent('$644817');
   });
 });

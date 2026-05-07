@@ -24,11 +24,15 @@ jest.mock('firebase/auth', () => ({
   GoogleAuthProvider: jest.fn(),
   GithubAuthProvider: jest.fn(),
   signInWithPopup: jest.fn(),
+  getAuth: jest.fn(() => ({})),
 }));
 
 // Mock getAuthentication
 jest.mock('../../../../src/firebaseConfig', () => ({
-  getAuthentication: jest.fn(() => ({})),
+  getAuthentication: jest.fn(() => ({
+    auth: {}
+  })),
+  auth: {},
 }));
 
 describe('LoginPage Component', () => {
@@ -44,6 +48,20 @@ describe('LoginPage Component', () => {
     jest.clearAllMocks();
     signInWithEmailAndPassword.mockResolvedValue({});
     signInWithPopup.mockResolvedValue({});
+
+    const { getAuth } = require('firebase/auth');
+    if (getAuth) getAuth.mockReturnValue({});
+    const { getAuthentication } = require('../../../../src/firebaseConfig');
+    if (getAuthentication) getAuthentication.mockReturnValue({ auth: {} });
+
+    // Suppress expected console errors
+    jest.spyOn(console, 'error').mockImplementation((msg) => {
+      if (typeof msg === 'string' && msg.includes('login error')) return;
+    });
+  });
+
+  afterEach(() => {
+    console.error.mockRestore();
   });
 
   // --- Basic Rendering ---
@@ -75,11 +93,7 @@ describe('LoginPage Component', () => {
     fireEvent.click(screen.getByRole('button', { name: /Login with Email/i }));
 
     await waitFor(() => {
-      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(
-        expect.any(Object),
-        'test@example.com',
-        'password123',
-      );
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(expect.any(Object), 'test@example.com', 'password123');
       expect(screen.getByText('Login successful!')).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
@@ -120,7 +134,7 @@ describe('LoginPage Component', () => {
     expect(
       screen.getByRole('button', { name: 'Logging In...' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getAllByRole('progressbar')[0]).toBeInTheDocument();
   });
 
   // --- Social Logins ---
@@ -130,10 +144,7 @@ describe('LoginPage Component', () => {
 
     await waitFor(() => {
       expect(GoogleAuthProvider).toHaveBeenCalledTimes(1);
-      expect(signInWithPopup).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(GoogleAuthProvider),
-      );
+      expect(signInWithPopup).toHaveBeenCalledWith(expect.any(Object), expect.any(GoogleAuthProvider));
       expect(screen.getByText('Google login successful!')).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
@@ -159,10 +170,7 @@ describe('LoginPage Component', () => {
 
     await waitFor(() => {
       expect(GithubAuthProvider).toHaveBeenCalledTimes(1);
-      expect(signInWithPopup).toHaveBeenCalledWith(
-        expect.any(Object),
-        expect.any(GithubAuthProvider),
-      );
+      expect(signInWithPopup).toHaveBeenCalledWith(expect.any(Object), expect.any(GithubAuthProvider));
       expect(screen.getByText('GitHub login successful!')).toBeInTheDocument();
       expect(mockNavigate).toHaveBeenCalledWith('/admin/articles');
     });
@@ -191,7 +199,7 @@ describe('LoginPage Component', () => {
     expect(
       screen.getByRole('button', { name: /Login with Google/i }),
     ).toBeDisabled();
-    expect(screen.getByRole('progressbar')).toBeInTheDocument();
+    expect(screen.getAllByRole('progressbar')[0]).toBeInTheDocument();
   });
 
   // --- Snackbar ---

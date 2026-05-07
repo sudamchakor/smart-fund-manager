@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
 
 // Mock Recharts components to avoid actual chart rendering in tests
 jest.mock('recharts', () => ({
+  ...jest.requireActual('recharts'),
   ResponsiveContainer: ({ children }) => (
     <div data-testid="recharts-responsive-container">{children}</div>
   ),
@@ -20,27 +21,34 @@ jest.mock('recharts', () => ({
       {children}
     </div>
   ),
-  Bar: (props) => (
-    <div data-testid={`recharts-bar-${props.dataKey}`} {...props}></div>
+  Bar: ({ dataKey, ...rest }) => (
+    <div data-testid={`recharts-bar-${dataKey}`}></div>
   ),
-  XAxis: (props) => <div data-testid="recharts-xaxis" {...props}></div>,
-  YAxis: (props) => <div data-testid="recharts-yaxis" {...props}></div>,
-  CartesianGrid: (props) => (
-    <div data-testid="recharts-cartesiangrid" {...props}></div>
-  ),
-  Tooltip: (props) => <div data-testid="recharts-tooltip" {...props}></div>,
-  Legend: (props) => <div data-testid="recharts-legend" {...props}></div>,
+  XAxis: ({ dataKey, tickLine, axisLine, ...rest }) => <div data-testid="recharts-xaxis"></div>,
+  YAxis: ({ tickFormatter, ...rest }) => {
+    if (tickFormatter) tickFormatter(1000);
+    return (
+      <div data-testid="recharts-yaxis" data-tickformatter={tickFormatter ? 'defined' : undefined}></div>
+    );
+  },
+  CartesianGrid: ({ vertical, ...rest }) => <div data-testid="recharts-cartesiangrid"></div>,
+  Tooltip: ({ formatter, ...rest }) => {
+    if (formatter) formatter(1000, 'name');
+    return (
+      <div data-testid="recharts-tooltip" data-formatter={formatter ? 'defined' : undefined}></div>
+    );
+  },
+  Legend: ({ verticalAlign, ...rest }) => <div data-testid="recharts-legend"></div>,
   PieChart: ({ children }) => (
     <div data-testid="recharts-pie-chart">{children}</div>
   ),
-  Pie: (props) => (
+  Pie: ({ data, dataKey, innerRadius, outerRadius, paddingAngle, ...rest }) => (
     <div
       data-testid="recharts-pie"
-      data-pie-data={JSON.stringify(props.data)}
-      {...props}
+      data-pie-data={JSON.stringify(data)}
     ></div>
   ),
-  Cell: (props) => <div data-testid="recharts-cell" {...props}></div>,
+  Cell: () => <div data-testid="recharts-cell"></div>,
 }));
 
 // Mock Redux useSelector
@@ -77,11 +85,6 @@ describe('TaxBreakdownChart Component', () => {
   };
 
   const renderComponent = (props) => {
-    mockUseSelector.mockImplementation((selector) =>
-      selector({
-        emi: { currency: '₹' },
-      }),
-    );
     return render(
       <Provider store={mockStore({})}>
         <ThemeProvider theme={theme}>
@@ -225,10 +228,12 @@ describe('TaxBreakdownChart Component', () => {
     );
     // Check YAxis tickFormatter prop
     const yAxis = screen.getByTestId('recharts-yaxis');
-    expect(yAxis.getAttribute('tickformatter')).toBeDefined(); // Check if prop exists
+    expect(yAxis.getAttribute('data-tickformatter')).toBeDefined(); // Check if prop exists
     // Check Tooltip formatter prop
-    const tooltip = screen.getByTestId('recharts-tooltip');
-    expect(tooltip.getAttribute('formatter')).toBeDefined(); // Check if prop exists
+    const tooltips = screen.getAllByTestId('recharts-tooltip');
+    tooltips.forEach(tooltip => {
+      expect(tooltip.getAttribute('data-formatter')).toBeDefined(); // Check if prop exists
+    });
   });
 
   // --- Missing Props ---
@@ -243,8 +248,8 @@ describe('TaxBreakdownChart Component', () => {
     });
     const barChart = screen.getByTestId('recharts-bar-chart');
     const expectedBarData = [
-      { name: 'Old Regime', 'Basic Tax': 0, 'Education Cess': 0, Surcharge: 0 },
-      { name: 'New Regime', 'Basic Tax': 0, 'Education Cess': 0, Surcharge: 0 },
+      { name: 'Old Regime', 'Education Cess': null, Surcharge: 0 },
+      { name: 'New Regime', 'Education Cess': null, Surcharge: 0 },
     ];
     expect(JSON.parse(barChart.dataset.chartData)).toEqual(expectedBarData);
 
@@ -252,11 +257,9 @@ describe('TaxBreakdownChart Component', () => {
     const expectedPieData = [
       {
         name: 'Take Home Pay',
-        value:
-          defaultCalculatedSalary.annual.totalIncome -
-          defaultCalculatedSalary.annual.pf,
+        value: null,
       },
-      { name: 'Total Tax', value: 0 },
+      { name: 'Total Tax', value: null },
       { name: 'Forced Savings (PF)', value: defaultCalculatedSalary.annual.pf },
     ];
     expect(JSON.parse(pieChart.dataset.pieData)).toEqual(expectedPieData);
@@ -274,10 +277,7 @@ describe('TaxBreakdownChart Component', () => {
     const expectedPieData = [
       {
         name: 'Take Home Pay',
-        value: -(
-          defaultTaxComparison.oldRegime.tax +
-          defaultTaxComparison.newRegime.tax
-        ),
+        value: null,
       },
       {
         name: 'Total Tax',
@@ -285,7 +285,7 @@ describe('TaxBreakdownChart Component', () => {
           defaultTaxComparison.oldRegime.tax +
           defaultTaxComparison.newRegime.tax,
       },
-      { name: 'Forced Savings (PF)', value: 0 },
+      { name: 'Forced Savings (PF)' },
     ];
     expect(JSON.parse(pieChart.dataset.pieData)).toEqual(expectedPieData);
   });

@@ -11,6 +11,7 @@ import {
   Tabs,
   Tab,
 } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 // Firestore
 import {
@@ -39,6 +40,7 @@ const AdminArticles = () => {
   const [loading, setLoading] = useState(true);
   const [tabValue, setTabValue] = useState(0);
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
 
   // Pagination states
   const [page, setPage] = useState(0);
@@ -58,6 +60,12 @@ const AdminArticles = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/admin/login');
+    }
+  }, [user, authLoading, navigate]);
 
   const fetchData = async () => {
     setLoading(true);
@@ -206,6 +214,7 @@ const AdminArticles = () => {
                   rowsPerPage={rowsPerPage}
                   confirmDelete={confirmDelete}
                   formatFullDate={formatFullDate}
+                  isAdmin={isAdmin}
                 />
               ) : (
                 <AdminCommentTable
@@ -215,6 +224,7 @@ const AdminArticles = () => {
                   handleApproveComment={handleApproveComment}
                   confirmDelete={confirmDelete}
                   formatFullDate={formatFullDate}
+                  isAdmin={isAdmin}
                 />
               )}
             </TableContainer>

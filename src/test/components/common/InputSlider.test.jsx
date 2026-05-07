@@ -35,21 +35,21 @@ describe('InputSlider Component', () => {
   it('renders the label and current value', () => {
     renderComponent();
     expect(screen.getByText('Test Slider')).toBeInTheDocument(); // Label is still text
-    expect(screen.getByRole('spinbutton')).toHaveValue('50'); // Input is spinbutton
+    expect(Number(screen.getByRole('textbox').value)).toBe(50);
   });
 
   it('renders with start adornment when adornmentPosition is "start"', () => {
     const { container } = renderComponent({ adornmentPosition: 'start', adornment: '₹' });
     // Check that the container has the adornment text
     expect(container).toHaveTextContent('₹');
-    expect(screen.getByRole('spinbutton')).toHaveValue('50');
+    expect(Number(screen.getByRole('textbox').value)).toBe(50);
   });
 
   it('renders with end adornment when adornmentPosition is "end"', () => {
     const { container } = renderComponent({ adornmentPosition: 'end', adornment: '%' });
     // Check that the container has the adornment text
     expect(container).toHaveTextContent('%');
-    expect(screen.getByRole('spinbutton')).toHaveValue('50');
+    expect(Number(screen.getByRole('textbox').value)).toBe(50);
   });
 
   it('calls onChange when the text input value changes', () => {
@@ -76,7 +76,7 @@ describe('InputSlider Component', () => {
   // --- Negative Scenarios / Edge Cases ---
   it('handles null/undefined value gracefully in text input', () => {
     renderComponent({ value: null }); // Pass null value
-    expect(screen.getByRole('spinbutton')).toHaveValue(''); // Expect empty string for null
+    expect(String(screen.getByRole('textbox').value)).toBe(''); // Expect empty string for null
   });
 
   it('handles non-numeric input in text field by passing NaN or empty string', () => {

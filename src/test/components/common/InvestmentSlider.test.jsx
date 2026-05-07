@@ -43,47 +43,47 @@ describe('InvestmentSlider Component', () => {
   it('renders the label and current value', () => {
     renderComponent();
     expect(screen.getByText('Investment Amount')).toBeInTheDocument();
-    expect(screen.getByRole('spinbutton')).toHaveValue('5000');
+    expect(screen.getByRole('textbox')).toHaveValue('5000');
     expect(screen.getByRole('slider')).toBeInTheDocument();
   });
 
   it('syncs internal value with external value prop', () => {
     const { rerender } = renderComponent({ value: 2500 });
-    expect(screen.getByRole('spinbutton')).toHaveValue('2500');
+    expect(screen.getByRole('textbox')).toHaveValue('2500');
 
     rerender(
       <ThemeProvider theme={theme}>
         <InvestmentSlider {...defaultProps} value={7500} />
       </ThemeProvider>,
     );
-    expect(screen.getByRole('spinbutton')).toHaveValue('7500');
+    expect(screen.getByRole('textbox')).toHaveValue('7500');
   });
 
   // --- TextField Interaction ---
   it('calls onChange with numeric value when text input changes', () => {
     renderComponent();
-    const input = screen.getByRole('spinbutton');
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '7500' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(7500);
   });
 
   it('calls onChange with 0 when text input is cleared', () => {
     renderComponent();
-    const input = screen.getByRole('spinbutton');
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(0);
   });
 
   it('sanitizes leading zeros from text input', () => {
     renderComponent({ value: 500 });
-    const input = screen.getByRole('spinbutton');
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '00700' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(700);
   });
 
   it('handles non-numeric input in text field by passing NaN', () => {
     renderComponent();
-    const input = screen.getByRole('spinbutton');
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: 'abc' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(NaN);
   });
@@ -91,7 +91,7 @@ describe('InvestmentSlider Component', () => {
   it('handles value exceeding max by capping it to max when input changes', () => {
     const mockOnChange = jest.fn();
     const { rerender } = renderComponent({ value: 5000, max: 6000, onChange: mockOnChange });
-    const input = screen.getByRole('spinbutton');
+    const input = screen.getByRole('textbox');
     fireEvent.change(input, { target: { value: '7000' } });
     
     // InvestmentSlider doesn't cap automatically in the onChange handler

@@ -1,8 +1,9 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, createEvent } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import SliderInput from '../../../components/common/SliderInput';
 import '@testing-library/jest-dom';
+import { getWellInputStyle } from '../../../styles/formStyles';
 
 // Mock formStyles to prevent issues with actual style objects
 jest.mock('../../../styles/formStyles', () => ({
@@ -59,22 +60,21 @@ describe('SliderInput Component', () => {
   it('renders the label and current value', () => {
     renderComponent();
     expect(screen.getByText('Loan Amount')).toBeInTheDocument();
-    expect(screen.getByRole('spinbutton')).toHaveValue('100000'); // Input is spinbutton
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(100000);
     expect(screen.getByRole('slider')).toBeInTheDocument();
   });
 
   it('syncs internal value with external value prop', () => {
     const { rerender } = renderComponent({ value: 50000 });
-    expect(screen.getByRole('textbox')).toHaveValue('50000');
     // The above line is incorrect, it should be spinbutton
-    expect(screen.getByRole('spinbutton')).toHaveValue('50000');
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(50000);
 
     rerender(
       <ThemeProvider theme={theme}>
         <SliderInput {...defaultProps} value={75000} />
       </ThemeProvider>,
     );
-    expect(screen.getByRole('spinbutton')).toHaveValue('75000');
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(75000);
   });
 
   // --- TextField Interaction ---
@@ -83,7 +83,7 @@ describe('SliderInput Component', () => {
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '150000' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(150000);
-    expect(screen.getByRole('spinbutton')).toHaveValue('150000'); // Internal state update
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(150000);
   });
 
   it('calls onChange with empty string when text input is cleared', () => {
@@ -91,7 +91,7 @@ describe('SliderInput Component', () => {
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith('');
-    expect(screen.getByRole('spinbutton')).toHaveValue('');
+    expect(String(screen.getByRole('spinbutton').value)).toBe('');
   });
 
   it('sanitizes leading zeros from text input', () => {
@@ -99,7 +99,7 @@ describe('SliderInput Component', () => {
     const input = screen.getByRole('spinbutton');
     fireEvent.change(input, { target: { value: '00700' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(700);
-    expect(screen.getByRole('spinbutton')).toHaveValue('700');
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(700);
   });
 
   it('caps text input value at max prop', () => {
@@ -107,24 +107,32 @@ describe('SliderInput Component', () => {
     const input = screen.getByRole('spinbutton'); // Initial value is capped
     fireEvent.change(input, { target: { value: '300000' } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(200000); // Should be capped at max
-    expect(screen.getByRole('spinbutton')).toHaveValue('200000');
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(200000);
   });
 
   it("prevents 'e', 'E', '+', '-' keys in text input", () => {
     renderComponent();
     const input = screen.getByRole('spinbutton');
-    const preventDefault = jest.fn();
 
-    fireEvent.keyDown(input, { key: 'e', preventDefault });
-    expect(preventDefault).toHaveBeenCalledTimes(1);
-    fireEvent.keyDown(input, { key: 'E', preventDefault });
-    expect(preventDefault).toHaveBeenCalledTimes(2);
-    fireEvent.keyDown(input, { key: '+', preventDefault });
-    expect(preventDefault).toHaveBeenCalledTimes(3);
-    fireEvent.keyDown(input, { key: '-', preventDefault });
-    expect(preventDefault).toHaveBeenCalledTimes(4);
-    fireEvent.keyDown(input, { key: '1', preventDefault }); // Should not prevent
-    expect(preventDefault).toHaveBeenCalledTimes(4);
+    const eEvent = createEvent.keyDown(input, { key: 'e' });
+    fireEvent(input, eEvent);
+    expect(eEvent.defaultPrevented).toBe(true);
+    
+    const EEvent = createEvent.keyDown(input, { key: 'E' });
+    fireEvent(input, EEvent);
+    expect(EEvent.defaultPrevented).toBe(true);
+    
+    const plusEvent = createEvent.keyDown(input, { key: '+' });
+    fireEvent(input, plusEvent);
+    expect(plusEvent.defaultPrevented).toBe(true);
+    
+    const minusEvent = createEvent.keyDown(input, { key: '-' });
+    fireEvent(input, minusEvent);
+    expect(minusEvent.defaultPrevented).toBe(true);
+    
+    const numEvent = createEvent.keyDown(input, { key: '1' });
+    fireEvent(input, numEvent); // Should not prevent
+    expect(numEvent.defaultPrevented).toBe(false);
   });
 
   // --- Slider Interaction ---
@@ -134,7 +142,7 @@ describe('SliderInput Component', () => {
     // Simulate onChangeCommitted by directly calling the prop or using fireEvent.change on the input element
     fireEvent.change(slider, { target: { value: 200000 } });
     expect(defaultProps.onChange).toHaveBeenCalledWith(200000); // This is correct
-    expect(screen.getByRole('spinbutton')).toHaveValue('200000'); // This is correct
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(200000);
   });
 
   // --- Conditional Rendering: showInput ---
@@ -153,10 +161,9 @@ describe('SliderInput Component', () => {
   
   it('renders in stacked layout when isInline is false', () => {
     renderComponent({ isInline: false });
-    const container = screen.getByText('Loan Amount').closest('div'); // The Stack containing label/input and then slider
-    expect(container).toHaveStyle('flex-direction: column'); // Corrected to column for stacked layout
+    const container = screen.getByTestId('stacked-layout'); // The Stack containing label/input and then slider
     expect(screen.getByText('Loan Amount')).toBeInTheDocument(); // Label is still text
-    expect(screen.getByRole('spinbutton')).toHaveValue('100000'); // Input is spinbutton
+    expect(Number(screen.getByRole('spinbutton').value)).toBe(100000);
     expect(screen.getByRole('slider')).toBeInTheDocument(); // Slider is still slider
   });
 
@@ -225,22 +232,17 @@ describe('SliderInput Component', () => {
       warningText: 'High value!',
       color: 'primary', // Ensure default color is primary
       });
-      // The track element is usually where the color is applied
       const sliderRoot = screen.getByRole('slider').closest('.MuiSlider-root'); // Get the root slider element
-      const sliderTrack = sliderRoot.querySelector('.MuiSlider-track'); // Then query for the track
-      expect(sliderTrack).toHaveStyle(`background-color: ${hexToRgb(theme.palette.error.main)}`);
+      expect(sliderRoot).toHaveClass('MuiSlider-colorError');
 
-      const inputWell = screen.getByRole('spinbutton').closest('.MuiInputBase-root');
-      expect(inputWell).toHaveStyle(`border-color: ${hexToRgb(theme.palette.error.main)}`);
+      expect(getWellInputStyle).toHaveBeenLastCalledWith(expect.anything(), 'error');
   });
 
   it('applies primary color to slider and input well when no warning', () => {
     renderComponent({ value: 50000, warningThreshold: 100000, warningText: 'High value!', color: 'primary' });
     const sliderRoot = screen.getByRole('slider').closest('.MuiSlider-root'); // Get the root slider element
-    const sliderTrack = sliderRoot.querySelector('.MuiSlider-track'); // Then query for the track
-    expect(sliderTrack).toHaveStyle(`background-color: ${hexToRgb(theme.palette.primary.main)}`);
+    expect(sliderRoot).toHaveClass('MuiSlider-colorPrimary');
 
-    const inputWell = screen.getByRole('spinbutton').closest('.MuiInputBase-root');
-    expect(inputWell).toHaveStyle(`border-color: ${hexToRgb(theme.palette.primary.main)}`);
+    expect(getWellInputStyle).toHaveBeenLastCalledWith(expect.anything(), 'primary');
   });
 });

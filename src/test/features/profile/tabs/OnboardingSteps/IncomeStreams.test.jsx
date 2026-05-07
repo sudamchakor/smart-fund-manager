@@ -4,16 +4,23 @@ import IncomeStreams from '../../../../../features/profile/tabs/OnboardingSteps/
 
 // Mock Redux hooks
 jest.mock('react-redux', () => ({
-  useSelector: jest.fn((selector) =>
-    selector({
-      profile: {
-        incomes: [],
-      },
-      emi: {
-        currency: '₹',
-      },
-    }),
-  ),
+  useSelector: jest.fn((selector) => {
+    try {
+      return selector({
+        profile: {
+          incomes: [], // Ensure this is an array
+          incomesList: [],
+          expenses: [],
+          goals: [],
+        },
+        emi: {
+          currency: '₹',
+        },
+      });
+    } catch (e) {
+      return undefined;
+    }
+  }),
   useDispatch: () => jest.fn(),
 }));
 
@@ -31,7 +38,17 @@ jest.mock(
 
 describe('IncomeStreams', () => {
   it('renders without crashing', () => {
-    render(<IncomeStreams onNext={() => {}} onBack={() => {}} />);
+    const mockIncome = { name: '', amount: '', type: 'monthly' };
+    const mockSetIncome = jest.fn();
+    render(
+      <IncomeStreams
+        onNext={() => {}}
+        onBack={() => {}}
+        income={mockIncome}
+        setIncome={mockSetIncome}
+        incomesList={[]} // Pass an empty array to prevent TypeError
+      />
+    );
     expect(
       screen.getByText(/What are your income streams?/i),
     ).toBeInTheDocument();
