@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  Typography,
-  Grid,
-  Divider,
-  Stack,
-  useTheme,
-  alpha,
-} from '@mui/material';
+import { Box, Typography, Grid, Divider, useTheme, alpha } from '@mui/material';
 import {
   Assignment as DetailsIcon,
   TrendingUp as IncrementIcon,

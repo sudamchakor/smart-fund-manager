@@ -11,6 +11,7 @@ import {
   Stack,
   Divider,
   Fade, // Import Fade component
+  Box,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -100,8 +101,14 @@ const LoginPage = () => {
             borderRadius: 3, // More rounded corners
             backgroundColor: 'background.paper', // Ensure it uses theme background
             boxShadow: 6, // Stronger shadow
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
           }}
         >
+          <Box sx={{ mb: 2 }}>
+             <img src={`${process.env.PUBLIC_URL}/android-chrome-192x192.png`} alt="SmartFund Manager Logo" width="60" height="60" style={{ borderRadius: '8px' }} />
+          </Box>
           <Typography
             variant="h4"
             component="h1"
@@ -120,7 +127,7 @@ const LoginPage = () => {
             Sign in to manage articles.
           </Typography>
           {/* Email/Password Login Form */}
-          <form onSubmit={handleEmailPasswordLogin}>
+          <form onSubmit={handleEmailPasswordLogin} style={{ width: '100%' }}>
             <Stack spacing={3}>
               <TextField
                 label="Email"
@@ -155,10 +162,10 @@ const LoginPage = () => {
               </Button>
             </Stack>
           </form>
-          <Divider sx={{ my: 3, borderColor: 'divider' }}>OR</Divider>{' '}
+          <Divider sx={{ my: 3, width: '100%', borderColor: 'divider' }}>OR</Divider>{' '}
           {/* Use theme divider color */}
           {/* Social Login Buttons */}
-          <Stack spacing={2}>
+          <Stack spacing={2} sx={{ width: '100%' }}>
             <Button
               variant="outlined"
               fullWidth

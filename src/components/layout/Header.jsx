@@ -19,6 +19,7 @@ import {
   Stack,
   Tooltip,
   useTheme,
+  alpha,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -37,7 +38,6 @@ import {
   ExpandLess,
   ExpandMore,
   Payments as PersonalLoanIcon,
-  Dashboard as DashboardIcon,
   Article as ArticleIcon,
 } from '@mui/icons-material';
 
@@ -123,12 +123,52 @@ const Header = () => {
     setProfileAnchorEl(null);
   };
 
-  // const handleLogout = () => { // No longer needed in public header
-  //   logout();
-  //   setProfileAnchorEl(null);
-  //   setDrawerOpen(false);
-  //   navigate('/');
-  // };
+  // Custom Menu PaperProps for styling
+  const menuPaperProps = {
+    elevation: 4,
+    sx: {
+      mt: 1,
+      borderRadius: 2,
+      bgcolor: 'background.paper',
+      border: '1px solid',
+      borderColor: 'divider',
+      overflow: 'hidden',
+      '& .MuiMenuItem-root': {
+        mx: 1,
+        mb: 0.5,
+        px: 2,
+        py: 1,
+        borderRadius: 1.5,
+        typography: 'body2',
+        fontWeight: 500,
+        color: 'text.primary',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+          bgcolor: alpha(theme.palette.primary.main, 0.08),
+          color: 'primary.main',
+          '& .MuiListItemIcon-root': {
+            color: 'primary.main',
+          },
+        },
+        '&.Mui-selected': {
+          bgcolor: alpha(theme.palette.primary.main, 0.12),
+          color: 'primary.main',
+          fontWeight: 600,
+          '& .MuiListItemIcon-root': {
+            color: 'primary.main',
+          },
+          '&:hover': {
+            bgcolor: alpha(theme.palette.primary.main, 0.16),
+          },
+        },
+      },
+      '& .MuiListItemIcon-root': {
+        minWidth: 36,
+        color: 'text.secondary',
+        transition: 'color 0.2s ease-in-out',
+      },
+    },
+  };
 
   return (
     <AppBar
@@ -173,7 +213,13 @@ const Header = () => {
                 color: 'primary.main',
               }}
             >
-              <DashboardIcon sx={{ fontSize: theme.spacing(3.5) }} />
+              <img
+                src={`${process.env.PUBLIC_URL}/android-chrome-192x192.png`}
+                alt="Logo"
+                width="28"
+                height="28"
+                style={{ borderRadius: '4px' }}
+              />
             </Box>
             <Typography
               variant="h6"
@@ -272,24 +318,20 @@ const Header = () => {
           onClose={() => setAnchorEl(null)}
           disableScrollLock
           PaperProps={{
-            elevation: 0,
-            sx: { mt: 1, minWidth: 220 },
+            ...menuPaperProps,
+            sx: { ...menuPaperProps.sx, minWidth: 260 },
           }}
+          transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
         >
           {CALCULATORS.map((calc) => (
             <MenuItem
               key={calc.path}
               onClick={() => handleNavigation(calc.path)}
               selected={location.pathname.startsWith(calc.path)}
-              sx={{ py: theme.spacing(1.5), gap: 2 }}
             >
-              <ListItemIcon sx={{ color: 'primary.main', minWidth: 'auto' }}>
-                {calc.icon}
-              </ListItemIcon>
-              <ListItemText
-                primary={calc.label}
-                primaryTypographyProps={{ fontWeight: 'bold' }}
-              />
+              <ListItemIcon>{calc.icon}</ListItemIcon>
+              <ListItemText primary={calc.label} />
             </MenuItem>
           ))}
         </Menu>
@@ -300,7 +342,12 @@ const Header = () => {
           open={Boolean(profileAnchorEl)}
           onClose={() => setProfileAnchorEl(null)}
           disableScrollLock
-          PaperProps={{ elevation: 0, sx: { mt: 1, minWidth: 240 } }}
+          PaperProps={{
+            ...menuPaperProps,
+            sx: { ...menuPaperProps.sx, minWidth: 260 },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
           <MenuItem onClick={() => handleNavigation('/profile?tab=personal')}>
             <ListItemIcon>
@@ -316,7 +363,13 @@ const Header = () => {
           </MenuItem>
           <MenuItem onClick={() => handleNavigation('/profile?tab=wealth')}>
             <ListItemIcon>
-              <DashboardIcon fontSize="small" />
+              <img
+                src={`${process.env.PUBLIC_URL}/android-chrome-192x192.png`}
+                alt="Logo"
+                width="20"
+                height="20"
+                style={{ borderRadius: '4px' }}
+              />
             </ListItemIcon>{' '}
             Wealth Dashboard
           </MenuItem>
@@ -344,9 +397,24 @@ const Header = () => {
           anchorEl={exportAnchorEl}
           open={Boolean(exportAnchorEl)}
           onClose={() => setExportAnchorEl(null)}
+          disableScrollLock
+          PaperProps={{
+            ...menuPaperProps,
+            sx: { ...menuPaperProps.sx, minWidth: 200 },
+          }}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
-          <MenuItem onClick={() => handleExport('pdf')}>Download PDF</MenuItem>
+          <MenuItem onClick={() => handleExport('pdf')}>
+            <ListItemIcon>
+              <ExportIcon fontSize="small" />
+            </ListItemIcon>{' '}
+            Download PDF
+          </MenuItem>
           <MenuItem onClick={() => handleExport('excel')}>
+            <ListItemIcon>
+              <ExportIcon fontSize="small" />
+            </ListItemIcon>{' '}
             Download Excel
           </MenuItem>
         </Menu>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Box,
@@ -23,6 +23,8 @@ import {
   Person as PersonIcon, // New Icon Import
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { getAuthentication, getDataBase } from '../../../firebaseConfig';
 
 // Component Imports
 import BasicInfoDisplay from '../components/BasicInfoDisplay';
@@ -49,6 +51,12 @@ import {
   selectIncomes,
   selectGeneralInflationRate,
   selectCareerGrowthRate,
+  setBasicInfo,
+  updateFinancialSettings,
+  setTotalDebt,
+  updateIncome,
+  updateExpense,
+  updateGoal,
 } from '../../../store/profileSlice';
 import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator';
 import { investmentCategories } from '../../../utils/taxRules';
@@ -57,6 +65,8 @@ export default function PersonalProfileTab({ onEditGoal }) {
   const dispatch = useDispatch();
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
+  const auth = getAuthentication();
+  const db = getDataBase();
 
   const [speedDialOpen, setSpeedDialOpen] = useState(false);
   const [editingBasicInfo, setEditingBasicInfo] = useState(false);
@@ -92,6 +102,42 @@ export default function PersonalProfileTab({ onEditGoal }) {
   );
   const goalsWithFunding = useSelector(selectPrioritizedGoalFunding) || [];
   const goals = useSelector(selectGoals) || [];
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      // REMOVED `process.env.NODE_ENV === 'production' &&` FOR LOCAL TESTING
+      const userDocRef = doc(db, 'users', auth.currentUser.uid);
+
+      const unsubscribe = onSnapshot(
+        userDocRef,
+        { includeMetadataChanges: true },
+        (doc) => {
+          if (doc.exists()) {
+            const source = doc.metadata.hasPendingWrites ? 'Local' : 'Server';
+            console.log(`Data came from ${source}`);
+            const data = doc.data();
+            // Assuming the data structure in Firestore matches the Redux state
+            dispatch(setBasicInfo(data.basicInfo));
+            dispatch(updateFinancialSettings(data.financialSettings));
+            dispatch(setTotalDebt(data.totalDebt));
+            // You might need more specific actions for array updates
+            // to avoid replacing the whole array and causing unnecessary re-renders.
+            // For simplicity, this example dispatches actions for each part of the state.
+            if (data.incomes)
+              data.incomes.forEach((income) => dispatch(updateIncome(income)));
+            if (data.expenses)
+              data.expenses.forEach((expense) =>
+                dispatch(updateExpense(expense)),
+              );
+            if (data.goals)
+              data.goals.forEach((goal) => dispatch(updateGoal(goal)));
+          }
+        },
+      );
+
+      return () => unsubscribe();
+    }
+  }, [auth.currentUser, db, dispatch]);
 
   // Chart Data Calculation
   const needsValue = expenses

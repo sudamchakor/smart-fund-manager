@@ -20,7 +20,6 @@ import {
   Payments as PaymentsIcon,
   Description as DescriptionIcon,
   ChevronRight as ChevronRightIcon,
-  Dashboard as DashboardIcon,
 } from '@mui/icons-material';
 
 const OnboardingModal = lazy(
@@ -35,42 +34,48 @@ const moduleBootUp = keyframes`
 const systemModules = [
   {
     title: 'Wealth Dashboard',
-    description: 'Track financial health, monitor net worth, and set clear goals for a secure future.',
+    description:
+      'Track financial health, monitor net worth, and set clear goals for a secure future.',
     icon: <AccountBalanceWalletIcon sx={{ fontSize: 32, color: '#3f51b5' }} />,
     path: '/profile',
     colorHex: '#3f51b5', // Indigo
   },
   {
     title: 'Home Loan EMI',
-    description: 'View amortization schedule, home loan interest, and plan prepayment savings easily.',
+    description:
+      'View amortization schedule, home loan interest, and plan prepayment savings easily.',
     icon: <MapsHomeWorkIcon sx={{ fontSize: 32, color: '#00796B' }} />,
     path: '/calculator',
     colorHex: '#00796B', // Teal
   },
   {
     title: 'Credit Card EMI',
-    description: 'Compare interest rates, avoid hidden costs, and accelerate your debt reduction.',
+    description:
+      'Compare interest rates, avoid hidden costs, and accelerate your debt reduction.',
     icon: <CreditCardIcon sx={{ fontSize: 32, color: '#7B1FA2' }} />,
     path: '/credit-card-emi',
     colorHex: '#7B1FA2', // Purple
   },
   {
     title: 'SIP & Investment',
-    description: 'Project mutual fund returns, harness compound interest, and drive wealth growth.',
+    description:
+      'Project mutual fund returns, harness compound interest, and drive wealth growth.',
     icon: <AutoGraphIcon sx={{ fontSize: 32, color: '#2E7D32' }} />,
     path: '/investment/sip',
     colorHex: '#2E7D32', // Green
   },
   {
     title: 'Personal Loan',
-    description: 'Check instant loan EMI options and generate a detailed repayment schedule instantly.',
+    description:
+      'Check instant loan EMI options and generate a detailed repayment schedule instantly.',
     icon: <PaymentsIcon sx={{ fontSize: 32, color: '#F57C00' }} />,
     path: '/personal-loan',
     colorHex: '#F57C00', // Amber
   },
   {
     title: 'Income Tax Planner',
-    description: 'Compare Old vs New tax regime, explore Section 80C, and get tax saving tips for 2026.',
+    description:
+      'Compare Old vs New tax regime, explore Section 80C, and get tax saving tips for 2026.',
     icon: <DescriptionIcon sx={{ fontSize: 32, color: '#455A64' }} />,
     path: '/tax-calculator',
     colorHex: '#455A64', // Slate
@@ -94,7 +99,9 @@ export default function Home() {
   return (
     <Container maxWidth="lg" sx={{ mt: { xs: 4, md: 8 }, mb: 8 }}>
       <Helmet>
-        <title>SmartFund Manager - Free EMI Calculator, Tax Planner & SIP Projector</title>
+        <title>
+          SmartFund Manager - Free EMI Calculator, Tax Planner & SIP Projector
+        </title>
         <meta
           name="description"
           content="Free financial tools to easily calculate Home Loan EMIs, compare New vs Old income tax regimes, and project your SIP investment growth."
@@ -112,9 +119,19 @@ export default function Home() {
             color: 'primary.main',
           }}
         >
-          <DashboardIcon sx={{ fontSize: 40 }} />
+          <img
+            src={`${process.env.PUBLIC_URL}/android-chrome-192x192.png`}
+            alt="SmartFund Manager Logo"
+            width="60"
+            height="60"
+            style={{ borderRadius: '8px' }}
+          />
         </Box>
-        <Typography variant="h3" component="h1" sx={{ fontWeight: 900, mb: 1.5 }}>
+        <Typography
+          variant="h3"
+          component="h1"
+          sx={{ fontWeight: 900, mb: 1.5 }}
+        >
           SmartFund{' '}
           <Box component="span" sx={{ color: 'primary.main' }}>
             Manager
@@ -124,7 +141,8 @@ export default function Home() {
           variant="h6"
           sx={{ color: 'text.secondary', maxWidth: 600, mx: 'auto' }}
         >
-          Free financial tools in India to calculate EMIs, plan SIPs, and optimize taxes.
+          Free financial tools in India to calculate EMIs, plan SIPs, and
+          optimize taxes.
         </Typography>
       </Box>
 

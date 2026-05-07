@@ -20,6 +20,9 @@ import Footer from './components/layout/Footer';
 import SuspenseFallback from './components/common/SuspenseFallback';
 import ErrorBoundary from './components/common/ErrorBoundary';
 
+// Lazy load UpdatePrompt
+const UpdatePrompt = lazy(() => import('./components/common/UpdatePrompt'));
+
 // Lazy Loaded Pages
 const Home = lazy(() => import('./pages/Home'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
@@ -85,6 +88,9 @@ const AppContent = () => {
   return (
     <ThemeResolver>
       <CssBaseline />
+      <Suspense fallback={null}>
+        <UpdatePrompt />
+      </Suspense>
       <Box
         sx={{
           display: 'flex',
