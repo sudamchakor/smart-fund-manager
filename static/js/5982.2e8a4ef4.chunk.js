@@ -1,0 +1,2 @@
+"use strict";(globalThis.webpackChunksmart_fund_manager=globalThis.webpackChunksmart_fund_manager||[]).push([[5982],{45982(e,s,a){a.r(s),a.d(s,{default:()=>d});var l=a(65043),n=a(96446),r=a(55376),h=a(58927),u=a(70579);const c=(0,l.lazy)(()=>Promise.all([a.e(9285),a.e(5146),a.e(8903),a.e(3010),a.e(5270),a.e(1332)]).then(a.bind(a,91332))),d=()=>(0,u.jsxs)(n.A,{children:[(0,u.jsx)(r.Ay,{}),(0,u.jsx)(l.Suspense,{fallback:(0,u.jsx)(h.A,{}),children:(0,u.jsx)(c,{})})]})}}]);
+//# sourceMappingURL=5982.2e8a4ef4.chunk.js.map
