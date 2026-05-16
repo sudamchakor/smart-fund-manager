@@ -387,7 +387,7 @@ export default function FinancialSection({
                     p: 2,
                     height: '100%',
                     background: (theme) =>
-                      `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
+                      `linear-gradient(135deg, ${theme.palette.error.main} 0%, ${theme.palette.error.dark} 100%)`,
                     color: 'white',
                     borderRight: '1px solid rgba(255,255,255,0.2)',
                     display: 'flex',

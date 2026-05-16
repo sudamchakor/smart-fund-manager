@@ -83,7 +83,7 @@ const Header = () => {
   const currentCalc = useMemo(
     () =>
       CALCULATORS.find((c) => location.pathname.startsWith(c.path)) ||
-      CALCULATORS[0],
+      { label: 'Select Calculator', path: '' }, // Placeholder for no selection
     [location.pathname],
   );
 

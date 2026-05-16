@@ -2,7 +2,7 @@ import React, {
   useState,
   useMemo,
   forwardRef,
-  useImperativeHandle,
+  useEffect, // Added useEffect for prop updates
 } from 'react';
 import { useSelector } from 'react-redux';
 import {
@@ -24,15 +24,33 @@ import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator'
 import { selectExpectedReturnRate } from '../../../store/profileSlice';
 import { selectCurrency } from '../../../store/emiSlice';
 import { formatCurrency as utilFormatCurrency } from '../../../utils/formatting';
-import SectionHeader from '../../../components/common/SectionHeader';
+import SectionHeader from '../../../components/common/SectionHeader'; // Re-added SectionHeader import
 
-const DebtAccelerator = forwardRef((props, ref) => {
+const DebtAccelerator = forwardRef(({
+  initialOutstandingPrincipal = 2500000,
+  initialInterestRateAnnual = 8.5,
+  initialRemainingTenureMonths = 240,
+  extraPayment, // Controlled prop for slider value
+  setExtraPayment, // Controlled prop for slider setter
+}, ref) => {
   const theme = useTheme();
   const calculatedValues = useSelector(selectCalculatedValues);
   const expectedReturnRate = useSelector(selectExpectedReturnRate);
   const currency = useSelector(selectCurrency);
 
-  const [extraPayment, setExtraPayment] = useState(10000);
+  // Internal state for loan details, updated from props
+  const [outstandingPrincipal, setOutstandingPrincipal] = useState(initialOutstandingPrincipal);
+  const [interestRateAnnual, setInterestRateAnnual] = useState(initialInterestRateAnnual);
+  const [remainingTenureMonths, setRemainingTenureMonths] = useState(initialRemainingTenureMonths);
+  const [marketReturnRateAnnual, setMarketReturnRateAnnual] = useState(12.0); // Default market return
+
+  // Update internal state if initial props change (e.g., from main calculator)
+  useEffect(() => {
+    setOutstandingPrincipal(initialOutstandingPrincipal);
+    setInterestRateAnnual(initialInterestRateAnnual);
+    setRemainingTenureMonths(initialRemainingTenureMonths);
+  }, [initialOutstandingPrincipal, initialInterestRateAnnual, initialRemainingTenureMonths]);
+
 
   const baseEmi = calculatedValues.emi || 0;
   const loanAmount = calculatedValues.loanAmount || 0;
@@ -99,6 +117,9 @@ const DebtAccelerator = forwardRef((props, ref) => {
     baseEmi,
     monthlyInterestRate,
     expectedReturnRate,
+    outstandingPrincipal, // Added to dependencies
+    interestRateAnnual, // Added to dependencies
+    remainingTenureMonths, // Added to dependencies
   ]);
 
   const verdictData = useMemo(() => {
@@ -112,15 +133,14 @@ const DebtAccelerator = forwardRef((props, ref) => {
         ? theme.palette.success
         : theme.palette.info,
     };
-  }, [impactData, theme]);
+  }, [impactData, theme, currency]);
 
-  useImperativeHandle(ref, () => ({
-    getVerdict: () => verdictData.text,
+  React.useImperativeHandle(ref, () => ({
+    getCurrentExtraPayment: () => extraPayment,
   }));
 
-  if (loanAmount <= 0) {
-    return null;
-  }
+  // The loanAmount check is now handled by the modal trigger's visibility logic
+  // if (loanAmount <= 0) { return null; }
 
   return (
     <Box

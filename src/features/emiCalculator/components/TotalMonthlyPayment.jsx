@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Stack, alpha, useTheme, Divider } from '@mui/material'; // Import Divider
 import { useSelector } from 'react-redux';
 import { selectCalculatedValues } from '../utils/emiCalculator';
 import { selectCurrency, selectExpenses } from '../../../store/emiSlice';
@@ -58,7 +58,8 @@ const TotalOutflowRow = ({ label, value }) => {
   );
 };
 
-const TotalMonthlyPayment = () => {
+// Add onOpenAccelerator prop
+const TotalMonthlyPayment = ({ onOpenAccelerator }) => {
   const theme = useTheme();
   const calculatedValues = useSelector(selectCalculatedValues);
   const currency = useSelector(selectCurrency);
@@ -137,6 +138,50 @@ const TotalMonthlyPayment = () => {
         label="Total Monthly Outflow"
         value={formatCurrency(totalMonthlyPayment, currency)}
       />
+
+      {/* Interactive Divider and Optimization Row */}
+      <Divider sx={{ my: 2, mx: 2, borderColor: alpha(theme.palette.divider, 0.1) }} /> {/* Styled Divider */}
+
+      <Box
+        onClick={onOpenAccelerator} // Action: open the modal
+        sx={{
+          px: 2,
+          py: 1.5,
+          mt: 1,
+          borderRadius: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          cursor: 'pointer',
+          '&:hover': {
+            bgcolor: alpha(theme.palette.common.white, 0.05), // Subtle hover effect
+          },
+        }}
+      >
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'text.secondary',
+            whiteSpace: 'nowrap',
+            mr: 1, // Margin right for spacing
+          }}
+        >
+          Got an extra {formatCurrency(2000, currency)} - {formatCurrency(5000, currency)} / month?
+        </Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'primary.main', // Accent color
+            fontWeight: 700,
+            whiteSpace: 'nowrap',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+          }}
+        >
+          Test Accelerator <span role="img" aria-label="rocket">🚀</span>
+        </Typography>
+      </Box>
     </Box>
   );
 };

@@ -14,7 +14,7 @@ import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator'
 import CashFlowDonutChart from '../components/CashFlowDonutChart';
 import WealthProjectionEngine from '../components/WealthProjectionEngine';
 import GoalCoverage from '../components/GoalCoverage';
-import DebtAccelerator from '../components/DebtAccelerator';
+// Removed: import DebtAccelerator from '../components/DebtAccelerator';
 import CorrectionEngine from '../components/CorrectionEngine';
 import AutoBalancer from '../components/AutoBalancer';
 import AssetAllocationChart from '../components/AssetAllocationChart';
@@ -46,26 +46,26 @@ export default function WealthTab() {
 
   // Component Refs for Export/Printing
   const engineRef = useRef(null);
-  const acceleratorRef = useRef(null);
+  // Removed: const acceleratorRef = useRef(null);
   const allocationChartRef = useRef(null);
   const goalCoverageRef = useRef(null);
 
   useEffect(() => {
     window.__wealthEngineRef = engineRef;
-    window.__debtAcceleratorRef = acceleratorRef;
+    // Removed: window.__debtAcceleratorRef = acceleratorRef;
     window.__allocationChartRef = allocationChartRef;
     window.__goalCoverageRef = goalCoverageRef;
 
     return () => {
       window.__wealthEngineRef = null;
-      window.__debtAcceleratorRef = null;
+      // Removed: window.__debtAcceleratorRef = null;
       window.__allocationChartRef = null;
       window.__goalCoverageRef = null;
     };
   }, []);
 
   return (
-    <Box sx={{ width: '100%', overflowX: 'hidden' }}>
+    <Box sx={{ width: '100%', overflow: 'hidden' }}> {/* Changed overflowX to overflow */}
       {/* Stack completely ignores null components, eliminating dead space */}
       <Stack spacing={2.5}>
         {/* 1. Background Logic Engines */}
@@ -91,7 +91,7 @@ export default function WealthTab() {
         </Grid>
 
         {/* 4. Actionable Optimization Tools */}
-        <DebtAccelerator ref={acceleratorRef} />
+        {/* Removed: <DebtAccelerator ref={acceleratorRef} /> */}
       </Stack>
     </Box>
   );

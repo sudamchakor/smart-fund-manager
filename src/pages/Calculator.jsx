@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // Import useState
 import {
   Grid,
   Box,
@@ -15,15 +15,17 @@ import {
   TableChart as TableIcon,
   BarChart as BarIcon,
 } from '@mui/icons-material';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux'; // Import useDispatch
 import { selectCalculatedValues } from '../features/emiCalculator/utils/emiCalculator';
+import { setPrepaymentAmount } from '../features/emiCalculator/utils/emiCalculatorActions'; // Corrected import path
 
 import HomeLoanForm from '../features/emiCalculator/components/HomeLoanForm';
 import PrepaymentsForm from '../features/emiCalculator/components/PrepaymentsForm';
 import PaymentScheduleTable from '../features/emiCalculator/components/PaymentScheduleTable';
-import TotalMonthlyPayment from '../features/emiCalculator/components/TotalMonthlyPayment';
+import TotalMonthlyPayment from '../features/emiCalculator/components/TotalMonthlyPayment'; // Import TotalMonthlyPayment
 import PieChartComponent from '../components/charts/PieChartComponent';
 import BarChartComponent from '../components/charts/BarChartComponent';
+import DebtAcceleratorModalTrigger from '../features/emiCalculator/components/DebtAcceleratorModalTrigger'; // Import the modal trigger
 
 const SectionHeader = ({ icon, title, color }) => (
   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
@@ -66,11 +68,37 @@ const StyledPaper = ({ children, sx = {} }) => {
 
 const Calculator = () => {
   const theme = useTheme();
-  const calculatedValues = useSelector(selectCalculatedValues);
-  const schedule = calculatedValues.schedule || [];
+  const dispatch = useDispatch();
+  const {
+    schedule,
+    principal,
+    interestRate,
+    tenure,
+    prepaymentAmount, // Assuming this is available from Redux state
+    loanAmount, // Get loanAmount to control modal trigger visibility
+  } = useSelector(selectCalculatedValues);
   const startMonthYear = schedule.length > 0 ? schedule[0].date : '';
   const endMonthYear =
     schedule.length > 0 ? schedule[schedule.length - 1].date : '';
+
+  // State to control the Debt Accelerator modal visibility
+  const [openDebtAccelerator, setOpenDebtAccelerator] = useState(false);
+
+  const handleOpenDebtAccelerator = () => {
+    if (loanAmount > 0) { // Only allow opening if there's a valid loan amount
+      setOpenDebtAccelerator(true);
+    }
+  };
+
+  const handleCloseDebtAccelerator = () => {
+    setOpenDebtAccelerator(false);
+  };
+
+  // Callback function to update the prepayment amount in Redux
+  const handleApplyPrepayment = (newPrepaymentValue) => {
+    dispatch(setPrepaymentAmount(newPrepaymentValue));
+    // You might want to trigger a recalculation of the EMI schedule here
+  };
 
   return (
     <Box
@@ -132,7 +160,9 @@ const Calculator = () => {
                 icon={<TableIcon />}
                 color={theme.palette.secondary.main}
               />
-              <TotalMonthlyPayment />
+              <TotalMonthlyPayment
+                onOpenAccelerator={handleOpenDebtAccelerator} // Pass the handler here
+              />
             </StyledPaper>
           </Grid>
 
@@ -163,6 +193,14 @@ const Calculator = () => {
           </Grid>
         </Grid>
       </Container>
+
+      {/* Render the DebtAcceleratorModalTrigger here, controlled by state */}
+      <DebtAcceleratorModalTrigger
+        open={openDebtAccelerator}
+        onClose={handleCloseDebtAccelerator}
+        initialPrepaymentAmount={prepaymentAmount || 0} // Pass current prepayment or default
+        onApplyPrepayment={handleApplyPrepayment}
+      />
     </Box>
   );
 };
