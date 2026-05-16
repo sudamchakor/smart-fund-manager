@@ -192,7 +192,7 @@ export const AmountWithUnitInput = ({
   );
 };
 
-export const DatePickerInput = ({ label, value, onChange }) => {
+export const DatePickerInput = ({ label, value, onChange, views = ['year', 'month'], openTo, minDate, maxDate }) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const dayjsValue = value
@@ -217,13 +217,15 @@ export const DatePickerInput = ({ label, value, onChange }) => {
         </Typography>
       )}
       <DatePicker
-        views={['year', 'month']}
-        openTo="month"
+        views={views}
+        openTo={openTo || views[views.length - 1]}
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         value={dayjsValue}
         onChange={handleChange}
+        minDate={minDate}
+        maxDate={maxDate}
         slotProps={{
           textField: {
             variant: 'standard',

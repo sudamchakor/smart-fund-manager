@@ -320,13 +320,30 @@ export const selectTotalMonthlyIncome = createSelector(
       ) {
         return total;
       }
-      let monthlyAmount = income.amount || 0;
-      if (income.frequency === 'quarterly') {
-        monthlyAmount /= 3;
-      } else if (income.frequency === 'yearly') {
-        monthlyAmount /= 12;
+      if (income.frequency === 'monthly') {
+        return total + (income.amount || 0);
       }
-      return total + monthlyAmount;
+      return total;
+    }, 0);
+  },
+);
+
+export const selectTotalYearlyIncome = createSelector(
+  [selectIncomes],
+  (incomes) => {
+    const currentYear = new Date().getFullYear();
+    return incomes.reduce((total, income) => {
+      if (
+        (typeof income.startYear === 'number' &&
+          currentYear < income.startYear) ||
+        (typeof income.endYear === 'number' && currentYear > income.endYear)
+      ) {
+        return total;
+      }
+      if (income.frequency === 'yearly' || income.frequency === 'one-time') {
+        return total + (income.amount || 0);
+      }
+      return total;
     }, 0);
   },
 );
@@ -335,13 +352,21 @@ export const selectTotalMonthlyExpenses = createSelector(
   [selectProfileExpenses],
   (expenses) =>
     expenses.reduce((total, expense) => {
-      let monthlyAmount = expense.amount || 0;
-      if (expense.frequency === 'quarterly') {
-        monthlyAmount /= 3;
-      } else if (expense.frequency === 'yearly') {
-        monthlyAmount /= 12;
+      if (expense.frequency === 'monthly') {
+        return total + (expense.amount || 0);
       }
-      return total + monthlyAmount;
+      return total;
+    }, 0),
+);
+
+export const selectTotalYearlyExpenses = createSelector(
+  [selectProfileExpenses],
+  (expenses) =>
+    expenses.reduce((total, expense) => {
+      if (expense.frequency === 'yearly') {
+        return total + (expense.amount || 0);
+      }
+      return total;
     }, 0),
 );
 
@@ -369,8 +394,11 @@ export const selectIndividualGoalInvestmentContributions = createSelector(
             frequency: 'monthly',
             goalId: goal.id,
             goalTargetYear: goal.targetYear,
-            startYear: plan.startYear || currentYear,
+            startYear:
+              (plan.startYear || goal.startYear || currentYear) +
+              (plan.startDelay || 0),
             endYear: plan.endYear || goal.targetYear,
+            isFunded: false,
           });
         } else if (
           (plan.type === 'lumpsum' || plan.type === 'fd') &&
@@ -384,12 +412,17 @@ export const selectIndividualGoalInvestmentContributions = createSelector(
             amount: plan.investedAmount,
             type: 'one-time-yearly',
             category: 'investment',
-            frequency: 'yearly',
+            frequency: 'one-time',
             goalId: goal.id,
-            year: plan.startYear || currentYear,
+            year:
+              (plan.startYear || goal.startYear || currentYear) +
+              (plan.startDelay || 0),
             goalTargetYear: goal.targetYear,
-            startYear: plan.startYear || currentYear,
+            startYear:
+              (plan.startYear || goal.startYear || currentYear) +
+              (plan.startDelay || 0),
             endYear: plan.endYear || goal.targetYear,
+            isFunded: Boolean(plan.isFunded),
           });
         }
       });
@@ -402,14 +435,44 @@ export const selectTotalMonthlyGoalContributions = createSelector(
   [selectIndividualGoalInvestmentContributions],
   (contributions) =>
     contributions.reduce((total, contribution) => {
-      let monthlyAmount = contribution.amount || 0;
-      if (contribution.frequency === 'yearly') {
-        monthlyAmount /= 12;
-      } else if (contribution.frequency === 'quarterly') {
-        monthlyAmount /= 3;
+      if (contribution.isFunded) return total;
+      if (contribution.frequency === 'monthly') {
+        return total + (contribution.amount || 0);
       }
-      return total + monthlyAmount;
+      return total;
     }, 0),
+);
+
+export const selectTotalYearlyGoalContributions = createSelector(
+  [selectIndividualGoalInvestmentContributions],
+  (contributions) =>
+    contributions.reduce((total, contribution) => {
+      if (contribution.isFunded) return total;
+      if (contribution.frequency === 'yearly') {
+        return total + (contribution.amount || 0);
+      }
+      return total;
+    }, 0),
+);
+
+export const selectTotalOneTimeInvestments = createSelector(
+  [selectIndividualGoalInvestmentContributions, selectProfileExpenses],
+  (contributions, expenses) => {
+    const contributionTotal = contributions.reduce((total, contribution) => {
+      if (contribution.isFunded) return total;
+      if (contribution.frequency === 'one-time') {
+        return total + (contribution.amount || 0);
+      }
+      return total;
+    }, 0);
+    const expenseTotal = expenses.reduce((total, expense) => {
+      if (expense.frequency === 'one-time') {
+        return total + (expense.amount || 0);
+      }
+      return total;
+    }, 0);
+    return contributionTotal + expenseTotal;
+  }
 );
 
 export const selectGoalsWithMonthlyContributions = createSelector(
@@ -444,6 +507,18 @@ export const selectTotalOutflow = createSelector(
 export const selectIsTotalOutflowExceedingIncome = createSelector(
   [selectTotalMonthlyIncome, selectTotalOutflow],
   (totalIncome, totalOutflow) => totalOutflow > totalIncome,
+);
+
+export const selectAnnualGoalRunway = createSelector(
+  [
+    selectCurrentSurplus,
+    selectTotalYearlyExpenses,
+    selectTotalYearlyGoalContributions,
+  ],
+  (currentSurplus, yearlyExpenses, yearlyGoals) => {
+    const rawAnnualBalance = (currentSurplus * 12) - yearlyExpenses - yearlyGoals;
+    return Math.max(0, rawAnnualBalance);
+  }
 );
 
 export const selectDebtFreeCountdown = createSelector(
@@ -615,7 +690,23 @@ export const selectWealthProjection = createSelector(
         return total + annualAmount;
       }, 0);
 
-      const annualGoalInvestment = goalInvestments.reduce((total, inv) => {
+      const annualGoalInvestmentFromSurplus = goalInvestments.reduce((total, inv) => {
+        if (inv.isFunded) return total;
+        if (
+          inv.frequency === 'monthly' &&
+          year >= inv.startYear &&
+          year < inv.endYear
+        ) {
+          return total + inv.amount * 12;
+        }
+        if (inv.frequency === 'yearly' && year === inv.year) {
+          return total + inv.amount;
+        }
+        return total;
+      }, 0);
+
+      const annualGoalInvestmentFunded = goalInvestments.reduce((total, inv) => {
+        if (!inv.isFunded) return total;
         if (
           inv.frequency === 'monthly' &&
           year >= inv.startYear &&
@@ -630,7 +721,7 @@ export const selectWealthProjection = createSelector(
       }, 0);
 
       const currentSurplus =
-        currentAnnualIncome - currentAnnualExpenses - annualGoalInvestment;
+        currentAnnualIncome - currentAnnualExpenses - annualGoalInvestmentFromSurplus;
 
       if (isFirstYear) {
         committedSurplusInvestment = currentSurplus > 0 ? currentSurplus : 0;
@@ -639,7 +730,7 @@ export const selectWealthProjection = createSelector(
       }
 
       const annualInvestment =
-        annualGoalInvestment + committedSurplusInvestment;
+        annualGoalInvestmentFromSurplus + annualGoalInvestmentFunded + committedSurplusInvestment;
 
       totalWealth *= 1 + (expectedReturnRate || 0);
       totalWealth += annualInvestment;

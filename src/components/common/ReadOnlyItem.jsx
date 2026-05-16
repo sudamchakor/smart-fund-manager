@@ -95,6 +95,19 @@ export default function ReadOnlyItem({
     isExpense && item.isTaxDeductible && taxRate ? item.amount * taxRate : 0;
   const netCost = isExpense && taxSaved > 0 ? item.amount - taxSaved : null;
 
+  const getFrequencyChipColor = (frequency) => {
+    switch (frequency) {
+      case 'monthly':
+        return 'primary';
+      case 'yearly':
+        return 'warning';
+      case 'one-time':
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <Box
       sx={{
@@ -129,7 +142,21 @@ export default function ReadOnlyItem({
           </Typography>
         </Box>
         <Stack direction="row" alignItems="center" spacing={0.5}>
-          {isExpense && totalIncome > 0 && (
+          {item.frequency && (
+            <Chip
+              label={item.frequency}
+              size="small"
+              variant="outlined"
+              color={getFrequencyChipColor(item.frequency)}
+              sx={{
+                fontWeight: 600,
+                fontSize: '0.65rem',
+                textTransform: 'capitalize',
+                mr: 0.5
+              }}
+            />
+          )}
+          {isExpense && totalIncome > 0 && item.frequency === 'monthly' && (
             <Chip
               label={`${((item.amount / totalIncome) * 100).toFixed(1)}%`}
               size="small"

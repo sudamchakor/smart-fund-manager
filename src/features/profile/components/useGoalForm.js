@@ -166,9 +166,10 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
             if (field === 'type') {
               const currentTargetAmount = prevGoal.targetAmount || 0;
               const currentStartYear = prevGoal.startYear || currentYear; // Use prevGoal.startYear
-              const currentTimePeriod = prevGoal.targetYear
+              const baseTimePeriod = prevGoal.targetYear
                 ? prevGoal.targetYear - currentStartYear
                 : 10;
+              const currentTimePeriod = Math.max(1, baseTimePeriod - (plan.startDelay || 0));
 
               // Calculate total future value of OTHER plans
               const otherPlans = prevGoal.investmentPlans.filter(
@@ -189,7 +190,12 @@ const useGoalForm = (initialGoal, currentYear, onSave) => {
                 currentStartYear, // Pass currentStartYear
                 prevGoal,
               );
-              tempUpdatedPlan = { ...newDefaultPlan, id: plan.id }; // Keep original ID
+              tempUpdatedPlan = { ...newDefaultPlan, id: plan.id, startDelay: plan.startDelay || 0 }; // Keep original ID and delay
+            } else if (field === 'startDelay') {
+              tempUpdatedPlan = { ...plan, [field]: value };
+              const currentStartYear = prevGoal.startYear || currentYear;
+              const baseTimePeriod = prevGoal.targetYear ? prevGoal.targetYear - currentStartYear : 10;
+              tempUpdatedPlan.timePeriod = Math.max(1, baseTimePeriod - (value || 0));
             } else {
               tempUpdatedPlan = { ...plan, [field]: value };
             }

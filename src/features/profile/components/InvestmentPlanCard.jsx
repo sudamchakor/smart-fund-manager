@@ -11,14 +11,20 @@ import {
   useTheme,
   Stack,
   Divider,
+  FormControlLabel,
+  Switch,
+  Chip,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from 'dayjs';
 import SipCalculatorForm from '../../investment/tabs/SipCalculatorForm';
 import LumpsumCalculatorForm from '../../investment/tabs/LumpsumCalculatorForm';
 import StepUpSipCalculatorForm from '../../investment/tabs/StepUpSipCalculatorForm';
 import SwpCalculatorForm from '../../investment/tabs/SwpCalculatorForm';
 import FdCalculatorForm from '../../investment/tabs/FdCalculatorForm';
 import { labelStyle, getWellInputStyle } from '../../../styles/formStyles';
+import InvestmentSlider from '../../../components/common/InvestmentSlider';
+import { DatePickerInput } from '../../../components/common/CommonComponents';
 
 const DataPoint = ({ label, value, color }) => (
   <Stack
@@ -50,10 +56,10 @@ const DataPoint = ({ label, value, color }) => (
 
 const InvestmentPlanCard = ({
   plan,
+  goal,
   handlePlanChange,
   handleRemovePlan,
   formatAmount,
-  targetAmount,
 }) => {
   const theme = useTheme();
 
@@ -123,6 +129,13 @@ const InvestmentPlanCard = ({
     ],
   );
 
+  const currentYear = new Date().getFullYear();
+  const goalStartYear = goal.startYear || currentYear;
+  const maxYear = Math.max(goalStartYear, (goal.targetYear || 0) - 1);
+  const currentStartYear = goalStartYear + (plan.startDelay || 0);
+
+  const isOneTimePlan = plan.type === 'lumpsum' || plan.type === 'fd';
+
   return (
     <Box
       sx={{
@@ -175,20 +188,43 @@ const InvestmentPlanCard = ({
           </FormControl>
         </Box>
 
-        <IconButton
-          size="small"
-          onClick={() => handleRemovePlan(plan.id)}
-          sx={{
-            color: theme.palette.error.main,
-            bgcolor: alpha(theme.palette.error.main, 0.05),
-            '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1) },
-          }}
-        >
-          <DeleteIcon fontSize="small" />
-        </IconButton>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ xs: 'flex-end', sm: 'center' }}>
+          {isOneTimePlan && plan.isFunded && (
+            <Chip 
+              label="Funded / Sunk Asset" 
+              color="success" 
+              size="small" 
+              sx={{ fontWeight: 'bold', height: 24, fontSize: '0.7rem' }} 
+            />
+          )}
+          {isOneTimePlan && (
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={Boolean(plan.isFunded)}
+                  onChange={(e) => handlePlanChange(plan.id, 'isFunded', e.target.checked)}
+                  color="success"
+                />
+              }
+              label={<Typography variant="caption" sx={{ fontWeight: 600 }}>Mark as Funded</Typography>}
+              sx={{ m: 0 }}
+            />
+          )}
+          <IconButton
+            size="small"
+            onClick={() => handleRemovePlan(plan.id)}
+            sx={{
+              color: theme.palette.error.main,
+              bgcolor: alpha(theme.palette.error.main, 0.05),
+              '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1) },
+            }}
+          >
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Stack>
       </Stack>
 
-      {/* 2. Technical Summary (Status Bar Style) */}
       {/* 2. Technical Summary (Status Bar Style) */}
       <Box
         sx={{
@@ -266,6 +302,38 @@ const InvestmentPlanCard = ({
         </Stack>
       </Box>
 
+      {maxYear > goalStartYear && (
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          alignItems={{ xs: 'stretch', sm: 'flex-end' }}
+          sx={{ mb: 2 }}
+        >
+          <Box sx={{ width: '100%' }}>
+            <DatePickerInput
+              label="Investment Start Year"
+              value={dayjs(`${currentStartYear}-01-01`).toISOString()}
+              views={['year']}
+              minDate={dayjs(`${goalStartYear}-01-01`)}
+              maxDate={dayjs(`${maxYear}-12-31`)}
+              onChange={(val) => {
+                if (val) {
+                  const selectedYear = dayjs(val).year();
+                  const newDelay = Math.max(
+                    0,
+                    Math.min(
+                      selectedYear - goalStartYear,
+                      maxYear - goalStartYear,
+                    ),
+                  );
+                  handlePlanChange(plan.id, 'startDelay', newDelay);
+                }
+              }}
+            />
+          </Box>
+        </Stack>
+      )}
+
       {/* 3. Calculator Form Area */}
       <Box
         sx={{
@@ -285,7 +353,7 @@ const InvestmentPlanCard = ({
               handlePlanChange(plan.id, targetField, value);
             }}
             onCalculate={handleCalculate}
-            targetAmount={targetAmount}
+            targetAmount={goal.targetAmount}
           />
         )}
         {plan.type === 'lumpsum' && (
@@ -295,7 +363,7 @@ const InvestmentPlanCard = ({
               handlePlanChange(plan.id, field, value)
             }
             onCalculate={handleCalculate}
-            targetAmount={targetAmount}
+            targetAmount={goal.targetAmount}
           />
         )}
         {plan.type === 'stepUpSip' && (
@@ -312,7 +380,7 @@ const InvestmentPlanCard = ({
               handlePlanChange(plan.id, targetField, value);
             }}
             onCalculate={handleCalculate}
-            targetAmount={targetAmount}
+            targetAmount={goal.targetAmount}
           />
         )}
         {plan.type === 'swp' && (
@@ -322,7 +390,7 @@ const InvestmentPlanCard = ({
               handlePlanChange(plan.id, field, value)
             }
             onCalculate={handleCalculate}
-            targetAmount={targetAmount}
+            targetAmount={goal.targetAmount}
           />
         )}
         {plan.type === 'fd' && (
@@ -332,7 +400,7 @@ const InvestmentPlanCard = ({
               handlePlanChange(plan.id, field, value)
             }
             onCalculate={handleCalculate}
-            targetAmount={targetAmount}
+            targetAmount={goal.targetAmount}
           />
         )}
       </Box>

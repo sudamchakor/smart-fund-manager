@@ -130,6 +130,7 @@ export const getDefaultPlanState = (
     totalValue: 0,
     timePeriod: timePeriod > 0 ? timePeriod : 10, // Ensure positive time period
     startYear: planStartYear, // Store the start year
+    startDelay: 0, // Add startDelay with a default of 0
     details: '',
     isSafe: false,
     // Default values for all types

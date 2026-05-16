@@ -23,4 +23,12 @@ export const getWellInputStyle = (theme, colorToken = 'primary') => ({
   '&:hover': {
     bgcolor: alpha(theme.palette[colorToken].main, 0.08),
   },
+  // Ensure the Select selected value text has high contrast
+  '& .MuiSelect-select': {
+    color: theme.palette.text.primary,
+  },
+  // Ensure inputs have high contrast text
+  '& .MuiInputBase-input': {
+    color: theme.palette.text.primary,
+  }
 });

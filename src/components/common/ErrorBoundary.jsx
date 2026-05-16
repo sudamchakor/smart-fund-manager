@@ -1,11 +1,11 @@
 import React from 'react';
-import { Box, Typography, Button, Paper } from '@mui/material';
+import { Box, Typography, Button, Paper, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { ReportProblemOutlined as ReportProblemOutlinedIcon } from '@mui/icons-material';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null, errorInfo: null };
+    this.state = { hasError: false, error: null, errorInfo: null, showClearDataModal: false };
   }
 
   static getDerivedStateFromError(error) {
@@ -20,6 +20,21 @@ class ErrorBoundary extends React.Component {
   }
 
   handleReload = () => {
+    window.location.reload();
+  };
+
+  handleOpenClearDataModal = () => {
+    this.setState({ showClearDataModal: true });
+  };
+
+  handleCloseClearDataModal = () => {
+    this.setState({ showClearDataModal: false });
+  };
+
+  handleClearData = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    this.setState({ showClearDataModal: false });
     window.location.reload();
   };
 
@@ -47,38 +62,48 @@ class ErrorBoundary extends React.Component {
               Something went wrong
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-              We're sorry, but an unexpected error occurred.
+              We're sorry, but an unexpected error occurred. Please try reloading the page or clearing your data if the issue persists.
             </Typography>
-            {this.state.error && (
-              <Box
-                sx={{
-                  mt: 2,
-                  p: 2,
-                  bgcolor: 'error.light',
-                  color: 'error.contrastText',
-                  borderRadius: 1,
-                  textAlign: 'left',
-                  maxHeight: '200px',
-                  overflowY: 'auto',
-                  wordBreak: 'break-word',
-                }}
+            
+            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 3 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={this.handleReload}
               >
-                <Typography variant="subtitle2">Error Details:</Typography>
-                <Typography variant="caption" component="pre">
-                  {this.state.error.toString()}
-                  {this.state.errorInfo && this.state.errorInfo.componentStack}
-                </Typography>
-              </Box>
-            )}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={this.handleReload}
-              sx={{ mt: 3 }}
-            >
-              Reload Page
-            </Button>
+                Reload Page
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={this.handleOpenClearDataModal}
+              >
+                Clear Data
+              </Button>
+            </Box>
           </Paper>
+
+          <Dialog
+            open={this.state.showClearDataModal}
+            onClose={this.handleCloseClearDataModal}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              {"Clear Application Data?"}
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                This will clear all your saved data and settings in this application. Are you sure you want to proceed?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleCloseClearDataModal}>Cancel</Button>
+              <Button onClick={this.handleClearData} color="error" autoFocus>
+                Clear Data & Reload
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Box>
       );
     }

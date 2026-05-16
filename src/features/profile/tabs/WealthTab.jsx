@@ -14,7 +14,6 @@ import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator'
 import CashFlowDonutChart from '../components/CashFlowDonutChart';
 import WealthProjectionEngine from '../components/WealthProjectionEngine';
 import GoalCoverage from '../components/GoalCoverage';
-import ExpenseOptimizer from '../components/ExpenseOptimizer';
 import DebtAccelerator from '../components/DebtAccelerator';
 import CorrectionEngine from '../components/CorrectionEngine';
 import AutoBalancer from '../components/AutoBalancer';
@@ -92,7 +91,6 @@ export default function WealthTab() {
         </Grid>
 
         {/* 4. Actionable Optimization Tools */}
-        <ExpenseOptimizer />
         <DebtAccelerator ref={acceleratorRef} />
       </Stack>
     </Box>

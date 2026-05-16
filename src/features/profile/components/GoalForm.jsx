@@ -68,7 +68,7 @@ export const GoalForm = ({ goal, currentYear, onSave, retirementYear }) => {
               {/* Ensure InvestmentPlanCard also uses StyledPaper/Card logic internally */}
               <InvestmentPlanCard
                 plan={plan}
-                targetAmount={editedGoal.targetAmount}
+                goal={editedGoal}
                 handlePlanChange={handlePlanChange}
                 handleRemovePlan={handleRemovePlan}
                 formatAmount={formatAmount}
