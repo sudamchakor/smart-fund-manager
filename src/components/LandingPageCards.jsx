@@ -6,13 +6,14 @@ import {
   CreditCard,
   AutoGraph,
   Payments,
-  Description
+  Description,
 } from '@mui/icons-material';
 
 const features = [
   {
     title: 'Wealth Dashboard',
-    description: 'Track and manage your entire portfolio in one unified dashboard.',
+    description:
+      'Track and manage your entire portfolio in one unified dashboard.',
     icon: AccountBalanceWallet,
     color: '#3f51b5', // Indigo
   },
@@ -42,7 +43,8 @@ const features = [
   },
   {
     title: 'Income Tax Planner',
-    description: 'Estimate your tax liability and discover tax-saving strategies.',
+    description:
+      'Estimate your tax liability and discover tax-saving strategies.',
     icon: Description,
     color: '#455A64', // Slate
   },
@@ -83,12 +85,22 @@ const LandingPageCards = () => {
                       mb: 3,
                     }}
                   >
-                    <IconComponent sx={{ color: feature.color, fontSize: 28 }} />
+                    <IconComponent
+                      sx={{ color: feature.color, fontSize: 28 }}
+                    />
                   </Box>
-                  <Typography variant="h6" component="h3" sx={{ fontWeight: 600, mb: 1.5 }}>
+                  <Typography
+                    variant="h6"
+                    component="h3"
+                    sx={{ fontWeight: 600, mb: 1.5 }}
+                  >
                     {feature.title}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ lineHeight: 1.6 }}
+                  >
                     {feature.description}
                   </Typography>
                 </CardContent>

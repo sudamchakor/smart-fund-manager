@@ -21,6 +21,7 @@ import CalculateIcon from '@mui/icons-material/Calculate';
 import { updateGoalPriority } from '../../store/profileSlice';
 import { formatCurrency } from '../../utils/formatting';
 import { getWellInputStyle } from '../../styles/formStyles';
+import ProgressLine from './ProgressLine';
 
 const EditableGoalItem = ({
   goal,
@@ -28,6 +29,8 @@ const EditableGoalItem = ({
   onEdit,
   onDelete,
   onOpenBridgeGapModal,
+  isSelected,
+  onSelect,
 }) => {
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -64,54 +67,80 @@ const EditableGoalItem = ({
 
   const priorityProps = getPriorityProps(goal.priority);
 
+  const selectedStyles = {
+    borderColor: theme.palette.primary.main,
+    bgcolor: alpha(theme.palette.primary.main, 0.08),
+    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.15)}`,
+    borderLeft: `4px solid ${theme.palette.primary.main}`,
+  };
+
   return (
     <Paper
       elevation={0}
       sx={{
-        p: 2,
-        mb: 2,
+        p: theme.spacing(1.5),
+        pl: isSelected ? theme.spacing(1) : theme.spacing(1.5),
+        mb: theme.spacing(1.5),
         border: '1px solid',
         borderColor: alpha(theme.palette.divider, 0.1),
         bgcolor: alpha(theme.palette.background.paper, 0.5),
-        borderRadius: 3,
+        borderRadius: theme.shape.borderRadius,
         position: 'relative',
-        boxShadow: `0 2px 8px ${alpha(theme.palette.common.black || '#000', 0.02)}`,
-        transition: 'all 0.2s',
+        boxShadow: `0 2px 6px ${alpha(theme.palette.common.black || '#000', 0.01)}`,
+        transition: 'all 0.2s ease-in-out',
+        cursor: 'pointer',
         '&:hover': {
-          borderColor: alpha(theme.palette.primary.main, 0.2),
+          borderColor: alpha(theme.palette.primary.main, 0.4),
           boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.05)}`,
         },
+        ...(isSelected && selectedStyles),
       }}
+      onClick={() => onSelect(goal.id)}
     >
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
-          mb: 1.5,
+          mb: 1,
         }}
       >
         <Box sx={{ flex: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.25 }}>
+            <Typography
+              variant="subtitle2"
+              sx={{
+                fontWeight: 700,
+                fontSize: '0.9rem',
+                color: theme.palette.text.primary,
+              }}
+            >
               {goal.name}
             </Typography>
             <Chip
               label={priorityProps.label}
               color={priorityProps.color}
               size="small"
+              sx={{ height: 18, fontSize: '0.6rem', fontWeight: 700 }}
             />
           </Box>
-
           <Typography
-            variant="body2"
-            sx={{ color: 'primary.main', fontWeight: 900, mb: 0.5 }}
+            variant="caption"
+            sx={{
+              color: 'primary.main',
+              fontWeight: 800,
+              display: 'block',
+              mb: 0.25,
+            }}
           >
             Target: {formatCurrency(goal.targetAmount, currency)}
           </Typography>
-
           {goal.inflationAdjustedTarget && (
-            <Tooltip title="This is the target amount adjusted for inflation in today's money.">
+            <Tooltip
+              title="Target adjusted for inflation in today's money."
+              arrow
+              placement="top"
+            >
               <Typography
                 variant="caption"
                 sx={{
@@ -119,39 +148,57 @@ const EditableGoalItem = ({
                   display: 'flex',
                   alignItems: 'center',
                   gap: 0.5,
+                  fontSize: '0.7rem',
                 }}
               >
-                <InfoIcon fontSize="small" />
+                <InfoIcon sx={{ fontSize: '0.75rem' }} />
                 Real Value:{' '}
                 {formatCurrency(goal.inflationAdjustedTarget, currency)}
               </Typography>
             </Tooltip>
           )}
         </Box>
-
-        <Box sx={{ display: 'flex', gap: 0.5 }}>
-          <IconButton size="small" onClick={() => onEdit(goal)} color="primary">
-            <EditIcon fontSize="small" />
+        <Box sx={{ display: 'flex', gap: 0.25 }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(goal);
+            }}
+            color="primary"
+            sx={{ p: 0.5 }}
+          >
+            <EditIcon sx={{ fontSize: '1rem' }} />
           </IconButton>
           <IconButton
             size="small"
-            onClick={() => onDelete(goal.id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(goal.id);
+            }}
             color="error"
+            sx={{ p: 0.5 }}
           >
-            <DeleteIcon fontSize="small" />
+            <DeleteIcon sx={{ fontSize: '1rem' }} />
           </IconButton>
         </Box>
       </Box>
+
+      <ProgressLine
+        plans={goal.investmentPlans}
+        targetAmount={goal.targetAmount}
+        currency={currency}
+      />
 
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          mt: 2,
+          mt: 1.25,
         }}
       >
-        <FormControl variant="standard" size="small" sx={{ minWidth: 140 }}>
+        <FormControl variant="standard" size="small" sx={{ minWidth: 120 }}>
           <Select
             value={goal.priority || 2}
             onChange={handlePriorityChange}
@@ -159,23 +206,28 @@ const EditableGoalItem = ({
             disableUnderline
             sx={{
               ...getWellInputStyle(theme, priorityProps.color),
-              fontSize: '0.75rem',
-              py: 0.2,
+              fontSize: '0.7rem',
+              py: 0.1,
+              color: theme.palette.text.primary,
             }}
           >
-            <MenuItem value={1} sx={{ fontWeight: 700, fontSize: '0.8rem' }}>
+            <MenuItem value={1} sx={{ fontWeight: 700, fontSize: '0.75rem' }}>
               High Priority
             </MenuItem>
-            <MenuItem value={2} sx={{ fontWeight: 700, fontSize: '0.8rem' }}>
+            <MenuItem value={2} sx={{ fontWeight: 700, fontSize: '0.75rem' }}>
               Medium Priority
             </MenuItem>
-            <MenuItem value={3} sx={{ fontWeight: 700, fontSize: '0.8rem' }}>
+            <MenuItem value={3} sx={{ fontWeight: 700, fontSize: '0.75rem' }}>
               Low Priority
             </MenuItem>
           </Select>
         </FormControl>
-
-        <Chip label={goal.status} color={getStatusColor(goal.status)} />
+        <Chip
+          label={goal.status}
+          color={getStatusColor(goal.status)}
+          size="small"
+          sx={{ fontWeight: 700, fontSize: '0.7rem', height: 22 }}
+        />
       </Box>
 
       {(goal.status === 'Partially Funded' || goal.status === 'At Risk') && (
@@ -183,9 +235,20 @@ const EditableGoalItem = ({
           variant="outlined"
           size="small"
           color="warning"
-          startIcon={<CalculateIcon />}
-          onClick={() => onOpenBridgeGapModal(goal)}
-          sx={{ mt: 2, width: '100%' }}
+          startIcon={<CalculateIcon sx={{ fontSize: '0.9rem' }} />}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenBridgeGapModal(goal);
+          }}
+          sx={{
+            mt: 1.5,
+            width: '100%',
+            borderRadius: 1.5,
+            textTransform: 'none',
+            fontWeight: 700,
+            fontSize: '0.75rem',
+            py: 0.4,
+          }}
         >
           Calculate Required Monthly SIP
         </Button>

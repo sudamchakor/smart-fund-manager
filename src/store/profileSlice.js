@@ -472,7 +472,7 @@ export const selectTotalOneTimeInvestments = createSelector(
       return total;
     }, 0);
     return contributionTotal + expenseTotal;
-  }
+  },
 );
 
 export const selectGoalsWithMonthlyContributions = createSelector(
@@ -516,9 +516,9 @@ export const selectAnnualGoalRunway = createSelector(
     selectTotalYearlyGoalContributions,
   ],
   (currentSurplus, yearlyExpenses, yearlyGoals) => {
-    const rawAnnualBalance = (currentSurplus * 12) - yearlyExpenses - yearlyGoals;
+    const rawAnnualBalance = currentSurplus * 12 - yearlyExpenses - yearlyGoals;
     return Math.max(0, rawAnnualBalance);
-  }
+  },
 );
 
 export const selectDebtFreeCountdown = createSelector(
@@ -526,12 +526,19 @@ export const selectDebtFreeCountdown = createSelector(
   (totalDebt, currentSurplus) => {
     if (totalDebt <= 0) return 'Debt-Free!';
     if (currentSurplus <= 0) return 'Cannot pay off debt with current surplus.';
-    const monthsToPayOff = totalDebt / currentSurplus;
-    const years = Math.floor(monthsToPayOff / 12);
-    const months = Math.round(monthsToPayOff % 12);
-    return years > 0
-      ? `${years} years and ${months} months`
-      : `${months} months`;
+
+    const totalMonths = Math.ceil(totalDebt / currentSurplus);
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    const yearString = years > 0 ? `${years} year${years > 1 ? 's' : ''}` : '';
+    const monthString =
+      months > 0 ? `${months} month${months > 1 ? 's' : ''}` : '';
+
+    if (years > 0 && months > 0) {
+      return `${yearString} and ${monthString}`;
+    }
+    return yearString || monthString;
   },
 );
 
@@ -690,38 +697,46 @@ export const selectWealthProjection = createSelector(
         return total + annualAmount;
       }, 0);
 
-      const annualGoalInvestmentFromSurplus = goalInvestments.reduce((total, inv) => {
-        if (inv.isFunded) return total;
-        if (
-          inv.frequency === 'monthly' &&
-          year >= inv.startYear &&
-          year < inv.endYear
-        ) {
-          return total + inv.amount * 12;
-        }
-        if (inv.frequency === 'yearly' && year === inv.year) {
-          return total + inv.amount;
-        }
-        return total;
-      }, 0);
+      const annualGoalInvestmentFromSurplus = goalInvestments.reduce(
+        (total, inv) => {
+          if (inv.isFunded) return total;
+          if (
+            inv.frequency === 'monthly' &&
+            year >= inv.startYear &&
+            year < inv.endYear
+          ) {
+            return total + inv.amount * 12;
+          }
+          if (inv.frequency === 'yearly' && year === inv.year) {
+            return total + inv.amount;
+          }
+          return total;
+        },
+        0,
+      );
 
-      const annualGoalInvestmentFunded = goalInvestments.reduce((total, inv) => {
-        if (!inv.isFunded) return total;
-        if (
-          inv.frequency === 'monthly' &&
-          year >= inv.startYear &&
-          year < inv.endYear
-        ) {
-          return total + inv.amount * 12;
-        }
-        if (inv.frequency === 'yearly' && year === inv.year) {
-          return total + inv.amount;
-        }
-        return total;
-      }, 0);
+      const annualGoalInvestmentFunded = goalInvestments.reduce(
+        (total, inv) => {
+          if (!inv.isFunded) return total;
+          if (
+            inv.frequency === 'monthly' &&
+            year >= inv.startYear &&
+            year < inv.endYear
+          ) {
+            return total + inv.amount * 12;
+          }
+          if (inv.frequency === 'yearly' && year === inv.year) {
+            return total + inv.amount;
+          }
+          return total;
+        },
+        0,
+      );
 
       const currentSurplus =
-        currentAnnualIncome - currentAnnualExpenses - annualGoalInvestmentFromSurplus;
+        currentAnnualIncome -
+        currentAnnualExpenses -
+        annualGoalInvestmentFromSurplus;
 
       if (isFirstYear) {
         committedSurplusInvestment = currentSurplus > 0 ? currentSurplus : 0;
@@ -730,7 +745,9 @@ export const selectWealthProjection = createSelector(
       }
 
       const annualInvestment =
-        annualGoalInvestmentFromSurplus + annualGoalInvestmentFunded + committedSurplusInvestment;
+        annualGoalInvestmentFromSurplus +
+        annualGoalInvestmentFunded +
+        committedSurplusInvestment;
 
       totalWealth *= 1 + (expectedReturnRate || 0);
       totalWealth += annualInvestment;

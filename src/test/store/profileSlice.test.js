@@ -786,7 +786,7 @@ describe.skip('profileSlice', () => {
     // Months: 700000 / 50000 = 14 months
     // Years: 1, Months: 2
     expect(selectDebtFreeCountdown(store.getState())).toBe(
-      '1 years and 2 months',
+      '1 year and 2 months',
     );
   });
 
@@ -893,7 +893,7 @@ describe.skip('profileSlice', () => {
   });
 
   it('selectFutureWealthContributions should return total monthly goal contributions', () => {
-    store.dispatch(
+    store..dispatch(
       updateGoal({
         id: 1,
         name: 'Retirement',

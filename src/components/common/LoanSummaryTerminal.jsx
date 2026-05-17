@@ -23,7 +23,6 @@ export default function LoanSummaryTerminal({
   // Helper function to safely format numbers, defaulting to 0 if null/undefined
   const formatNumber = (num) => (num ?? 0).toLocaleString('en-IN');
 
-
   return (
     <Box
       sx={{

@@ -152,7 +152,7 @@ export default function ReadOnlyItem({
                 fontWeight: 600,
                 fontSize: '0.65rem',
                 textTransform: 'capitalize',
-                mr: 0.5
+                mr: 0.5,
               }}
             />
           )}

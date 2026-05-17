@@ -1,7 +1,7 @@
 {
   "homepage": "https://sudamchakor.github.io/smart-fund-manager/",
   "name": "smart-fund-manager",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.0",

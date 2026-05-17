@@ -268,32 +268,47 @@ export default function ProjectedCashFlowChart({
     }
   }
 
+  // --- Cumulative Surplus Calculation ---
+  let cumulativeSurplus = 0;
+  projectionData.forEach((d) => {
+    cumulativeSurplus += d.Surplus;
+    d.cumulativeSurplus = cumulativeSurplus;
+  });
+
   // --- Dynamic Y-Axis Calculation ---
   let yMin = 0;
   let yMax = 100000;
 
   if (projectionData.length > 0) {
-    const allValues = projectionData.flatMap((d) => [
-      d.Income,
-      d.Expenses,
-      d.Surplus,
-      d.BaseExpenses,
-    ]);
-    const minValue = Math.min(...allValues);
-    const maxValue = Math.max(...allValues);
+    const allValues = projectionData.flatMap((d) => {
+      const values = [];
+      if (!hiddenLines['Income']) values.push(d.Income);
+      if (!hiddenLines['Expenses']) {
+        values.push(d.Expenses);
+        values.push(d.BaseExpenses); // BaseExpenses is tied to Expenses visibility
+      }
+      if (!hiddenLines['Surplus']) values.push(d.Surplus);
+      if (!hiddenLines['cumulativeSurplus']) values.push(d.cumulativeSurplus);
+      return values;
+    });
 
-    const bufferedMin = minValue < 0 ? minValue * 1.1 : 0;
-    const bufferedMax = maxValue * 1.1;
+    if (allValues.length > 0) {
+      const minValue = Math.min(...allValues);
+      const maxValue = Math.max(...allValues);
 
-    yMin = roundToNiceNumber(bufferedMin, false);
-    yMax = roundToNiceNumber(bufferedMax, true);
+      const bufferedMin = minValue < 0 ? minValue * 1.1 : 0;
+      const bufferedMax = maxValue * 1.1;
+
+      yMin = roundToNiceNumber(bufferedMin, false);
+      yMax = roundToNiceNumber(bufferedMax, true);
+    } else {
+      yMin = 0;
+      yMax = 100000; // Default if all lines are hidden
+    }
   }
 
   return (
     <>
-      <Typography variant="h6" align="center" gutterBottom>
-        Projected Annual Income vs. Expenses Until Retirement
-      </Typography>
       <ResponsiveContainer width="100%" height={350}>
         <ComposedChart
           data={projectionData}
@@ -365,6 +380,15 @@ export default function ProjectedCashFlowChart({
             name="Surplus"
             stroke={theme.palette.primary.main}
             strokeWidth={2}
+            dot={false}
+          />
+          <Line
+            hide={hiddenLines['cumulativeSurplus']}
+            type="monotone"
+            dataKey="cumulativeSurplus"
+            name="Cumulative Surplus"
+            stroke={theme.palette.info.main}
+            strokeWidth={3}
             dot={false}
           />
         </ComposedChart>

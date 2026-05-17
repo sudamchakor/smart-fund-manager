@@ -93,7 +93,13 @@ const DebtAccelerator = forwardRef(({
     const newImpact = calculatePrepaymentImpact(extraPayment);
 
     const monthsSaved = Math.max(0, baseImpact.months - newImpact.months);
-    const yearsSaved = (monthsSaved / 12).toFixed(1);
+    const years = Math.floor(monthsSaved / 12);
+    const months = monthsSaved % 12;
+
+    const yearString = years > 0 ? `${years} yr` : '';
+    const monthString = months > 0 ? `${months} mo` : '';
+    const timeSavedString = [yearString, monthString].filter(Boolean).join(' ');
+
     const interestSaved = Math.max(0, baseImpact.interest - newImpact.interest);
 
     let investmentValue = 0;
@@ -106,7 +112,7 @@ const DebtAccelerator = forwardRef(({
     const investmentGains = investmentValue - extraPayment * baseImpact.months;
 
     return {
-      yearsSaved,
+      timeSavedString,
       interestSaved,
       investmentGains,
       netDifference: investmentGains - interestSaved,
@@ -192,11 +198,18 @@ const DebtAccelerator = forwardRef(({
           max={50000}
           step={1000}
           onChange={(e, val) => setExtraPayment(val)}
-          color="secondary"
+          color="primary" // Changed to primary
           sx={{
             py: 1,
-            '& .MuiSlider-thumb': { width: 14, height: 14 },
-            '& .MuiSlider-track': { height: 4 },
+            '& .MuiSlider-thumb': {
+              width: 14,
+              height: 14,
+              backgroundColor: theme.palette.primary.dark, // Darker thumb
+            },
+            '& .MuiSlider-track': {
+              height: 4,
+              backgroundColor: theme.palette.primary.main, // Darker track
+            },
             '& .MuiSlider-rail': { height: 4, opacity: 0.2 },
           }}
         />
@@ -354,7 +367,7 @@ const DebtAccelerator = forwardRef(({
                   {formatCurrency(impactData.interestSaved)}
                 </Typography>
               </Box>
-              {impactData.yearsSaved > 0 && (
+              {impactData.timeSavedString && (
                 <Box
                   sx={{
                     bgcolor: alpha(theme.palette.info.main, 0.1),
@@ -367,7 +380,7 @@ const DebtAccelerator = forwardRef(({
                     variant="caption"
                     sx={{ fontWeight: 900, color: 'info.dark' }}
                   >
-                    {impactData.yearsSaved} YRS SOONER
+                    {impactData.timeSavedString} SOONER
                   </Typography>
                 </Box>
               )}

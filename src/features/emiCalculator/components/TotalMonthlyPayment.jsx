@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box, Typography, Stack, alpha, useTheme, Divider } from '@mui/material'; // Import Divider
+import {
+  Box,
+  Typography,
+  Stack,
+  alpha,
+  useTheme,
+  Divider,
+} from '@mui/material'; // Import Divider
 import { useSelector } from 'react-redux';
 import { selectCalculatedValues } from '../utils/emiCalculator';
 import { selectCurrency, selectExpenses } from '../../../store/emiSlice';
@@ -132,16 +139,16 @@ const TotalMonthlyPayment = ({ onOpenAccelerator }) => {
           />
         </Stack>
       </Box>
-
       {/* Styled Total Row aligned with Payment Breakdown */}
       <TotalOutflowRow
         label="Total Monthly Outflow"
         value={formatCurrency(totalMonthlyPayment, currency)}
       />
-
       {/* Interactive Divider and Optimization Row */}
-      <Divider sx={{ my: 2, mx: 2, borderColor: alpha(theme.palette.divider, 0.1) }} /> {/* Styled Divider */}
-
+      <Divider
+        sx={{ my: 2, mx: 2, borderColor: alpha(theme.palette.divider, 0.1) }}
+      />{' '}
+      {/* Styled Divider */}
       <Box
         onClick={onOpenAccelerator} // Action: open the modal
         sx={{
@@ -166,7 +173,8 @@ const TotalMonthlyPayment = ({ onOpenAccelerator }) => {
             mr: 1, // Margin right for spacing
           }}
         >
-          Got an extra {formatCurrency(2000, currency)} - {formatCurrency(5000, currency)} / month?
+          Got an extra {formatCurrency(2000, currency)} -{' '}
+          {formatCurrency(5000, currency)} / month?
         </Typography>
         <Typography
           variant="body2"
@@ -179,7 +187,10 @@ const TotalMonthlyPayment = ({ onOpenAccelerator }) => {
             gap: 0.5,
           }}
         >
-          Test Accelerator <span role="img" aria-label="rocket">🚀</span>
+          Test Accelerator{' '}
+          <span role="img" aria-label="rocket">
+            🚀
+          </span>
         </Typography>
       </Box>
     </Box>

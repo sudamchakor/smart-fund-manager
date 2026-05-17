@@ -25,7 +25,6 @@ import {
   HealthAndSafety as HealthAndSafetyIcon,
   ListAlt as ListIcon,
   AutoGraph as GraphIcon,
-  PieChart as PieIcon,
   Close as CloseIcon,
 } from '@mui/icons-material';
 
@@ -43,9 +42,7 @@ import {
   setConsiderInflation,
   selectGeneralInflationRate,
   selectEducationInflationRate,
-  selectCareerGrowthRate,
   selectCurrentSurplus,
-  selectTotalMonthlyIncome,
   selectTotalMonthlyGoalContributions,
   selectPrioritizedGoalFunding,
 } from '../../../store/profileSlice';
@@ -59,6 +56,8 @@ import BridgeGapModal from '../components/BridgeGapModal';
 import StyledPaper from '../../../components/common/StyledPaper';
 import SectionHeader from '../../../components/common/SectionHeader';
 import ActionSpeedDial from '../../../components/common/ActionSpeedDial';
+import IndividualGoalTimelineChart from '../components/IndividualGoalTimelineChart';
+import GoalDistributionChart from '../components/GoalDistributionChart'; // Import the new component
 
 // Charts
 import {
@@ -67,17 +66,31 @@ import {
   CartesianGrid,
   Tooltip as RechartsTooltip,
   ResponsiveContainer,
-  ReferenceLine,
   AreaChart,
   Area,
-  BarChart,
-  Bar,
-  Line,
+  Legend,
 } from 'recharts';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+// Helper for Indian currency formatting
+const formatIndianCurrency = (value, currency) => {
+  const num = Number(value);
+  if (isNaN(num)) return `${currency}0`;
+  // Use Intl.NumberFormat for Lakhs and Crores formatting
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    notation: 'compact',
+    compactDisplay: 'short',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+    .format(num)
+    .replace('₹', currency);
+};
 
 export default function FutureGoalsTab({ goalToEditId }) {
   const dispatch = useDispatch();
@@ -92,23 +105,16 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const currentAge = useSelector(selectCurrentAge) || 30;
   const retirementAge = useSelector(selectRetirementAge) || 60;
   const profileExpenses = useSelector(selectProfileExpenses) || [];
-  const generalInflationRate = useSelector(selectGeneralInflationRate) || 0;
-  const educationInflationRate = useSelector(selectEducationInflationRate) || 0;
-  const careerGrowthRaw = useSelector(selectCareerGrowthRate);
-  const careerGrowthRate =
-    typeof careerGrowthRaw === 'object'
-      ? careerGrowthRaw.value
-      : careerGrowthRaw || 0;
-  const careerGrowthType =
-    typeof careerGrowthRaw === 'object' ? careerGrowthRaw.type : 'percentage';
-  const totalMonthlyIncome = useSelector(selectTotalMonthlyIncome) || 0;
+  const generalInflationRate =
+    (useSelector(selectGeneralInflationRate) || 0) / 100;
+  const educationInflationRate =
+    (useSelector(selectEducationInflationRate) || 0) / 100;
   const currentSurplus = useSelector(selectCurrentSurplus) || 0;
   const totalMonthlyGoalContributions =
     useSelector(selectTotalMonthlyGoalContributions) || 0;
   const { emi: monthlyEmi } = useSelector(selectCalculatedValues);
 
   // UI State
-  const [realValueToggle, setRealValueToggle] = useState(false);
   const [openModal, setOpenModal] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
   const [modalTitle, setModalTitle] = useState('Add New Goal');
@@ -117,8 +123,22 @@ export default function FutureGoalsTab({ goalToEditId }) {
   const [selectedGoalForGap, setSelectedGoalForGap] = useState(null);
   const [processedGoalId, setProcessedGoalId] = useState(null);
 
+  // State for selected goal
+  const [selectedGoalId, setSelectedGoalId] = useState(null);
+
   const currentYear = new Date().getFullYear();
   const calculatedRetirementYear = currentYear + (retirementAge - currentAge);
+
+  useEffect(() => {
+    if (
+      goalsWithFunding.length > 0 &&
+      !goalsWithFunding.some((g) => g.id === selectedGoalId)
+    ) {
+      setSelectedGoalId(goalsWithFunding[0].id);
+    } else if (goalsWithFunding.length === 0) {
+      setSelectedGoalId(null);
+    }
+  }, [goalsWithFunding, selectedGoalId]);
 
   // --- Handlers ---
   const handleCloseModal = useCallback(() => {
@@ -162,13 +182,8 @@ export default function FutureGoalsTab({ goalToEditId }) {
     setOpenModal(true);
   }, [currentYear]);
 
-  // --- Effect to handle incoming edit requests from other tabs ---
   useEffect(() => {
-    if (!goalToEditId) {
-      setProcessedGoalId(null);
-      return;
-    }
-    if (goalToEditId !== processedGoalId && goals.length > 0) {
+    if (goalToEditId && goalToEditId !== processedGoalId && goals.length > 0) {
       const goal = goals.find((g) => g.id === goalToEditId);
       if (goal) {
         handleOpenModalForEdit(goal);
@@ -263,354 +278,318 @@ export default function FutureGoalsTab({ goalToEditId }) {
     },
   ];
 
-  // --- Wealth Calculation Logic ---
+  // Overall Wealth Projection Logic
   const wealthData = useMemo(() => {
+    if (goals.length === 0) return [];
     const maxGoalYear = goals.reduce(
       (max, g) => Math.max(max, g.targetYear),
-      currentYear + 10,
+      currentYear,
     );
     const endYear = Math.max(
       maxGoalYear,
-      currentYear + (retirementAge - currentAge),
-      currentYear + 10,
+      calculatedRetirementYear,
+      currentYear + 25,
     );
-    let currentTotalWealth = 0;
-    let currentMonthlyIncome = totalMonthlyIncome;
-    let outflowExGoals =
-      profileExpenses.reduce((acc, exp) => acc + exp.amount, 0) + monthlyEmi;
+
+    let currentWealth = 0; // Starts from 0, projecting future wealth from surplus
     const data = [];
+    const goalPayouts = new Map();
+    goals.forEach((g) => {
+      const currentPayout = goalPayouts.get(g.targetYear) || 0;
+      goalPayouts.set(g.targetYear, currentPayout + g.targetAmount);
+    });
 
     for (let year = currentYear; year <= endYear; year++) {
-      const yearsFromNow = year - currentYear;
-      if (yearsFromNow > 0) {
-        currentMonthlyIncome *=
-          1 + (careerGrowthType === 'percentage' ? careerGrowthRate : 0);
+      const annualSurplus = currentSurplus * 12;
+      const investmentReturnRate = 0.08; // Assumed rate of return
+
+      // Compound the wealth annually
+      currentWealth =
+        currentWealth * (1 + investmentReturnRate) + annualSurplus;
+
+      // Subtract one-time goal target amounts in their respective maturity years
+      if (goalPayouts.has(year)) {
+        currentWealth -= goalPayouts.get(year);
       }
-      const annualSurplus =
-        (currentMonthlyIncome -
-          outflowExGoals -
-          totalMonthlyGoalContributions) *
-        12;
-      currentTotalWealth = (currentTotalWealth + annualSurplus) * 1.08;
 
-      let displayWealth = currentTotalWealth;
-      if (realValueToggle && yearsFromNow > 0)
-        displayWealth /= Math.pow(1 + generalInflationRate, yearsFromNow);
-
-      const totalGoalsThisYear = goals.reduce((sum, g) => {
-        if (g.targetYear === year) {
-          let target = g.targetAmount;
-          if (considerInflation)
-            target *= Math.pow(
-              1 +
-                (g.category === 'education'
-                  ? educationInflationRate
-                  : generalInflationRate),
-              yearsFromNow,
-            );
-          return sum + target;
-        }
-        return sum;
-      }, 0);
+      let realWealth = currentWealth;
+      if (year - currentYear > 0) {
+        realWealth /= Math.pow(1 + generalInflationRate, year - currentYear);
+      }
 
       data.push({
         year,
-        'Total Wealth': Math.round(displayWealth),
-        'Goals Target':
-          totalGoalsThisYear > 0 ? Math.round(totalGoalsThisYear) : null,
+        'Total Wealth': Math.max(0, Math.round(currentWealth)),
+        'Real Value': Math.max(0, Math.round(realWealth)),
       });
     }
     return data;
   }, [
     goals,
     currentYear,
-    retirementAge,
-    totalMonthlyIncome,
-    profileExpenses,
-    monthlyEmi,
-    careerGrowthRate,
-    careerGrowthType,
-    realValueToggle,
-    considerInflation,
+    calculatedRetirementYear,
+    currentSurplus,
     generalInflationRate,
-    educationInflationRate,
-    totalMonthlyGoalContributions,
   ]);
 
-  const breakEvenYear = useMemo(() => {
-    const point = wealthData.find(
-      (d) => d['Total Wealth'] >= d['Goals Target'],
-    );
-    return point ? point.year : null;
-  }, [wealthData]);
+  // Goal Distribution Pie Chart Data
+  const goalDistributionData = useMemo(() => {
+    const totalGoalsValue = goals.reduce((sum, g) => sum + g.targetAmount, 0);
+    if (totalGoalsValue === 0) return [];
+
+    const chartColors = [
+      theme.palette.primary.main,
+      theme.palette.secondary.main,
+      theme.palette.success.main,
+      theme.palette.warning.main,
+      theme.palette.info.main,
+      theme.palette.error.main,
+    ];
+
+    return goals.map((g, index) => ({
+      name: g.name,
+      value: g.targetAmount,
+      percentage: (g.targetAmount / totalGoalsValue) * 100,
+      color: chartColors[index % chartColors.length],
+    }));
+  }, [goals, theme]);
+
+  const totalAggregateGoalsValue = useMemo(
+    () => goals.reduce((sum, g) => sum + g.targetAmount, 0),
+    [goals],
+  );
 
   return (
-    <Grid container spacing={2.5}>
+    <Box>
       {currentSurplus < 0 && (
-        <Grid item xs={12}>
-          <Alert
-            severity="warning"
-            variant="outlined"
-            sx={{ borderRadius: 2, fontWeight: 700 }}
-          >
-            Goal funding is restricted due to negative surplus.
-          </Alert>
-        </Grid>
+        <Alert
+          severity="warning"
+          variant="outlined"
+          sx={{ borderRadius: 2, fontWeight: 700, mb: 2 }}
+        >
+          Goal funding is restricted due to negative surplus.
+        </Alert>
       )}
 
       {!isMediumScreen && (
-        <Grid item xs={12}>
-          <StyledPaper sx={{ p: 2 }}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <SectionHeader
-                title="Smart Goal Templates"
-                icon={<TrendingUpIcon />}
-                color={theme.palette.primary.main}
-              />
-              <Stack direction="row" spacing={1.5}>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<TrendingUpIcon />}
-                  onClick={applyRetirementGoal}
-                >
-                  Retirement
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<SchoolIcon />}
-                  onClick={applyEducationGoal}
-                >
-                  Education
-                </Button>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  startIcon={<HealthAndSafetyIcon />}
-                  onClick={applyEmergencyFundGoal}
-                >
-                  Emergency
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  startIcon={<AddIcon />}
-                  onClick={handleOpenModalForNew}
-                  disabled={currentSurplus < 0}
-                >
-                  New Custom Goal
-                </Button>
-              </Stack>
-            </Stack>
-          </StyledPaper>
-        </Grid>
-      )}
-
-      <Grid item xs={12} md={4}>
-        <StyledPaper>
+        <StyledPaper sx={{ p: 2, mb: 2.5 }}>
           <Stack
             direction="row"
             justifyContent="space-between"
-            alignItems="flex-start"
+            alignItems="center"
           >
             <SectionHeader
-              title={`Your Goals (${goalsWithFunding.length})`}
-              icon={<ListIcon />}
-              color="#7b1fa2"
+              title="Smart Goal Templates"
+              icon={<TrendingUpIcon />}
+              color={theme.palette.primary.main}
             />
-            <FormControlLabel
-              control={
-                <Switch
-                  size="small"
-                  checked={considerInflation}
-                  onChange={(e) =>
-                    dispatch(setConsiderInflation(e.target.checked))
-                  }
-                />
-              }
-              label={
-                <Typography variant="caption" sx={{ fontWeight: 800 }}>
-                  Inflation
-                </Typography>
-              }
-            />
+            <Stack direction="row" spacing={1.5}>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<TrendingUpIcon />}
+                onClick={applyRetirementGoal}
+              >
+                Retirement
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<SchoolIcon />}
+                onClick={applyEducationGoal}
+              >
+                Education
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                startIcon={<HealthAndSafetyIcon />}
+                onClick={applyEmergencyFundGoal}
+              >
+                Emergency
+              </Button>
+              <Button
+                size="small"
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={handleOpenModalForNew}
+                disabled={currentSurplus < 0}
+              >
+                New Custom Goal
+              </Button>
+            </Stack>
           </Stack>
-          <Stack spacing={1.5}>
-            {goalsWithFunding.length > 0 ? (
-              goalsWithFunding.map((g) => (
+        </StyledPaper>
+      )}
+
+      {/* Horizontally Scrollable Goal List */}
+      <StyledPaper sx={{ p: 2, mb: 2.5 }}>
+        <Stack
+          direction="row"
+          justifyContent="space-between"
+          alignItems="center"
+        >
+          <SectionHeader
+            title={`Your Goals (${goalsWithFunding.length})`}
+            icon={<ListIcon />}
+            color={theme.palette.secondary.main}
+          />
+          {/* Removed Inflation Toggle */}
+        </Stack>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            overflowX: 'auto',
+            '&::-webkit-scrollbar': {
+              height: '8px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              backgroundColor: alpha(theme.palette.divider, 0.2),
+              borderRadius: '4px',
+            },
+          }}
+        >
+          {goalsWithFunding.length > 0 ? (
+            goalsWithFunding.map((g) => (
+              <Box key={g.id} sx={{ flex: '0 0 300px' }}>
                 <EditableGoalItem
-                  key={g.id}
                   goal={g}
                   currency={currency}
-                  currentYear={currentYear}
-                  considerInflation={considerInflation}
                   onEdit={handleOpenModalForEdit}
                   onDelete={(id) => dispatch(deleteGoal(id))}
                   onOpenBridgeGapModal={(goal) => {
                     setSelectedGoalForGap(goal);
                     setBridgeGapModalOpen(true);
                   }}
+                  isSelected={g.id === selectedGoalId}
+                  onSelect={setSelectedGoalId}
                 />
-              ))
-            ) : (
-              <Typography
-                variant="body2"
-                color="textSecondary"
-                align="center"
-                sx={{ py: 4 }}
-              >
-                No active goals.
-              </Typography>
-            )}
-          </Stack>
-        </StyledPaper>
-      </Grid>
+              </Box>
+            ))
+          ) : (
+            <Typography
+              variant="body2"
+              color="textSecondary"
+              align="center"
+              sx={{ py: 4, width: '100%' }}
+            >
+              No active goals.
+            </Typography>
+          )}
+        </Box>
+      </StyledPaper>
 
-      <Grid item xs={12} md={8}>
-        <Stack spacing={2.5}>
-          <StyledPaper>
-            <Stack direction="row" justifyContent="space-between">
+      {/* Charts Section */}
+      <Grid container spacing={2.5} alignItems="flex-start">
+        <Grid item xs={12} lg={8}>
+          <Stack spacing={2.5}>
+            {/* Top Chart: Individual Goal Timeline */}
+            <StyledPaper>
               <SectionHeader
-                title="Wealth Projection"
+                title={`Goals Timeline: ${goals.find((g) => g.id === selectedGoalId)?.name || 'All'} vs. Combined Total`}
                 icon={<GraphIcon />}
-                color="#2e7d32"
+                color={theme.palette.primary.main}
               />
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={realValueToggle}
-                    onChange={(e) => setRealValueToggle(e.target.checked)}
-                  />
-                }
-                label={
-                  <Typography variant="caption" sx={{ fontWeight: 800 }}>
-                    Real Value
-                  </Typography>
-                }
+              <Box sx={{ height: { xs: 280, md: 350 } }}>
+                <IndividualGoalTimelineChart
+                  goals={goalsWithFunding}
+                  selectedGoalId={selectedGoalId}
+                  currency={currency}
+                />
+              </Box>
+            </StyledPaper>
+
+            {/* Middle Chart: Overall Wealth Projection */}
+            <StyledPaper>
+              <SectionHeader
+                title="Overall Wealth Projection"
+                icon={<GraphIcon />}
+                color={theme.palette.success.main}
               />
-            </Stack>
-            <Box sx={{ height: 350 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={wealthData}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke={alpha(theme.palette.divider, 0.1)}
-                  />
-                  <XAxis
-                    dataKey="year"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fontWeight: 700 }}
-                  />
-                  <YAxis
-                    tickFormatter={(val) => `${currency}${val / 100000}L`}
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 11, fontWeight: 700 }}
-                  />
-                  <RechartsTooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                      backdropFilter: 'blur(8px)',
-                      backgroundColor: alpha('#fff', 0.8),
-                    }}
-                  />
-                  <Area
-                    type="monotone"
-                    dataKey="Total Wealth"
-                    stroke={theme.palette.primary.main}
-                    fill={alpha(theme.palette.primary.main, 0.2)}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="Goals Target"
-                    stroke="#ff7c7c"
-                    strokeWidth={3}
-                    dot={false}
-                  />
-                  {breakEvenYear && (
-                    <ReferenceLine
-                      x={breakEvenYear}
-                      stroke="green"
+              <Box sx={{ height: { xs: 280, md: 350 }, p: 1 }}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={wealthData}>
+                    <CartesianGrid
                       strokeDasharray="3 3"
-                      label={{
-                        value: 'Breakeven',
-                        position: 'top',
-                        fill: 'green',
-                        fontWeight: 800,
+                      vertical={false}
+                      stroke={alpha(theme.palette.divider, 0.1)}
+                    />
+                    <XAxis
+                      dataKey="year"
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        fill: theme.palette.text.secondary,
                       }}
                     />
-                  )}
-                </AreaChart>
-              </ResponsiveContainer>
-            </Box>
-          </StyledPaper>
-
-          <StyledPaper>
-            <SectionHeader
-              title="Goal Distribution"
-              icon={<PieIcon />}
-              color="#ed6c02"
-            />
-            <Box sx={{ height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={goals.map((g) => ({
-                    name: g.name.substring(0, 10),
-                    amount: g.targetAmount,
-                  }))}
-                >
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke={alpha(theme.palette.divider, 0.1)}
-                  />
-                  <XAxis
-                    dataKey="name"
-                    axisLine={false}
-                    tickLine={false}
-                    tick={{ fontSize: 10, fontWeight: 700 }}
-                  />
-                  <YAxis
-                    tickFormatter={(val) => `${currency}${val / 100000}L`}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <RechartsTooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 8px 24px rgba(0,0,0,0.12)',
-                    }}
-                  />
-                  <Bar
-                    dataKey="amount"
-                    fill={theme.palette.primary.main}
-                    radius={[4, 4, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          </StyledPaper>
-        </Stack>
+                    <YAxis
+                      tickFormatter={(val) =>
+                        formatIndianCurrency(val, currency)
+                      }
+                      axisLine={false}
+                      tickLine={false}
+                      tick={{
+                        fontSize: 11,
+                        fontWeight: 700,
+                        fill: theme.palette.text.secondary,
+                      }}
+                    />
+                    <RechartsTooltip
+                      formatter={(value, name) => [
+                        formatIndianCurrency(value, currency),
+                        name,
+                      ]}
+                      contentStyle={{
+                        backgroundColor: theme.palette.background.paper,
+                        color: theme.palette.text.primary,
+                        border: `1px solid ${theme.palette.divider}`,
+                      }}
+                    />
+                    <Legend
+                      iconSize={10}
+                      wrapperStyle={{
+                        fontSize: '12px',
+                        color: theme.palette.text.secondary,
+                      }}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Total Wealth"
+                      stroke={theme.palette.success.main}
+                      fill={alpha(theme.palette.success.main, 0.2)}
+                      name="Nominal Value"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Real Value"
+                      stroke={theme.palette.info.main}
+                      strokeDasharray="5 5"
+                      fill="transparent"
+                      name="Real Value (Inflation Adjusted)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </Box>
+            </StyledPaper>
+          </Stack>
+        </Grid>
+        <Grid item xs={12} lg={4}>
+          {/* Bottom Chart: Goal Distribution Pie Chart */}
+          <GoalDistributionChart
+            goalDistributionData={goalDistributionData}
+            totalAggregateGoalsValue={totalAggregateGoalsValue}
+            currency={currency}
+          />
+        </Grid>
       </Grid>
 
       {isMediumScreen && !openModal && (
         <ActionSpeedDial
           actions={actions}
-          sx={{
-            bottom: { xs: 80, sm: 70 },
-            zIndex: 1400, // FIX: Ensures it floats above the footer (which is 1300)
-          }}
+          sx={{ bottom: { xs: 80, sm: 70 }, zIndex: 1400 }}
         />
       )}
 
@@ -660,6 +639,6 @@ export default function FutureGoalsTab({ goalToEditId }) {
         onClose={() => setBridgeGapModalOpen(false)}
         goal={selectedGoalForGap}
       />
-    </Grid>
+    </Box>
   );
 }

@@ -31,7 +31,7 @@ import BasicInfoDisplay from '../components/BasicInfoDisplay';
 import BasicInfoEdit from '../components/BasicInfoEdit';
 import FinancialSettings from '../components/FinancialSettings';
 import CashFlowDonutChart from '../components/CashFlowDonutChart';
-import ProjectedCashFlowChart from '../components/ProjectedCashFlowChart';
+import FinancialProjectionsDashboard from '../components/FinancialProjectionsDashboard.jsx';
 import FinancialSection from '../components/FinancialSection';
 import CorpusManager from '../../corpus/CorpusManager';
 import FinancialModal from '../components/FinancialModal';
@@ -316,34 +316,19 @@ export default function PersonalProfileTab({ onEditGoal }) {
         </Grid>
 
         <Grid item xs={12}>
-          <Card sx={{ borderRadius: 3, boxShadow: 1 }}>
-            <CardHeader
-              title={
-                <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
-                  Projected Annual Income vs. Expenses
-                </Typography>
-              }
-              avatar={<TimelineIcon color="primary" />}
-            />
-            <Divider />
-            <CardContent>
-              <Box sx={{ width: '100%', height: 400 }}>
-                <ProjectedCashFlowChart
-                  currentAge={currentAge}
-                  retirementAge={retirementAge}
-                  careerGrowthRate={careerGrowthRate}
-                  careerGrowthType={careerGrowthType}
-                  monthlyEmi={monthlyEmi}
-                  emiState={emiState}
-                  individualGoalInvestments={individualGoalInvestments}
-                  goals={goals}
-                  expenses={expenses}
-                  incomes={incomes}
-                  inflationRate={generalInflationRate}
-                />
-              </Box>
-            </CardContent>
-          </Card>
+          <FinancialProjectionsDashboard
+            currentAge={currentAge}
+            retirementAge={retirementAge}
+            careerGrowthRate={careerGrowthRate}
+            careerGrowthType={careerGrowthType}
+            monthlyEmi={monthlyEmi}
+            emiState={emiState}
+            individualGoalInvestments={individualGoalInvestments}
+            goals={goals}
+            expenses={expenses}
+            incomes={incomes}
+            inflationRate={generalInflationRate}
+          />
         </Grid>
       </Grid>
 

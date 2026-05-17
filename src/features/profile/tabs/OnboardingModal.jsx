@@ -155,15 +155,24 @@ export default function OnboardingModal({ open, onClose }) {
 
   const applyRetirementGoal = () => {
     const yearsToRetirement = basicInfo.retirementAge - basicInfo.age;
-    const monthlyBasicExpenses = expensesList
-      .filter((e) => e.category === 'basic')
-      .reduce((sum, e) => sum + e.amount, 0);
-    let yearlyExpenses = monthlyBasicExpenses * 12;
-    let targetAmount = Math.round(yearlyExpenses / 0.04);
+    // Sum all expenses for a more robust retirement goal calculation
+    const totalMonthlyExpenses = expensesList.reduce(
+      (sum, e) => sum + e.amount,
+      0,
+    );
+    let yearlyExpenses = totalMonthlyExpenses * 12;
+    // Ensure a minimum target amount if expenses are zero or very low
+    let targetAmount = Math.round(yearlyExpenses / 0.04); // Using 4% withdrawal rate
+    if (targetAmount === 0) {
+      targetAmount = 1000000; // Fallback minimum retirement goal
+    }
+
     if (yearsToRetirement > 0) {
-      targetAmount =
+      targetAmount = Math.round(
+        // Apply rounding after inflation
         targetAmount *
-        Math.pow(1 + basicInfo.generalInflationRate, yearsToRetirement);
+          Math.pow(1 + basicInfo.generalInflationRate, yearsToRetirement),
+      );
     }
     setGoalsList([
       ...goalsList,
@@ -299,7 +308,7 @@ export default function OnboardingModal({ open, onClose }) {
           variant="h5"
           sx={{ fontWeight: 900, letterSpacing: -0.5 }}
         >
-          Initialize Profile Protocol
+          Initialize Profile
         </Typography>
         <Typography
           variant="caption"
@@ -346,7 +355,7 @@ export default function OnboardingModal({ open, onClose }) {
               onClick={onClose}
               sx={{ color: 'text.secondary', fontWeight: 700 }}
             >
-              Bypass Initialization
+              Skip
             </Button>
             <Box sx={{ flex: '1 1 auto' }} />
             {activeStep > 0 && (
@@ -361,7 +370,7 @@ export default function OnboardingModal({ open, onClose }) {
                 color="primary"
                 sx={{ fontWeight: 800, px: 4 }}
               >
-                Engage System
+                Submit
               </Button>
             ) : (
               <Button
@@ -369,7 +378,7 @@ export default function OnboardingModal({ open, onClose }) {
                 variant="contained"
                 sx={{ fontWeight: 800, px: 4 }}
               >
-                Proceed
+                Next
               </Button>
             )}
           </DialogActions>

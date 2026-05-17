@@ -161,15 +161,6 @@ export default function UserProfile() {
           type={modalType}
         />
       </Suspense>
-
-      {/* 4. High-End Floating Status Island */}
-      <Suspense fallback={<SuspenseFallback />}>
-        <FloatingStatusIsland
-          investableSurplus={investableSurplus}
-          debtFreeCountdown={debtFreeCountdown}
-          currency={currency}
-        />
-      </Suspense>
     </Box>
   );
 }

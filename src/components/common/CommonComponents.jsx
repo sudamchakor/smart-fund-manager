@@ -192,7 +192,15 @@ export const AmountWithUnitInput = ({
   );
 };
 
-export const DatePickerInput = ({ label, value, onChange, views = ['year', 'month'], openTo, minDate, maxDate }) => {
+export const DatePickerInput = ({
+  label,
+  value,
+  onChange,
+  views = ['year', 'month'],
+  openTo,
+  minDate,
+  maxDate,
+}) => {
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const dayjsValue = value
