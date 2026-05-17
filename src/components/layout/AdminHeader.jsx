@@ -53,11 +53,12 @@ const AdminHeader = () => {
       position="fixed"
       elevation={0}
       sx={{
-        bgcolor: 'primary.dark',
+        bgcolor: 'primary.main',
         color: 'primary.contrastText',
         zIndex: theme.zIndex.drawer + 1,
         borderBottom: 1,
         borderColor: 'divider',
+        borderRadius: 0,
       }}
     >
       <Toolbar>
@@ -67,7 +68,6 @@ const AdminHeader = () => {
           alignItems="center"
           sx={{ flexGrow: 1 }}
         >
-          {/* HIDE MOBILE HAMBURGER IF NOT LOGGED IN */}
           {isMobile && user && (
             <IconButton onClick={() => setDrawerOpen(true)} color="inherit">
               <MenuIcon />
@@ -92,7 +92,6 @@ const AdminHeader = () => {
             </Typography>
           </Box>
 
-          {/* HIDE DESKTOP NAV LINKS IF NOT LOGGED IN */}
           {!isMobile && user && (
             <>
               <Button
@@ -125,7 +124,6 @@ const AdminHeader = () => {
           )}
         </Stack>
 
-        {/* LOGOUT SECTION */}
         {!isMobile && user && (
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Typography variant="body2" color="inherit">
@@ -143,39 +141,44 @@ const AdminHeader = () => {
           </Stack>
         )}
 
-        {/* DRAWER (Only logic for when user is logged in) */}
         <Drawer
           anchor="left"
           open={drawerOpen}
           onClose={() => setDrawerOpen(false)}
-          PaperProps={{ sx: { width: 280 } }}
+          PaperProps={{ sx: { width: theme.spacing(35) } }}
         >
-          <Box sx={{ p: 2, bgcolor: 'primary.dark', color: 'white' }}>
-            <Typography variant="h6">Admin Menu</Typography>
+          <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <Box sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
+              <Toolbar>
+                <Typography variant="h6" sx={{ fontWeight: 'black' }}>
+                  Admin Menu
+                </Typography>
+              </Toolbar>
+            </Box>
+            <List sx={{ p: theme.spacing(1.5) }}>
+              <ListItemButton onClick={() => handleNavigation('/admin/articles')}>
+                <ListItemIcon>
+                  <ArticleIcon />
+                </ListItemIcon>
+                <ListItemText primary="Manage Articles" />
+              </ListItemButton>
+              <ListItemButton
+                onClick={() => handleNavigation('/admin/articles/new')}
+              >
+                <ListItemIcon>
+                  <AddIcon />
+                </ListItemIcon>
+                <ListItemText primary="Create Article" />
+              </ListItemButton>
+              <Divider sx={{ my: theme.spacing(1) }} />
+              <ListItemButton onClick={handleLogout}>
+                <ListItemIcon>
+                  <LogoutIcon />
+                </ListItemIcon>
+                <ListItemText primary="Logout" />
+              </ListItemButton>
+            </List>
           </Box>
-          <List>
-            <ListItemButton onClick={() => handleNavigation('/admin/articles')}>
-              <ListItemIcon>
-                <ArticleIcon />
-              </ListItemIcon>
-              <ListItemText primary="Manage Articles" />
-            </ListItemButton>
-            <ListItemButton
-              onClick={() => handleNavigation('/admin/articles/new')}
-            >
-              <ListItemIcon>
-                <AddIcon />
-              </ListItemIcon>
-              <ListItemText primary="Create Article" />
-            </ListItemButton>
-            <Divider />
-            <ListItemButton onClick={handleLogout}>
-              <ListItemIcon>
-                <LogoutIcon />
-              </ListItemIcon>
-              <ListItemText primary="Logout" />
-            </ListItemButton>
-          </List>
         </Drawer>
       </Toolbar>
     </AppBar>

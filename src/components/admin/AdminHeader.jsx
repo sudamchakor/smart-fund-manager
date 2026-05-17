@@ -13,7 +13,7 @@ const AdminHeader = ({ isAdmin, tabValue }) => {
         mb: 3,
       }}
     >
-      <Typography variant="h4" sx={{ fontWeight: 900, color: '#111' }}>
+      <Typography variant="h4" sx={{ fontWeight: 900 }}>
         Admin Console
       </Typography>
       {isAdmin && tabValue === 0 && (
@@ -22,7 +22,7 @@ const AdminHeader = ({ isAdmin, tabValue }) => {
           startIcon={<AddIcon />}
           component={Link}
           to="/admin/articles/new"
-          sx={{ bgcolor: '#111', borderRadius: 2, px: 3 }}
+          sx={{ px: 3 }}
         >
           Create Article
         </Button>
