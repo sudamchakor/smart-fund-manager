@@ -1,44 +1,24 @@
 import { createTheme, alpha } from '@mui/material';
 import { getMotionProfile } from './motionProfiles';
 
-// --- PRE-CONFIGURED GALLERY PRESETS ---
+// --- 1. PRE-CONFIGURED GALLERY PRESETS ---
 export const themePresets = {
-  modern_solid: {
-    name: 'Modern Solid',
-    arch: 'material',
-    style: 'flat',
-    desc: 'Clean and dependable.',
-    previewColor: '#0061A4',
-  },
-  premium_glass: {
-    name: 'Premium Glass',
-    arch: 'apple',
-    style: 'glass',
-    desc: 'Frosted transparency.',
-    previewColor: '#000000',
-  },
+  modern_solid: { name: 'Modern Solid', arch: 'material', style: 'flat' },
+  premium_glass: { name: 'Premium Glass', arch: 'apple', style: 'glass' },
   enterprise_pro: {
     name: 'Enterprise Pro',
     arch: 'fluent',
     style: 'minimalist',
-    desc: 'Sharp data focus.',
-    previewColor: '#0078D4',
   },
-  soft_3d: {
-    name: 'Soft & Deep',
-    arch: 'apple',
-    style: 'neumorphic',
-    desc: 'Tactile 3D shadows.',
-    previewColor: '#C5A059',
-  },
+  soft_3d: { name: 'Soft & Deep', arch: 'apple', style: 'neumorphic' },
 };
 
-// --- EXPANDED COLOR PALETTE (10 Professional Themes) ---
+// --- 2. EXPANDED COLOR PALETTE ---
 export const themeColors = [
   {
     name: 'System',
     value: 'system',
-    colors: ['#0061A4', '#D1E4FF', '#F8FAFF', '#001D35', '#535F70'], // fallback values
+    colors: ['#0061A4', '#D1E4FF', '#F8FAFF', '#001D35', '#535F70'],
   },
   {
     name: 'DodgerBlue',
@@ -77,95 +57,374 @@ export const themeColors = [
   },
 ];
 
-export const getAppTheme = (resolvedThemeMode, designSystem, visualStyle) => {
-  let isDarkMode = false;
-  let colorName = resolvedThemeMode;
-
-  // Determine mode and color palette name from the resolved theme mode.
-  if (resolvedThemeMode === 'dark') {
-    isDarkMode = true;
-    colorName = 'dodgerblue'; // Use default color palette for system dark mode
-  } else if (resolvedThemeMode === 'light') {
-    isDarkMode = false;
-    colorName = 'dodgerblue'; // Use default color palette for system light mode
-  }
-  // If a specific color theme (e.g., 'green') is passed, isDarkMode will be false.
-  // This is a pre-existing limitation: selecting a color theme forces light mode.
-
+// --- 3. THEME GENERATOR ---
+export const getAppTheme = (themeMode, designSystem, visualStyle) => {
   const selectedTheme =
-    themeColors.find((t) => t.value === colorName) ||
-    themeColors.find((t) => t.value === 'dodgerblue');
-
+    themeColors.find((t) => t.value === themeMode) || themeColors[0];
   const [primary, secondary, background, textPrimary, textSecondary] =
     selectedTheme.colors;
 
-  const motion = getMotionProfile(designSystem);
+  const isDarkMode =
+    themeMode === 'dark' || themeMode === 'zinc' || themeMode === 'slate';
+  const isGlass = visualStyle === 'glass';
+  const isNeumorphic = visualStyle === 'neumorphic';
+  const isMinimalist = visualStyle === 'minimalist';
 
-  // Define palette options, with specific overrides for dark mode.
-  const themeOptions = {
+  const motion = getMotionProfile(designSystem);
+  const isMaterial = designSystem === 'material';
+
+  const baseRadius =
+    designSystem === 'apple'
+      ? '14px'
+      : designSystem === 'fluent'
+        ? '0px'
+        : '8px';
+  const innerRadius =
+    designSystem === 'apple'
+      ? '8px'
+      : designSystem === 'fluent'
+        ? '0px'
+        : '4px';
+
+  return createTheme({
     palette: {
       mode: isDarkMode ? 'dark' : 'light',
       primary: { main: primary },
       secondary: { main: secondary },
       background: {
-        default: isDarkMode ? '#121212' : background,
-        paper: isDarkMode ? '#1E1E1E' : '#ffffff',
+        default: isNeumorphic
+          ? isDarkMode
+            ? '#1e1e1e'
+            : '#f3f4f6'
+          : background,
+        paper: isDarkMode
+          ? themeMode === 'slate'
+            ? '#1E293B'
+            : '#1C1B1F'
+          : '#ffffff',
       },
-      text: {
-        primary: isDarkMode ? '#FFFFFF' : textPrimary,
-        secondary: isDarkMode ? '#B0B0B0' : textSecondary,
-      },
+      text: { primary: textPrimary, secondary: textSecondary },
     },
-    transitions: {
-      easing: motion.easing,
-      duration: motion.duration,
-    },
-    shape: {
-      borderRadius: designSystem === 'fluent' ? 2 : 3,
-    },
+    transitions: { easing: motion.easing, duration: motion.duration },
+    shape: { borderRadius: 4 },
     typography: {
       fontFamily:
         designSystem === 'apple'
-          ? "'-apple-system', sans-serif"
-          : "'Inter', 'Roboto', sans-serif",
+          ? "'-apple-system', 'SF Pro Text', sans-serif"
+          : "'Inter', sans-serif",
     },
+
     components: {
+      MuiButton: {
+        defaultProps: {
+          disableRipple: !isMaterial,
+          disableElevation: !isMaterial,
+        },
+        styleOverrides: {
+          root: {
+            textTransform: 'none',
+            fontWeight: designSystem === 'apple' ? 500 : 400,
+            borderRadius: innerRadius,
+            transition: 'all 0.2s ease-in-out',
+            ...(designSystem === 'apple' && {
+              '&:active': { transform: 'scale(0.96)' },
+            }),
+          },
+        },
+      },
+      MuiList: {
+        styleOverrides: {
+          root: {
+            ...(isGlass && { backgroundColor: 'transparent !important' }),
+          },
+        },
+      },
+      // 🟢 THE FIX: Explicitly target the Mobile Drawer from Header.jsx
+      MuiDrawer: {
+        styleOverrides: {
+          paper: {
+            ...(isGlass && {
+              backgroundColor: isDarkMode
+                ? 'rgba(18, 18, 18, 0.65) !important'
+                : 'rgba(255, 255, 255, 0.45) !important',
+              backdropFilter: 'blur(24px) saturate(200%) !important',
+              WebkitBackdropFilter: 'blur(24px) saturate(200%) !important',
+              backgroundImage: 'none !important',
+              borderRight: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)'} !important`,
+            }),
+            ...(isMinimalist && {
+              borderRight: '1px solid #e0e0e0 !important',
+              boxShadow: 'none !important',
+            }),
+          },
+        },
+      },
+      // 🟢 THE FIX: Add hover & select styles to the Mobile Drawer Lists
+      MuiListItemButton: {
+        styleOverrides: {
+          root: {
+            borderRadius: innerRadius,
+            margin: '2px 8px',
+            padding: '8px 14px',
+            transition: 'all 0.15s ease',
+            ...(isGlass && {
+              '&:hover': {
+                backgroundColor: isDarkMode
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(0, 0, 0, 0.05)',
+                color: primary,
+              },
+              '&.Mui-selected': {
+                backgroundColor: isDarkMode
+                  ? 'rgba(255, 255, 255, 0.15)'
+                  : 'rgba(0, 0, 0, 0.08)',
+                color: primary,
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: isDarkMode
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.12)',
+                },
+              },
+            }),
+          },
+        },
+      },
+      // Forces Icons inside the Mobile Drawer to change color when you select/hover them
+      MuiListItemIcon: {
+        styleOverrides: {
+          root: {
+            color: 'inherit',
+            transition: 'color 0.15s ease',
+          },
+        },
+      },
+      MuiMenu: {
+        defaultProps: { PaperProps: { sx: { mt: '8px' } } },
+        styleOverrides: {
+          paper: {
+            borderRadius: baseRadius + ' !important',
+            ...(isGlass && {
+              backgroundColor: isDarkMode
+                ? 'rgba(18, 18, 18, 0.6) !important'
+                : 'rgba(255, 255, 255, 0.4) !important',
+              backdropFilter: 'blur(24px) saturate(200%) !important',
+              WebkitBackdropFilter: 'blur(24px) saturate(200%) !important',
+              backgroundImage: 'none !important',
+              border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)'} !important`,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12) !important',
+            }),
+            ...(isMinimalist && {
+              boxShadow: 'none !important',
+              border: '1px solid #e0e0e0 !important',
+            }),
+          },
+          list: { padding: '8px !important' },
+        },
+      },
+      MuiPopover: {
+        styleOverrides: {
+          paper: {
+            borderRadius: baseRadius + ' !important',
+            ...(isGlass && {
+              backgroundColor: isDarkMode
+                ? 'rgba(18, 18, 18, 0.6) !important'
+                : 'rgba(255, 255, 255, 0.4) !important',
+              backdropFilter: 'blur(24px) saturate(200%) !important',
+              WebkitBackdropFilter: 'blur(24px) saturate(200%) !important',
+              backgroundImage: 'none !important',
+              border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)'} !important`,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12) !important',
+            }),
+            ...(isMinimalist && {
+              boxShadow: 'none !important',
+              border: '1px solid #e0e0e0 !important',
+            }),
+          },
+        },
+      },
+      MuiDialog: {
+        styleOverrides: {
+          paper: {
+            borderRadius: baseRadius + ' !important',
+            ...(isGlass && {
+              backgroundColor: isDarkMode
+                ? 'rgba(18, 18, 18, 0.6) !important'
+                : 'rgba(255, 255, 255, 0.4) !important',
+              backdropFilter: 'blur(24px) saturate(200%) !important',
+              WebkitBackdropFilter: 'blur(24px) saturate(200%) !important',
+              backgroundImage: 'none !important',
+              border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)'} !important`,
+              boxShadow: '0 24px 64px rgba(0, 0, 0, 0.2) !important',
+            }),
+          },
+        },
+      },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            borderRadius: innerRadius,
+            margin: '2px 4px',
+            padding: '8px 14px',
+            fontSize: '0.94rem',
+            ...(isGlass && {
+              '&:hover': {
+                backgroundColor: isDarkMode
+                  ? 'rgba(255, 255, 255, 0.1)'
+                  : 'rgba(0, 0, 0, 0.05)',
+                color: primary,
+              },
+              '&.Mui-selected': {
+                backgroundColor: isDarkMode
+                  ? 'rgba(255, 255, 255, 0.15)'
+                  : 'rgba(0, 0, 0, 0.08)',
+                color: primary,
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: isDarkMode
+                    ? 'rgba(255, 255, 255, 0.2)'
+                    : 'rgba(0, 0, 0, 0.12)',
+                },
+              },
+            }),
+          },
+        },
+      },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          root: {
+            borderRadius: innerRadius,
+            ...(isGlass && {
+              backgroundColor: isDarkMode
+                ? 'rgba(255, 255, 255, 0.05)'
+                : 'rgba(255, 255, 255, 0.35)',
+              backdropFilter: 'blur(8px)',
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: isDarkMode
+                  ? 'rgba(255, 255, 255, 0.15)'
+                  : 'rgba(0, 0, 0, 0.1)',
+              },
+            }),
+          },
+        },
+      },
       MuiPaper: {
         styleOverrides: {
-          root: ({ theme }) => ({
-            transition: theme.transitions.create(['all'], {
-              duration: theme.transitions.duration.standard,
-              easing: theme.transitions.easing.easeInOut,
+          root: {
+            transition: 'all 0.3s ease',
+            borderRadius: baseRadius,
+            ...(isGlass && {
+              '&.MuiCard-root, &.MuiTableContainer-root': {
+                backgroundColor: isDarkMode
+                  ? 'rgba(30, 30, 30, 0.5)'
+                  : 'rgba(255, 255, 255, 0.5)',
+                backdropFilter: 'blur(20px)',
+                border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'}`,
+              },
             }),
-            borderRadius: theme.shape.borderRadius,
-            boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-            ...(visualStyle === 'glass' && {
-              backgroundColor: alpha(theme.palette.background.paper, 0.7),
-              backdropFilter: 'blur(20px)',
-              border: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
-            }),
-            ...(visualStyle === 'neumorphic' && {
-              backgroundColor: isDarkMode ? '#1e1e1e' : '#f3f4f6',
+            ...(isNeumorphic && {
               boxShadow: isDarkMode
-                ? '5px 5px 10px #0b0b0b, -5px -5px 10px #252525'
-                : '6px 6px 12px #d1d5db, -6px -6px 12px #ffffff',
+                ? '12px 12px 24px #0b0b0b, -12px -12px 24px #252525'
+                : '10px 10px 20px #d1d5db, -10px -10px 20px #ffffff',
             }),
-            ...(visualStyle === 'minimalist' && {
+            ...(isMinimalist && {
               boxShadow: 'none',
-              border: `1px solid ${theme.palette.divider}`,
+              border: '1px solid #e0e0e0',
             }),
-          }),
+          },
         },
       },
     },
-  };
-
-  // Apply special background for neumorphic style, overriding the default.
-  if (visualStyle === 'neumorphic') {
-    themeOptions.palette.background.default = isDarkMode
-      ? '#1e1e1e'
-      : '#f3f4f6';
-  }
-
-  return createTheme(themeOptions);
+  });
 };
+
+// --- 4. ANIMATION CONFIGURATIONS ---
+export const textVariant = (delay) => ({
+  hidden: { y: -50, opacity: 0 },
+  show: {
+    y: 0,
+    opacity: 1,
+    transition: { type: 'spring', duration: 1.25, delay: delay },
+  },
+});
+export const fadeIn = (direction, type, delay, duration) => ({
+  hidden: {
+    x: direction === 'left' ? 100 : direction === 'right' ? -100 : 0,
+    y: direction === 'up' ? 100 : direction === 'down' ? -100 : 0,
+    opacity: 0,
+  },
+  show: {
+    x: 0,
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: type,
+      delay: delay,
+      duration: duration,
+      ease: 'easeOut',
+    },
+  },
+});
+export const zoomIn = (delay, duration) => ({
+  hidden: { scale: 0, opacity: 0 },
+  show: {
+    scale: 1,
+    opacity: 1,
+    transition: {
+      type: 'tween',
+      delay: delay,
+      duration: duration,
+      ease: 'easeOut',
+    },
+  },
+});
+export const slideIn = (direction, type, delay, duration) => ({
+  hidden: {
+    x: direction === 'left' ? '-100%' : direction === 'right' ? '100%' : 0,
+    y: direction === 'up' ? '100%' : direction === 'down' ? '-100%' : 0,
+  },
+  show: {
+    x: 0,
+    y: 0,
+    transition: {
+      type: type,
+      delay: delay,
+      duration: duration,
+      ease: 'easeOut',
+    },
+  },
+});
+export const staggerContainer = (staggerChildren, delayChildren) => ({
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: staggerChildren,
+      delayChildren: delayChildren || 0,
+    },
+  },
+});
+export const textVariant2 = () => ({
+  hidden: { opacity: 0, y: 20 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'tween',
+      ease: 'easeIn',
+      staggerChildren: 0.02,
+      delayChildren: 0.02,
+    },
+  },
+});
+export const footerVariants = () => ({
+  hidden: {
+    opacity: 0,
+    y: 50,
+    transition: { type: 'spring', stiffness: 300, damping: 140 },
+  },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 80, delay: 0.5, duration: 1.2 },
+  },
+});

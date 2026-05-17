@@ -19,7 +19,6 @@ import {
   Stack,
   Tooltip,
   useTheme,
-  alpha,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
@@ -85,20 +84,22 @@ const Header = () => {
       CALCULATORS.find((c) => location.pathname.startsWith(c.path)) || {
         label: 'Select Calculator',
         path: '',
-      }, // Placeholder for no selection
+      },
     [location.pathname],
   );
 
-  const showExport = useMemo(() => {
-    const allowed = ['/calculator', '/profile', '/tax-calculator'];
-    return allowed.some((path) => location.pathname.startsWith(path));
-  }, [location.pathname]);
+  const showExport = useMemo(
+    () =>
+      ['/calculator', '/profile', '/tax-calculator'].some((path) =>
+        location.pathname.startsWith(path),
+      ),
+    [location.pathname],
+  );
 
   const handleExport = async (format) => {
     setExportAnchorEl(null);
-    if (format === 'pdf') {
-      window.print();
-    } else if (format === 'excel') {
+    if (format === 'pdf') window.print();
+    else if (format === 'excel') {
       if (!calculatedValues?.schedule || calculatedValues.schedule.length === 0)
         return enqueueSnackbar('No data to export', { variant: 'info' });
       const XLSX = await import('xlsx');
@@ -125,50 +126,6 @@ const Header = () => {
     setProfileAnchorEl(null);
   };
 
-  // Custom Menu PaperProps for styling
-  const menuPaperProps = {
-    sx: {
-      mt: 1,
-      border: '1px solid',
-      borderColor: 'divider',
-      overflow: 'hidden',
-      '& .MuiMenuItem-root': {
-        mx: 1,
-        mb: 0.5,
-        px: 2,
-        py: 1,
-        borderRadius: 1.5,
-        typography: 'body2',
-        fontWeight: 500,
-        color: 'text.primary',
-        transition: 'all 0.2s ease-in-out',
-        '&:hover': {
-          bgcolor: alpha(theme.palette.primary.main, 0.08),
-          color: 'primary.main',
-          '& .MuiListItemIcon-root': {
-            color: 'primary.main',
-          },
-        },
-        '&.Mui-selected': {
-          bgcolor: alpha(theme.palette.primary.main, 0.12),
-          color: 'primary.main',
-          fontWeight: 600,
-          '& .MuiListItemIcon-root': {
-            color: 'primary.main',
-          },
-          '&:hover': {
-            bgcolor: alpha(theme.palette.primary.main, 0.16),
-          },
-        },
-      },
-      '& .MuiListItemIcon-root': {
-        minWidth: 36,
-        color: 'text.secondary',
-        transition: 'color 0.2s ease-in-out',
-      },
-    },
-  };
-
   return (
     <AppBar
       position="fixed"
@@ -179,7 +136,7 @@ const Header = () => {
         zIndex: theme.zIndex.drawer + 1,
         borderBottom: 1,
         borderColor: 'divider',
-        borderRadius: { xs: 0, md: 0 }, // Explicitly set to 0 for all screen sizes
+        borderRadius: 0,
       }}
     >
       <Toolbar>
@@ -208,7 +165,7 @@ const Header = () => {
               sx={{
                 display: 'inline-flex',
                 p: 0.5,
-                borderRadius: `${theme.shape.borderRadius}px`,
+                borderRadius: '4px',
                 bgcolor: 'background.paper',
                 color: 'primary.main',
               }}
@@ -250,7 +207,6 @@ const Header = () => {
               >
                 {currentCalc.label}
               </Button>
-
               <Button
                 onClick={() => handleNavigation('/articles')}
                 sx={{
@@ -289,7 +245,6 @@ const Header = () => {
                   Export
                 </Button>
               )}
-
               <Tooltip title="Help & FAQ">
                 <IconButton
                   onClick={() => handleNavigation('/faq')}
@@ -300,8 +255,6 @@ const Header = () => {
               </Tooltip>
             </>
           )}
-
-          {/* Profile Icon for public users, leads to generic profile or login */}
           <IconButton
             onClick={(e) => setProfileAnchorEl(e.currentTarget)}
             color="inherit"
@@ -311,16 +264,13 @@ const Header = () => {
           </IconButton>
         </Stack>
 
-        {/* CALCULATORS DROPDOWN */}
+        {/* 🟢 CALCULATORS MENU */}
         <Menu
           anchorEl={anchorEl}
           open={Boolean(anchorEl)}
           onClose={() => setAnchorEl(null)}
           disableScrollLock
-          PaperProps={{
-            ...menuPaperProps,
-            sx: { ...menuPaperProps.sx, minWidth: 260 },
-          }}
+          PaperProps={{ sx: { minWidth: 260, overflow: 'hidden' } }}
           transformOrigin={{ horizontal: 'center', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
         >
@@ -336,16 +286,13 @@ const Header = () => {
           ))}
         </Menu>
 
-        {/* PROFILE DROPDOWN (Public) */}
+        {/* 🟢 PROFILE MENU */}
         <Menu
           anchorEl={profileAnchorEl}
           open={Boolean(profileAnchorEl)}
           onClose={() => setProfileAnchorEl(null)}
           disableScrollLock
-          PaperProps={{
-            ...menuPaperProps,
-            sx: { ...menuPaperProps.sx, minWidth: 260 },
-          }}
+          PaperProps={{ sx: { minWidth: 260, overflow: 'hidden' } }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
@@ -373,7 +320,6 @@ const Header = () => {
             </ListItemIcon>{' '}
             Wealth Dashboard
           </MenuItem>
-
           <Divider sx={{ my: 1 }} />
           <MenuItem onClick={() => handleNavigation('/settings')}>
             <ListItemIcon>
@@ -382,26 +328,21 @@ const Header = () => {
             Global Settings
           </MenuItem>
           <Divider sx={{ my: 1 }} />
-
           <MenuItem onClick={handleResetData} sx={{ color: 'error.main' }}>
             <ListItemIcon>
               <ResetIcon fontSize="small" color="error" />
             </ListItemIcon>{' '}
             Reset All Data
           </MenuItem>
-          {/* No Login/Logout here, handled by AdminHeader or direct route */}
         </Menu>
 
-        {/* EXPORT MENU */}
+        {/* 🟢 EXPORT MENU */}
         <Menu
           anchorEl={exportAnchorEl}
           open={Boolean(exportAnchorEl)}
           onClose={() => setExportAnchorEl(null)}
           disableScrollLock
-          PaperProps={{
-            ...menuPaperProps,
-            sx: { ...menuPaperProps.sx, minWidth: 200 },
-          }}
+          PaperProps={{ sx: { minWidth: 200, overflow: 'hidden' } }}
           transformOrigin={{ horizontal: 'right', vertical: 'top' }}
           anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         >
@@ -420,7 +361,7 @@ const Header = () => {
         </Menu>
       </Toolbar>
 
-      {/* DRAWER - Public */}
+      {/* DRAWER CODE REMAINS UNCHANGED */}
       <Drawer
         anchor="left"
         open={drawerOpen}
@@ -428,19 +369,13 @@ const Header = () => {
         PaperProps={{ sx: { width: theme.spacing(35) } }}
       >
         <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-          <Box
-            sx={{
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-            }}
-          >
+          <Box sx={{ bgcolor: 'primary.main', color: 'primary.contrastText' }}>
             <Toolbar>
               <Typography variant="h6" sx={{ fontWeight: 'black' }}>
                 SmartFund Manager
               </Typography>
             </Toolbar>
           </Box>
-
           <List sx={{ p: theme.spacing(1.5) }}>
             <ListItemButton
               onClick={() => setOpenCalculators(!openCalculators)}
@@ -455,7 +390,6 @@ const Header = () => {
               />
               {openCalculators ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-
             <Collapse in={openCalculators} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 {CALCULATORS.map((calc) => (
@@ -477,9 +411,7 @@ const Header = () => {
                 ))}
               </List>
             </Collapse>
-
             <Divider sx={{ my: theme.spacing(1) }} />
-
             <ListItemButton
               onClick={() => handleNavigation('/articles')}
               sx={{ borderRadius: theme.shape.borderRadius }}
@@ -489,9 +421,7 @@ const Header = () => {
               </ListItemIcon>
               <ListItemText primary="Articles" />
             </ListItemButton>
-
             <Divider sx={{ my: theme.spacing(1) }} />
-
             <ListItemButton
               onClick={() => setOpenProfile(!openProfile)}
               sx={{ borderRadius: theme.shape.borderRadius }}
@@ -505,7 +435,6 @@ const Header = () => {
               />
               {openProfile ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
-
             <Collapse in={openProfile} timeout="auto" unmountOnExit>
               <List component="div" disablePadding>
                 <ListItemButton
@@ -522,7 +451,6 @@ const Header = () => {
                 </ListItemButton>
               </List>
             </Collapse>
-
             <ListItemButton
               onClick={() => handleNavigation('/settings')}
               sx={{ borderRadius: theme.shape.borderRadius }}
@@ -532,9 +460,7 @@ const Header = () => {
               </ListItemIcon>
               <ListItemText primary="Settings" />
             </ListItemButton>
-
             <Divider sx={{ my: theme.spacing(1) }} />
-
             <ListItemButton
               onClick={() => handleNavigation('/faq')}
               sx={{ borderRadius: theme.shape.borderRadius }}
@@ -544,9 +470,7 @@ const Header = () => {
               </ListItemIcon>
               <ListItemText primary="Help & FAQ" />
             </ListItemButton>
-
             <Divider sx={{ my: theme.spacing(1) }} />
-
             <ListItemButton
               onClick={handleResetData}
               sx={{
@@ -559,7 +483,6 @@ const Header = () => {
               </ListItemIcon>
               <ListItemText primary="Clear All Data" />
             </ListItemButton>
-            {/* No Login/Logout here, handled by AdminHeader or direct route */}
           </List>
         </Box>
       </Drawer>
