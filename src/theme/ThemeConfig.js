@@ -121,8 +121,7 @@ export const getAppTheme = (resolvedThemeMode, designSystem, visualStyle) => {
       duration: motion.duration,
     },
     shape: {
-      borderRadius:
-        designSystem === 'apple' ? 8 : designSystem === 'fluent' ? 2 : 4,
+      borderRadius: designSystem === 'fluent' ? 2 : 3,
     },
     typography: {
       fontFamily:
