@@ -59,10 +59,11 @@ const profileSlice = createSlice({
   initialState,
   reducers: {
     setBasicInfo: (state, action) => {
-      state.name = action.payload.name;
-      state.occupation = action.payload.occupation;
-      state.riskTolerance = action.payload.riskTolerance;
-      state.currentAge = action.payload.age;
+      const payload = action.payload || {};
+      state.name = payload.name ?? state.name;
+      state.occupation = payload.occupation ?? state.occupation;
+      state.riskTolerance = payload.riskTolerance ?? state.riskTolerance;
+      state.currentAge = payload.age ?? state.currentAge;
     },
     setCurrentAge: (state, action) => {
       state.currentAge = action.payload;
