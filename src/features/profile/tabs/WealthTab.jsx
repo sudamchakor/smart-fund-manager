@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Grid, Box, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useSelector } from 'react-redux';
 
 // Redux Selectors
@@ -13,7 +13,6 @@ import { selectCalculatedValues } from '../../emiCalculator/utils/emiCalculator'
 // Feature Components
 import CashFlowDonutChart from '../components/CashFlowDonutChart';
 import WealthProjectionEngine from '../components/WealthProjectionEngine';
-import GoalCoverage from '../components/GoalCoverage';
 // Removed: import DebtAccelerator from '../components/DebtAccelerator';
 import CorrectionEngine from '../components/CorrectionEngine';
 import AutoBalancer from '../components/AutoBalancer';
@@ -48,24 +47,21 @@ export default function WealthTab() {
   const engineRef = useRef(null);
   // Removed: const acceleratorRef = useRef(null);
   const allocationChartRef = useRef(null);
-  const goalCoverageRef = useRef(null);
 
   useEffect(() => {
     window.__wealthEngineRef = engineRef;
     // Removed: window.__debtAcceleratorRef = acceleratorRef;
     window.__allocationChartRef = allocationChartRef;
-    window.__goalCoverageRef = goalCoverageRef;
 
     return () => {
       window.__wealthEngineRef = null;
       // Removed: window.__debtAcceleratorRef = null;
       window.__allocationChartRef = null;
-      window.__goalCoverageRef = null;
     };
   }, []);
 
   return (
-    <Box sx={{ width: '100%', overflow: 'hidden' }}> {/* Changed overflowX to overflow */}
+    <Box sx={{ width: '100%', overflow: 'hidden' }}>
       {/* Stack completely ignores null components, eliminating dead space */}
       <Stack spacing={2.5}>
         {/* 1. Background Logic Engines */}
@@ -76,19 +72,10 @@ export default function WealthTab() {
         <WealthProjectionEngine ref={engineRef} />
         <AssetAllocationChart ref={allocationChartRef} />
 
-        {/* 3. Current State Analysis (Grid used here ONLY because it's side-by-side) */}
-        <Grid container spacing={2.5}>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ height: '100%', minHeight: 350 }}>
-              <CashFlowDonutChart donutData={donutData} />
-            </Box>
-          </Grid>
-          <Grid item xs={12} md={6}>
-            <Box sx={{ height: '100%' }}>
-              <GoalCoverage ref={goalCoverageRef} />
-            </Box>
-          </Grid>
-        </Grid>
+        {/* 3. Current State Analysis */}
+        <Box sx={{ height: '100%', minHeight: 350 }}>
+          <CashFlowDonutChart donutData={donutData} />
+        </Box>
 
         {/* 4. Actionable Optimization Tools */}
         {/* Removed: <DebtAccelerator ref={acceleratorRef} /> */}

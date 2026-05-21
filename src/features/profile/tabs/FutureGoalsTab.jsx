@@ -58,6 +58,7 @@ import SectionHeader from '../../../components/common/SectionHeader';
 import ActionSpeedDial from '../../../components/common/ActionSpeedDial';
 import IndividualGoalTimelineChart from '../components/IndividualGoalTimelineChart';
 import GoalDistributionChart from '../components/GoalDistributionChart'; // Import the new component
+import GoalCoverage from '../components/GoalCoverage';
 
 // Charts
 import {
@@ -482,102 +483,99 @@ export default function FutureGoalsTab({ goalToEditId }) {
 
       {/* Charts Section */}
       <Grid container spacing={2.5} alignItems="flex-start">
-        <Grid item xs={12} lg={8}>
-          <Stack spacing={2.5}>
-            {/* Top Chart: Individual Goal Timeline */}
-            <StyledPaper>
-              <SectionHeader
-                title={`Goals Timeline: ${goals.find((g) => g.id === selectedGoalId)?.name || 'All'} vs. Combined Total`}
-                icon={<GraphIcon />}
-                color={theme.palette.primary.main}
+        <Grid item xs={12} lg={6}>
+          <StyledPaper>
+            <SectionHeader
+              title={`Goals Timeline: ${goals.find((g) => g.id === selectedGoalId)?.name || 'All'} vs. Combined Total`}
+              icon={<GraphIcon />}
+              color={theme.palette.primary.main}
+            />
+            <Box sx={{ height: { xs: 280, md: 350 } }}>
+              <IndividualGoalTimelineChart
+                goals={goalsWithFunding}
+                selectedGoalId={selectedGoalId}
+                currency={currency}
               />
-              <Box sx={{ height: { xs: 280, md: 350 } }}>
-                <IndividualGoalTimelineChart
-                  goals={goalsWithFunding}
-                  selectedGoalId={selectedGoalId}
-                  currency={currency}
-                />
-              </Box>
-            </StyledPaper>
-
-            {/* Middle Chart: Overall Wealth Projection */}
-            <StyledPaper>
-              <SectionHeader
-                title="Overall Wealth Projection"
-                icon={<GraphIcon />}
-                color={theme.palette.success.main}
-              />
-              <Box sx={{ height: { xs: 280, md: 350 }, p: 1 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={wealthData}>
-                    <CartesianGrid
-                      strokeDasharray="3 3"
-                      vertical={false}
-                      stroke={alpha(theme.palette.divider, 0.1)}
-                    />
-                    <XAxis
-                      dataKey="year"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        fill: theme.palette.text.secondary,
-                      }}
-                    />
-                    <YAxis
-                      tickFormatter={(val) =>
-                        formatIndianCurrency(val, currency)
-                      }
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{
-                        fontSize: 11,
-                        fontWeight: 700,
-                        fill: theme.palette.text.secondary,
-                      }}
-                    />
-                    <RechartsTooltip
-                      formatter={(value, name) => [
-                        formatIndianCurrency(value, currency),
-                        name,
-                      ]}
-                      contentStyle={{
-                        backgroundColor: theme.palette.background.paper,
-                        color: theme.palette.text.primary,
-                        border: `1px solid ${theme.palette.divider}`,
-                      }}
-                    />
-                    <Legend
-                      iconSize={10}
-                      wrapperStyle={{
-                        fontSize: '12px',
-                        color: theme.palette.text.secondary,
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="Total Wealth"
-                      stroke={theme.palette.success.main}
-                      fill={alpha(theme.palette.success.main, 0.2)}
-                      name="Nominal Value"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="Real Value"
-                      stroke={theme.palette.info.main}
-                      strokeDasharray="5 5"
-                      fill="transparent"
-                      name="Real Value (Inflation Adjusted)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </Box>
-            </StyledPaper>
-          </Stack>
+            </Box>
+          </StyledPaper>
         </Grid>
-        <Grid item xs={12} lg={4}>
-          {/* Bottom Chart: Goal Distribution Pie Chart */}
+        <Grid item xs={12} lg={6}>
+          <StyledPaper>
+            <SectionHeader
+              title="Overall Wealth Projection"
+              icon={<GraphIcon />}
+              color={theme.palette.success.main}
+            />
+            <Box sx={{ height: { xs: 280, md: 350 }, p: 1 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={wealthData}>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke={alpha(theme.palette.divider, 0.1)}
+                  />
+                  <XAxis
+                    dataKey="year"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      fill: theme.palette.text.secondary,
+                    }}
+                  />
+                  <YAxis
+                    tickFormatter={(val) => formatIndianCurrency(val, currency)}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      fill: theme.palette.text.secondary,
+                    }}
+                  />
+                  <RechartsTooltip
+                    formatter={(value, name) => [
+                      formatIndianCurrency(value, currency),
+                      name,
+                    ]}
+                    contentStyle={{
+                      backgroundColor: theme.palette.background.paper,
+                      color: theme.palette.text.primary,
+                      border: `1px solid ${theme.palette.divider}`,
+                    }}
+                  />
+                  <Legend
+                    iconSize={10}
+                    wrapperStyle={{
+                      fontSize: '12px',
+                      color: theme.palette.text.secondary,
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="Total Wealth"
+                    stroke={theme.palette.success.main}
+                    fill={alpha(theme.palette.success.main, 0.2)}
+                    name="Nominal Value"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="Real Value"
+                    stroke={theme.palette.info.main}
+                    strokeDasharray="5 5"
+                    fill="transparent"
+                    name="Real Value (Inflation Adjusted)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </Box>
+          </StyledPaper>
+        </Grid>
+        <Grid item xs={12} lg={6}>
+          <GoalCoverage />
+        </Grid>
+        <Grid item xs={12} lg={6}>
           <GoalDistributionChart
             goalDistributionData={goalDistributionData}
             totalAggregateGoalsValue={totalAggregateGoalsValue}
