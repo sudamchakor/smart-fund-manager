@@ -20,6 +20,7 @@ import SavingsOutlinedIcon from '@mui/icons-material/SavingsOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';
 import ReadOnlyItem from '../../../components/common/ReadOnlyItem';
 import ExpenseOptimizerModal from './ExpenseOptimizerModal';
+import ExpenseDetailsModal from '../../../components/common/ExpenseDetailsModal';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   selectIncomes,
@@ -37,6 +38,7 @@ import {
   selectAnnualGoalRunway,
   selectTotalOneTimeInvestments,
   deleteGoal,
+  selectPrioritizedGoalFunding,
 } from '../../../store/profileSlice';
 import {
   resetHomeLoanForm,
@@ -59,6 +61,8 @@ export default function FinancialSection({
   const navigate = useNavigate();
   const theme = useTheme();
   const [isOptimizerOpen, setOptimizerOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [detailsModalData, setDetailsModalData] = useState({ title: '', items: [] });
 
   const incomes = useSelector(selectIncomes) || [];
   const totalIncome = useSelector(selectTotalMonthlyIncome);
@@ -78,6 +82,7 @@ export default function FinancialSection({
   const { emi: monthlyEmi } = useSelector(selectCalculatedValues);
   const isLoanActive = useSelector(selectIsLoanActive);
   const taxComparison = useSelector(selectTaxComparison);
+  const prioritizedGoals = useSelector(selectPrioritizedGoalFunding);
 
   const totalAmount = isIncome
     ? totalIncome
@@ -112,11 +117,13 @@ export default function FinancialSection({
           investments: [],
         };
       }
-      let monthly = inv.amount || 0;
-      if (inv.frequency === 'yearly') monthly /= 12;
-      else if (inv.frequency === 'quarterly') monthly /= 3;
-
-      acc[inv.goalId].amount += monthly;
+      // Exclude funded investments from the total amount
+      if (!inv.isFunded) {
+        let monthly = inv.amount || 0;
+        if (inv.frequency === 'yearly') monthly /= 12;
+        else if (inv.frequency === 'quarterly') monthly /= 3;
+        acc[inv.goalId].amount += monthly;
+      }
       acc[inv.goalId].investments.push(inv);
       return acc;
     }, {});
@@ -143,6 +150,58 @@ export default function FinancialSection({
     if (taxableIncome > 250000) return 0.05;
     return 0;
   }, [taxComparison]);
+
+  const handleOpenDetailsModal = (title, items) => {
+    setDetailsModalData({ title, items });
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setDetailsModalData({ title: '', items: [] });
+  };
+
+  const monthlyExpensesList = useMemo(() => {
+    const list = [...expenses];
+    if (isLoanActive && monthlyEmi > 0) {
+      list.push({
+        id: 'home-loan-emi',
+        name: 'Home Loan EMI',
+        amount: monthlyEmi,
+        frequency: 'monthly',
+        category: 'loan',
+      });
+    }
+    Object.values(groupedGoals).forEach(goal => {
+      const correspondingPrioritizedGoal = prioritizedGoals.find(pg => pg.id === goal.id);
+      if (correspondingPrioritizedGoal && correspondingPrioritizedGoal.status !== 'Fully Funded') {
+        list.push({
+          id: goal.id,
+          name: `${goal.name} (Goal Contribution)`,
+          amount: goal.amount,
+          frequency: 'monthly',
+          category: 'goal',
+        });
+      }
+    });
+    return list;
+  }, [expenses, isLoanActive, monthlyEmi, groupedGoals, prioritizedGoals]);
+
+  const oneTimeInvestmentsList = useMemo(() => {
+    return individualGoalInvestments.filter(inv => inv.frequency === 'one-time').map(inv => {
+      const goal = goals.find(g => g.id === inv.goalId);
+      return {
+        id: inv.id,
+        name: `${goal?.name || 'Goal'} (One-Time Investment)`,
+        amount: inv.amount,
+        frequency: 'one-time',
+        category: 'goal-one-time',
+        year: inv.year,
+        isFunded: inv.isFunded,
+      };
+    });
+  }, [individualGoalInvestments, goals]);
+
 
   return (
     <>
@@ -282,7 +341,7 @@ export default function FinancialSection({
                   opacity: 0.6,
                   textAlign: 'center',
                 }}
-              >
+                >
                 <ReceiptLongOutlinedIcon
                   sx={{ fontSize: 64, mb: 2, color: 'text.secondary' }}
                 />
@@ -321,7 +380,7 @@ export default function FinancialSection({
                   <ReadOnlyItem
                     key={goal.id}
                     item={goal}
-                    subItems={goal.investments} // investments passed to subItems
+                    subItems={goal.investments}
                     currency={currency}
                     isExpense={true}
                     totalIncome={totalIncome}
@@ -340,7 +399,7 @@ export default function FinancialSection({
                     item={item}
                     currency={currency}
                     isExpense={true}
-                    isReadOnly={false} // Ensure edit button is visible
+                    isReadOnly={false}
                     onDelete={(id) => dispatch(deleteExpense(id))}
                     onEdit={(itemId) =>
                       onOpenModal(
@@ -395,9 +454,18 @@ export default function FinancialSection({
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography variant="caption" sx={{ opacity: 0.9, display: 'block' }}>
-                    Total Monthly Expenses
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ opacity: 0.9, display: 'block' }}>
+                      Total Monthly Expenses
+                    </Typography>
+                    <Tooltip title="View monthly expense details">
+                      <InfoIcon
+                        fontSize="small"
+                        sx={{ cursor: 'pointer', opacity: 0.8 }}
+                        onClick={() => handleOpenDetailsModal('Monthly Expense Details', monthlyExpensesList)}
+                      />
+                    </Tooltip>
+                  </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                     {formatCurrency(totalAmount)}
                   </Typography>
@@ -438,9 +506,18 @@ export default function FinancialSection({
                     justifyContent: 'center',
                   }}
                 >
-                  <Typography variant="caption" sx={{ opacity: 0.9, display: 'block' }}>
-                    Total One-Time Expenses
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Typography variant="caption" sx={{ opacity: 0.9, display: 'block' }}>
+                      Total One-Time Expenses
+                    </Typography>
+                    <Tooltip title="View one-time expense details">
+                      <InfoIcon
+                        fontSize="small"
+                        sx={{ cursor: 'pointer', opacity: 0.8 }}
+                        onClick={() => handleOpenDetailsModal('One-Time Expense Details', oneTimeInvestmentsList)}
+                      />
+                    </Tooltip>
+                  </Box>
                   <Typography variant="subtitle1" sx={{ fontWeight: 800 }}>
                     {formatCurrency(totalOneTimeInvestments)}
                   </Typography>
@@ -457,6 +534,14 @@ export default function FinancialSection({
         flexibleExpenses={flexibleExpenses}
         currency={currency}
         onApply={handleApplyExpenses}
+      />
+      <ExpenseDetailsModal
+        open={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        title={detailsModalData.title}
+        items={detailsModalData.items}
+        currency={currency}
+        formatCurrency={formatCurrency}
       />
     </>
   );

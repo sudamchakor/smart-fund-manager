@@ -39,7 +39,9 @@ export default function IncomeExpenseForm({
     amount: '',
     frequency: 'monthly',
     startYear: currentYear,
+    startMonth: 1,
     endYear: currentYear + 10,
+    endMonth: 1,
     category: 'basic',
     incomeType: 'Salary',
     isTaxDeductible: false,
@@ -50,6 +52,9 @@ export default function IncomeExpenseForm({
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
+      // ensure month fields exist when initial data supplies only years
+      startMonth: initialData?.startMonth || prev.startMonth || 1,
+      endMonth: initialData?.endMonth || prev.endMonth || 1,
       ...initialData,
     }));
   }, [initialData]);
@@ -265,11 +270,18 @@ export default function IncomeExpenseForm({
             open={startYearOpen}
             onOpen={() => setStartYearOpen(true)}
             onClose={() => setStartYearOpen(false)}
-            value={dayjs(`${Number(formData.startYear) || currentYear}-01-01`)}
+            value={(() => {
+              const y = formData.startYear;
+              const m = formData.startMonth || 1;
+              if (typeof y === 'number' && !isNaN(y)) return dayjs(`${y}-${String(m).padStart(2,'0')}-01`);
+              const parsed = dayjs(formData.startYear);
+              return parsed.isValid() ? parsed : dayjs(`${currentYear}-01-01`);
+            })()}
             onChange={(newValue) =>
               setFormData({
                 ...formData,
                 startYear: newValue ? newValue.year() : currentYear,
+                startMonth: newValue ? newValue.month() + 1 : (formData.startMonth || 1),
               })
             }
             slotProps={{
@@ -300,13 +312,18 @@ export default function IncomeExpenseForm({
             open={endYearOpen}
             onOpen={() => setEndYearOpen(true)}
             onClose={() => setEndYearOpen(false)}
-            value={dayjs(
-              `${Number(formData.endYear) || currentYear + 10}-01-01`,
-            )}
+            value={(() => {
+              const y = formData.endYear;
+              const m = formData.endMonth || 1;
+              if (typeof y === 'number' && !isNaN(y)) return dayjs(`${y}-${String(m).padStart(2,'0')}-01`);
+              const parsed = dayjs(formData.endYear);
+              return parsed.isValid() ? parsed : dayjs(`${currentYear + 10}-01-01`);
+            })()}
             onChange={(newValue) =>
               setFormData({
                 ...formData,
                 endYear: newValue ? newValue.year() : currentYear + 10,
+                endMonth: newValue ? newValue.month() + 1 : (formData.endMonth || 1),
               })
             }
             slotProps={{
@@ -322,9 +339,13 @@ export default function IncomeExpenseForm({
                 },
               },
             }}
-            minDate={dayjs(
-              `${Number(formData.startYear) || currentYear}-01-01`,
-            )}
+            minDate={(() => {
+              const sY = formData.startYear;
+              const sM = formData.startMonth || 1;
+              if (typeof sY === 'number' && !isNaN(sY)) return dayjs(`${sY}-${String(sM).padStart(2,'0')}-01`);
+              const parsed = dayjs(sY);
+              return parsed.isValid() ? parsed : dayjs(`${currentYear}-01-01`);
+            })()}
             maxDate={dayjs(`${currentYear + 50}-12-31`)}
           />
         </Grid>

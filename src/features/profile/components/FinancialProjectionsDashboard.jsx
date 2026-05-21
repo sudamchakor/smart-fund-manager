@@ -23,6 +23,24 @@ import dayjs from 'dayjs';
 
 // --- UTILITY FUNCTIONS & CUSTOM COMPONENTS ---
 
+// Helper to calculate active months in a year for an item
+const getActiveMonthsInYear = (startMonth, endMonth, year, startYear, endYear) => {
+  if (startYear === endYear && year === startYear) {
+    // Item only spans one year
+    return endMonth - startMonth + 1;
+  }
+  if (year === startYear) {
+    // First year: from startMonth to December
+    return 12 - startMonth;
+  }
+  if (year === endYear) {
+    // Last year: from January to endMonth
+    return endMonth + 1;
+  }
+  // Full year
+  return 12;
+};
+
 const formatCurrency = (value, currency = '₹') => {
   return `${currency}${value.toLocaleString('en-IN', {
     maximumFractionDigits: 0,
@@ -337,8 +355,15 @@ const FinancialProjectionsDashboard = ({
       let hasActiveIncome = false;
 
       incomes.forEach((inc) => {
+        // Skip funded incomes
+        if (inc.isFunded) {
+          return;
+        }
         const start = inc.startYear || currentYear;
         const end = inc.endYear || currentYear + 40;
+        const startMonth = inc.startMonth !== undefined ? inc.startMonth : 0;
+        const endMonth = inc.endMonth !== undefined ? inc.endMonth : 11;
+        
         if (year >= start && year <= end) {
           hasActiveIncome = true;
           let rawAmount = Number(inc.amount) || 0;
@@ -347,9 +372,18 @@ const FinancialProjectionsDashboard = ({
           else if (inc.frequency === 'quarterly') rawAmount *= 4;
 
           let yearlyAmount = rawAmount;
+          
+          // Prorate if item doesn't span full year
+          const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+          if (activeMonths < 12) {
+            yearlyAmount = (rawAmount / 12) * activeMonths;
+          }
+          
           const activeYears = year - Math.max(start, currentYear);
           if (activeYears > 0) {
-            yearlyAmount *= Math.pow(1 + careerGrowthRate, activeYears);
+            if (careerGrowthType === 'percentage') {
+              yearlyAmount *= Math.pow(1 + careerGrowthRate, activeYears);
+            }
           }
           annualIncome += yearlyAmount;
         }
@@ -366,16 +400,26 @@ const FinancialProjectionsDashboard = ({
       let totalExpenses = 0;
 
       expenses.forEach((exp) => {
+        // Skip funded expenses
+        if (exp.isFunded) {
+          return;
+        }
         const start = exp.startYear || currentYear;
         const end = exp.endYear || currentYear + 40;
+        const startMonth = exp.startMonth !== undefined ? exp.startMonth : 0;
+        const endMonth = exp.endMonth !== undefined ? exp.endMonth : 11;
+        
         if (year >= start && year <= end) {
           let rawAmount = Number(exp.amount) || 0;
           if (exp.frequency === 'monthly') rawAmount *= 12;
           else if (exp.frequency === 'quarterly') rawAmount *= 4;
 
-          baseTotalExpenses += rawAmount;
+          // Prorate if expense doesn't span full year
+          const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+          const baseAmount = (activeMonths < 12) ? (rawAmount / 12) * activeMonths : rawAmount;
+          baseTotalExpenses += baseAmount;
 
-          let yearlyAmount = rawAmount;
+          let yearlyAmount = baseAmount;
           const activeYears = year - Math.max(start, currentYear);
           if (activeYears > 0) {
             yearlyAmount *= Math.pow(1 + inflationRate, activeYears);
@@ -402,6 +446,10 @@ const FinancialProjectionsDashboard = ({
       totalExpenses += emiAnnual;
 
       individualGoalInvestments.forEach((inv) => {
+        const goal = goals.find((g) => g.id === inv.goalId);
+        if (goal?.isFunded || inv.isFunded) {
+          return;
+        }
         if (inv.type === 'one-time-yearly') {
           if (year === inv.year) {
             const amt = Number(inv.amount) || 0;
@@ -413,6 +461,8 @@ const FinancialProjectionsDashboard = ({
           const end =
             inv.endYear ||
             (inv.goalTargetYear ? inv.goalTargetYear : currentYear + 40);
+          const startMonth = inv.startMonth !== undefined ? inv.startMonth : 0;
+          const endMonth = inv.endMonth !== undefined ? inv.endMonth : 11;
 
           if (year >= start && year <= end) {
             let rawAmount = Number(inv.amount) || 0;
@@ -420,9 +470,12 @@ const FinancialProjectionsDashboard = ({
             if (inv.frequency === 'monthly') rawAmount *= 12;
             else if (inv.frequency === 'quarterly') rawAmount *= 4;
 
-            baseTotalExpenses += rawAmount;
+            // Prorate if investment doesn't span full year
+            const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+            const baseAmount = (activeMonths < 12) ? (rawAmount / 12) * activeMonths : rawAmount;
+            baseTotalExpenses += baseAmount;
 
-            let yearlyAmount = rawAmount;
+            let yearlyAmount = baseAmount;
             if (
               inv.type === 'step_up_sip' ||
               inv.investmentType === 'step_up_sip'

@@ -18,6 +18,43 @@ import { selectCurrency } from '../../../store/emiSlice';
 import dayjs from 'dayjs';
 
 const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth(); // 0-indexed
+
+// Helper to determine if an item is active in a given year, considering months
+const isItemActiveInYear = (itemYear, itemMonth, year, isStartYear, isEndYear) => {
+  if (isStartYear && isEndYear && itemYear === year) {
+    // Only this year is active
+    return true;
+  }
+  if (isStartYear && itemYear === year) {
+    // Start year: already checked if year matches
+    return true;
+  }
+  if (isEndYear && itemYear === year) {
+    // End year: already checked if year matches
+    return true;
+  }
+  // Middle years are always fully active
+  return true;
+};
+
+// Helper to calculate active months in a year for an item
+const getActiveMonthsInYear = (itemYear, startMonth, endMonth, year, startYear, endYear) => {
+  if (startYear === endYear && year === startYear) {
+    // Item only spans one year
+    return endMonth - startMonth + 1;
+  }
+  if (year === startYear) {
+    // First year: from startMonth to December
+    return 12 - startMonth;
+  }
+  if (year === endYear) {
+    // Last year: from January to endMonth
+    return endMonth + 1;
+  }
+  // Full year
+  return 12;
+};
 
 // Helper to round values to nice numbers (e.g. 112344 -> 120000)
 const roundToNiceNumber = (val, roundUp) => {
@@ -155,8 +192,15 @@ export default function ProjectedCashFlowChart({
       let hasActiveIncome = false;
 
       incomes.forEach((inc) => {
+        // Skip funded incomes
+        if (inc.isFunded) {
+          return;
+        }
         const start = inc.startYear || currentYear;
-        const end = inc.endYear || currentYear + 10;
+        const end = inc.endYear || currentYear + 40;
+        const startMonth = inc.startMonth !== undefined ? inc.startMonth : 0;
+        const endMonth = inc.endMonth !== undefined ? inc.endMonth : 11;
+        
         if (year >= start && year <= end) {
           hasActiveIncome = true;
           let rawAmount = Number(inc.amount) || 0;
@@ -165,6 +209,13 @@ export default function ProjectedCashFlowChart({
           else if (inc.frequency === 'quarterly') rawAmount *= 4;
 
           let yearlyAmount = rawAmount;
+          
+          // Prorate if item doesn't span full year
+          const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+          if (activeMonths < 12) {
+            yearlyAmount = (rawAmount / 12) * activeMonths;
+          }
+          
           const activeYears = year - Math.max(start, currentYear);
           if (activeYears > 0) {
             if (careerGrowthType === 'percentage') {
@@ -186,16 +237,25 @@ export default function ProjectedCashFlowChart({
       let annualExpense = 0;
 
       expenses.forEach((exp) => {
+        if (exp.isFunded) {
+          return;
+        }
         const start = exp.startYear || currentYear;
-        const end = exp.endYear || currentYear + 10;
+        const end = exp.endYear || currentYear + 40;
+        const startMonth = exp.startMonth !== undefined ? exp.startMonth : 0;
+        const endMonth = exp.endMonth !== undefined ? exp.endMonth : 11;
+        
         if (year >= start && year <= end) {
           let rawAmount = Number(exp.amount) || 0;
           if (exp.frequency === 'monthly') rawAmount *= 12;
           else if (exp.frequency === 'quarterly') rawAmount *= 4;
 
-          baseAnnualExpense += rawAmount;
+          // Prorate if expense doesn't span full year
+          const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+          const baseAmount = (activeMonths < 12) ? (rawAmount / 12) * activeMonths : rawAmount;
+          baseAnnualExpense += baseAmount;
 
-          let yearlyAmount = rawAmount;
+          let yearlyAmount = baseAmount;
           const activeYears = year - Math.max(start, currentYear);
           if (activeYears > 0) {
             yearlyAmount *= Math.pow(1 + inflationRate, activeYears);
@@ -222,6 +282,10 @@ export default function ProjectedCashFlowChart({
       baseAnnualExpense += emiAnnual;
 
       individualGoalInvestments.forEach((inv) => {
+        const goal = goals.find((g) => g.id === inv.goalId);
+        if (goal?.isFunded || inv.isFunded) {
+          return;
+        }
         if (inv.type === 'one-time-yearly') {
           if (year === inv.year) {
             const amt = Number(inv.amount) || 0;
@@ -232,7 +296,9 @@ export default function ProjectedCashFlowChart({
           const start = inv.startYear || currentYear;
           const end =
             inv.endYear ||
-            (inv.goalTargetYear ? inv.goalTargetYear : currentYear + 10);
+            (inv.goalTargetYear ? inv.goalTargetYear : currentYear + 40);
+          const startMonth = inv.startMonth !== undefined ? inv.startMonth : 0;
+          const endMonth = inv.endMonth !== undefined ? inv.endMonth : 11;
 
           if (year >= start && year <= end) {
             let rawAmount = Number(inv.amount) || 0;
@@ -240,9 +306,12 @@ export default function ProjectedCashFlowChart({
             if (inv.frequency === 'monthly') rawAmount *= 12;
             else if (inv.frequency === 'quarterly') rawAmount *= 4;
 
-            baseAnnualExpense += rawAmount;
+            // Prorate if investment doesn't span full year
+            const activeMonths = getActiveMonthsInYear(startMonth, endMonth, year, start, end);
+            const baseAmount = (activeMonths < 12) ? (rawAmount / 12) * activeMonths : rawAmount;
+            baseAnnualExpense += baseAmount;
 
-            let yearlyAmount = rawAmount;
+            let yearlyAmount = baseAmount;
             if (
               inv.type === 'step_up_sip' ||
               inv.investmentType === 'step_up_sip'

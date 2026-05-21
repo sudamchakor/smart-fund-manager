@@ -17,6 +17,7 @@ import {
   Grid,
 } from '@mui/material';
 import { Tune as OptimizeIcon } from '@mui/icons-material';
+import { getModalStyle, getDialogTitleStyle, getDialogContentStyle, getDialogActionsStyle } from '../../../theme/modalStyles';
 
 export default function ExpenseOptimizerModal({
   open,
@@ -101,13 +102,10 @@ export default function ExpenseOptimizerModal({
       fullWidth
       maxWidth="sm"
       PaperProps={{
-        sx: {
-          borderRadius: 3,
-          backgroundImage: 'none',
-        },
+        sx: getModalStyle(theme),
       }}
     >
-      <DialogTitle sx={{ pb: 1 }}>
+      <DialogTitle sx={getDialogTitleStyle()}>
         <Stack direction="row" alignItems="center" spacing={1.5}>
           <OptimizeIcon color="secondary" />
           <Typography variant="h6" sx={{ fontWeight: 800 }}>
@@ -120,7 +118,7 @@ export default function ExpenseOptimizerModal({
         </Typography>
       </DialogTitle>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={getDialogContentStyle()}>
         <Box sx={{ py: 1 }}>
           {localExpenses.map((expense) => {
             const initialExpense =
@@ -263,7 +261,7 @@ export default function ExpenseOptimizerModal({
         </Paper>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, pt: 1.5 }}>
+      <DialogActions sx={getDialogActionsStyle()}>
         <Button
           onClick={onClose}
           sx={{ fontWeight: 600, color: 'text.secondary' }}

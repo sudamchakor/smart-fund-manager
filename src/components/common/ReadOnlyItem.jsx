@@ -108,6 +108,8 @@ export default function ReadOnlyItem({
     }
   };
 
+  const isFunded = item.isFunded;
+
   return (
     <Box
       sx={{
@@ -118,6 +120,7 @@ export default function ReadOnlyItem({
         borderColor: alpha(theme.palette.divider, 0.1),
         borderLeft: `4px solid ${itemColor}`,
         transition: 'all 0.2s ease-in-out',
+        opacity: isFunded ? 0.7 : 1,
         '&:hover': {
           boxShadow: `0 4px 12px ${alpha(theme.palette.common.black || '#000', 0.08)}`,
           bgcolor: alpha(theme.palette.action.hover, 0.04),
@@ -137,11 +140,23 @@ export default function ReadOnlyItem({
           >
             {item.name}
           </Typography>
-          <Typography variant="caption" color="text.secondary">
+          <Typography
+            variant="caption"
+            color="text.secondary"
+          >
             {formatCurrency(item.amount, currency)} / {item.frequency}
           </Typography>
         </Box>
         <Stack direction="row" alignItems="center" spacing={0.5}>
+          {isFunded && (
+            <Chip
+              label="Funded"
+              size="small"
+              color="success"
+              variant="outlined"
+              sx={{ fontWeight: 'bold' }}
+            />
+          )}
           {item.frequency && (
             <Chip
               label={item.frequency}
