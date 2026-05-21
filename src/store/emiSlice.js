@@ -90,6 +90,11 @@ const emiSlice = createSlice({
       state.autoSave = action.payload;
     },
 
+    // State hydration reducer for Firestore loads
+    setEmiState: (state, action) => {
+      return { ...defaultInitialState, ...action.payload };
+    },
+
     // Reset Reducers
     resetEmiState: () => {
       return defaultInitialState;
@@ -115,11 +120,13 @@ export const {
   setDesignSystem,
   setVisualStyle,
   setAutoSave,
+  setEmiState,
   resetEmiState,
   resetHomeLoanForm,
 } = emiSlice.actions;
 
 // Export Selectors
+export const selectEmiState = (state) => state.emi;
 export const selectLoanDetails = (state) => state.emi.loanDetails;
 export const selectExpenses = (state) => state.emi.expenses;
 export const selectPrepayments = (state) => state.emi.prepayments;

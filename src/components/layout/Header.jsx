@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -19,13 +19,15 @@ import {
   Stack,
   Tooltip,
   useTheme,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from '@mui/material';
 import {
   Calculate as CalculateIcon,
   KeyboardArrowDown as ArrowDownIcon,
-  CreditCard as CreditCardIcon,
-  TrendingUp as TrendingUpIcon,
-  AccountBalanceWallet as TaxIcon,
   AccountCircle as ProfileIcon,
   Menu as MenuIcon,
   FileDownload as ExportIcon,
@@ -36,32 +38,28 @@ import {
   RestartAlt as ResetIcon,
   ExpandLess,
   ExpandMore,
-  Payments as PersonalLoanIcon,
   Article as ArticleIcon,
+  CloudUpload as CloudUploadIcon,
+  CloudDownload as CloudDownloadIcon,
 } from '@mui/icons-material';
 
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCalculatedValues } from '../../features/emiCalculator/utils/emiCalculator';
-import { resetEmiState } from '../../store/emiSlice';
+import { resetEmiState, selectEmiState, setEmiState } from '../../store/emiSlice';
+import { selectProfileState, setProfileState } from '../../store/profileSlice';
 import { useSnackbar } from 'notistack';
 import storage from 'redux-persist/lib/storage';
-
-const CALCULATORS = [
-  { path: '/calculator', label: 'Home Loan EMI', icon: <CalculateIcon /> },
-  {
-    path: '/credit-card-emi',
-    label: 'Credit Card EMI',
-    icon: <CreditCardIcon />,
-  },
-  { path: '/investment', label: 'Investment', icon: <TrendingUpIcon /> },
-  {
-    path: '/personal-loan',
-    label: 'Personal Loan',
-    icon: <PersonalLoanIcon />,
-  },
-  { path: '/tax-calculator', label: 'Tax Calculator', icon: <TaxIcon /> },
-];
+import { onAuthStateChanged } from 'firebase/auth';
+import { getAuthentication } from '../../firebaseConfig';
+import {
+  CALCULATORS,
+  exportSchedule,
+  isCloudPage,
+  isExportPage,
+  loadUserDataFromFirestore,
+  saveUserDataToFirestore,
+} from './headerHelpers';
 
 const Header = () => {
   const theme = useTheme();
@@ -70,7 +68,10 @@ const Header = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const { enqueueSnackbar } = useSnackbar();
+  const [authUser, setAuthUser] = useState(null);
   const calculatedValues = useSelector(selectCalculatedValues);
+  const emiState = useSelector(selectEmiState);
+  const profileState = useSelector(selectProfileState);
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [profileAnchorEl, setProfileAnchorEl] = useState(null);
@@ -78,6 +79,21 @@ const Header = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openCalculators, setOpenCalculators] = useState(false);
   const [openProfile, setOpenProfile] = useState(false);
+  const [cloudBusy, setCloudBusy] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogConfig, setDialogConfig] = useState({
+    title: '',
+    message: '',
+    confirmText: 'Confirm',
+    cancelText: 'Cancel',
+    onConfirm: null,
+    isDestructive: false,
+  });
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuthentication(), setAuthUser);
+    return () => unsubscribe();
+  }, []);
 
   const currentCalc = useMemo(
     () =>
@@ -88,35 +104,127 @@ const Header = () => {
     [location.pathname],
   );
 
-  const showExport = useMemo(
-    () =>
-      ['/calculator', '/profile', '/tax-calculator'].some((path) =>
-        location.pathname.startsWith(path),
-      ),
-    [location.pathname],
+  const showExport = useMemo(() => isExportPage(location.pathname), [
+    location.pathname,
+  ]);
+
+  const showCloudActions = useMemo(
+    () => isCloudPage(location.pathname) && Boolean(authUser),
+    [location.pathname, authUser],
   );
 
-  const handleExport = async (format) => {
-    setExportAnchorEl(null);
-    if (format === 'pdf') window.print();
-    else if (format === 'excel') {
-      if (!calculatedValues?.schedule || calculatedValues.schedule.length === 0)
-        return enqueueSnackbar('No data to export', { variant: 'info' });
-      const XLSX = await import('xlsx');
-      const ws = XLSX.utils.json_to_sheet(calculatedValues.schedule);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Schedule');
-      XLSX.writeFile(wb, 'SmartFund_Export.xlsx');
+  const handleSaveToFirestore = async () => {
+    if (!authUser) {
+      enqueueSnackbar('Sign in to save data', { variant: 'warning' });
+      return;
+    }
+
+    setCloudBusy(true);
+    try {
+      await saveUserDataToFirestore({
+        user: authUser,
+        emiState,
+        profileState,
+        enqueueSnackbar,
+      });
+    } catch (error) {
+      console.error('Firestore save error:', error);
+      enqueueSnackbar(
+        error?.message || 'Unable to save data to Firestore',
+        {
+          variant: 'error',
+        },
+      );
+    } finally {
+      setCloudBusy(false);
     }
   };
 
-  const handleResetData = async () => {
-    if (window.confirm('This will clear all your data. Continue?')) {
-      dispatch(resetEmiState());
-      await storage.removeItem('persist:app_v1');
-      localStorage.clear();
-      window.location.reload();
+  const handleLoadFromFirestore = async () => {
+    if (!authUser) {
+      enqueueSnackbar('Sign in to load data', { variant: 'warning' });
+      return;
     }
+
+    setDialogConfig({
+      title: 'Load Data from Cloud',
+      message:
+        'Loading data from Firestore will replace your current EMI and profile values. Continue?',
+      confirmText: 'Load',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        setDialogOpen(false);
+        setCloudBusy(true);
+        try {
+          const loadedData = await loadUserDataFromFirestore({
+            user: authUser,
+            enqueueSnackbar,
+          });
+
+          if (loadedData?.profileData) {
+            dispatch(setProfileState(loadedData.profileData));
+          }
+          if (loadedData?.emiData) {
+            dispatch(setEmiState(loadedData.emiData));
+          }
+        } catch (error) {
+          console.error('Firestore load error:', error);
+          enqueueSnackbar(
+            error?.message || 'Unable to load data from Firestore',
+            {
+              variant: 'error',
+            },
+          );
+        } finally {
+          setCloudBusy(false);
+        }
+      },
+      isDestructive: false,
+    });
+    setDialogOpen(true);
+  };
+
+  const handleExport = async (format) => {
+    setExportAnchorEl(null);
+    await exportSchedule({
+      format,
+      calculatedValues,
+      enqueueSnackbar,
+    });
+  };
+
+  const handleResetData = () => {
+    setDialogConfig({
+      title: 'Reset All Data',
+      message:
+        'This action will permanently clear all your data including EMI calculations, profile information, and local storage. This cannot be undone. Continue?',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        setDialogOpen(false);
+        try {
+          dispatch(resetEmiState());
+          await storage.removeItem('persist:app_v1');
+          localStorage.clear();
+          enqueueSnackbar('All data cleared successfully', {
+            variant: 'success',
+          });
+          setTimeout(() => {
+            window.location.reload();
+          }, 1000);
+        } catch (error) {
+          console.error('Error resetting data:', error);
+          enqueueSnackbar(
+            error?.message || 'Unable to reset data. Please try again.',
+            {
+              variant: 'error',
+            },
+          );
+        }
+      },
+      isDestructive: true,
+    });
+    setDialogOpen(true);
   };
 
   const handleNavigation = (path) => {
@@ -280,7 +388,9 @@ const Header = () => {
               onClick={() => handleNavigation(calc.path)}
               selected={location.pathname.startsWith(calc.path)}
             >
-              <ListItemIcon>{calc.icon}</ListItemIcon>
+              <ListItemIcon>
+                <calc.icon fontSize="small" />
+              </ListItemIcon>
               <ListItemText primary={calc.label} />
             </MenuItem>
           ))}
@@ -320,6 +430,35 @@ const Header = () => {
             </ListItemIcon>{' '}
             Wealth Dashboard
           </MenuItem>
+          {showCloudActions && (
+            <>
+              <Divider sx={{ my: 1 }} />
+              <MenuItem
+                onClick={() => {
+                  handleSaveToFirestore();
+                  setProfileAnchorEl(null);
+                }}
+                disabled={cloudBusy}
+              >
+                <ListItemIcon>
+                  <CloudUploadIcon fontSize="small" />
+                </ListItemIcon>{' '}
+                Save to Cloud
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  handleLoadFromFirestore();
+                  setProfileAnchorEl(null);
+                }}
+                disabled={cloudBusy}
+              >
+                <ListItemIcon>
+                  <CloudDownloadIcon fontSize="small" />
+                </ListItemIcon>{' '}
+                Load from Cloud
+              </MenuItem>
+            </>
+          )}
           <Divider sx={{ my: 1 }} />
           <MenuItem onClick={() => handleNavigation('/settings')}>
             <ListItemIcon>
@@ -404,7 +543,7 @@ const Header = () => {
                     selected={location.pathname.startsWith(calc.path)}
                   >
                     <ListItemIcon sx={{ minWidth: theme.spacing(5) }}>
-                      {calc.icon}
+                      <calc.icon />
                     </ListItemIcon>
                     <ListItemText primary={calc.label} />
                   </ListItemButton>
@@ -486,6 +625,66 @@ const Header = () => {
           </List>
         </Box>
       </Drawer>
+
+      {/* CONFIRMATION DIALOG */}
+      <Dialog
+        open={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: theme.shape.borderRadius,
+            boxShadow: theme.shadows[8],
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 'bold',
+            fontSize: '1.25rem',
+            color: dialogConfig.isDestructive ? 'error.main' : 'primary.main',
+            borderBottom: `2px solid ${dialogConfig.isDestructive ? theme.palette.error.light : theme.palette.primary.light}`,
+          }}
+        >
+          {dialogConfig.title}
+        </DialogTitle>
+        <DialogContent sx={{ py: 3 }}>
+          <DialogContentText sx={{ color: 'text.primary', fontSize: '1rem' }}>
+            {dialogConfig.message}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions sx={{ p: 2, gap: 1 }}>
+          <Button
+            onClick={() => setDialogOpen(false)}
+            variant="outlined"
+            sx={{
+              borderColor: 'divider',
+              color: 'text.primary',
+              '&:hover': {
+                borderColor: 'primary.main',
+                bgcolor: 'action.hover',
+              },
+            }}
+          >
+            {dialogConfig.cancelText}
+          </Button>
+          <Button
+            onClick={dialogConfig.onConfirm}
+            variant="contained"
+            sx={{
+              bgcolor: dialogConfig.isDestructive ? 'error.main' : 'primary.main',
+              '&:hover': {
+                bgcolor: dialogConfig.isDestructive
+                  ? 'error.dark'
+                  : 'primary.dark',
+              },
+            }}
+          >
+            {dialogConfig.confirmText}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </AppBar>
   );
 };

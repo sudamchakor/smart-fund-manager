@@ -94,6 +94,9 @@ const profileSlice = createSlice({
     setScenario: (state, action) => {
       state.scenario = action.payload;
     },
+    setProfileState: (state, action) => {
+      return { ...initialState, ...action.payload };
+    },
     updateFinancialSettings: (state, action) => {
       const { taxRegime, emergencyFundTarget, riskProfile } = action.payload;
       state.taxRegime = taxRegime;
@@ -277,10 +280,12 @@ export const {
   updateGoalPriority,
   reorderGoals,
   addTemplateGoal,
+  setProfileState,
   resetProfile,
 } = profileSlice.actions;
 
 // Basic Selectors
+export const selectProfileState = (state) => state.profile;
 export const selectName = (state) => state.profile.name;
 export const selectOccupation = (state) => state.profile.occupation;
 export const selectRiskTolerance = (state) => state.profile.riskTolerance;
